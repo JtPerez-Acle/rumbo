@@ -9,7 +9,7 @@ session scratchpad" as a real risk. These don't.
 
 | File | Kind | Pass condition |
 |---|---|---|
-| `real-content-ecommerce-latam.txt` | **Real.** The posting Liv is targeting (semi-senior content / e-commerce marketer), extracted from `liv-docs/liv-tema-a-estudiar.docx`. | Coverage 60–95 (measured: 83). Route names seo-aeo and email-marketing. **Planning tools (Trello/ClickUp/Notion) reported as a gap.** No baseline traits (ortografía, años de experiencia) in `competencies`. Ads courses stop **before module 5** — the posting says the role does not manage ad budget. Núcleo 12–54 lessons and listed first. |
+| `real-content-ecommerce-latam.txt` | **Real.** The posting the design partner is targeting (semi-senior content / e-commerce marketer), taken from her own study brief. | Coverage 60–95 (measured: 83). Route names seo-aeo and email-marketing. **Planning tools (Trello/ClickUp/Notion) reported as a gap.** No baseline traits (ortografía, años de experiencia) in `competencies`. Ads courses stop **before module 5** — the posting says the role does not manage ad budget. Núcleo 12–54 lessons and listed first. |
 | `adversarial-out-of-coverage.txt` | **Authored, deliberately.** A senior data-engineering role with nothing in our catalog. | **Coverage ≤ 20, route nearly empty, gaps honest, and `doc_type`/`doc_title`/`pitch` all empty.** If it invents a path through the marketing courses — or promises a deliverable — the prompt is broken. |
 
 **One expectation here was wrong, and the catalog corrected it.** This file used

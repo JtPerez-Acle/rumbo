@@ -1,0 +1,34 @@
+# Curso: "Social media management en 30 días" (gestión de redes y comunidad en agencia).
+# Solo herramientas nativas y gratuitas: Meta Business Suite, Insights, TikTok
+# Analytics, YouTube Studio y una planilla. Nada de Sprout/Later/Hootsuite.
+kind = "course"
+name = "Social media management"
+slug = "curso-social-media"
+niche = "Lleva cuentas como en agencia: parrilla, comunidad, crisis y un reporte mensual que defiende resultados"
+category = "Redes y creadores"
+audience = "Community managers, social media managers y freelancers hispanohablantes que gestionan cuentas de marca y necesitan método operativo, no hacks de crecimiento"
+tone = "Social media manager de agencia con varias cuentas encima: operativo, escéptico del folclore de algoritmos, obsesionado con lo que sí está documentado."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre gestión de redes sociales y comunidad con enfoque de agencia en LatAm. Progresión: (1) estrategia de canal — qué hace bien y mal cada plataforma, cómo se decide en cuáles estar, arquetipo y tono por canal, objetivos que no sean 'más seguidores'; (2) parrilla editorial y producción — pilares de contenido, calendario mensual realista, formatos por plataforma, adaptación de una pieza a varios canales, flujo de aprobación con cliente; (3) algoritmos y distribución CON EVIDENCIA — qué se sabe realmente por documentación oficial y declaraciones de producto, qué es folclore de marketero, señales que sí importan por formato, y cómo leer las analíticas nativas sin engañarse; (4) comunidad y crisis — moderación, políticas de respuesta, tono en conflicto, escalamiento, crisis en tiempo real; (5) medición y reportería de agencia — qué reporta un SMM y qué no, reporte mensual, tendencia vs ruido, y cómo defender resultados ante un cliente que solo mira seguidores. Este es el campo con MÁS folclore del rubro: separar lo documentado de lo repetido es la mitad del valor, y todo dato de plataforma va fechado porque cambian. RESTRICCIÓN DE HERRAMIENTAS: solo nativas y gratuitas (Meta Business Suite, Instagram/Facebook Insights, TikTok Analytics, YouTube Studio, LinkedIn Analytics) más una planilla. Nada de Sprout Social, Later, Hootsuite ni suites de pago como tutorial; cuando un programador de pago sea relevante, explicar qué problema resuelve a escala y cómo se hace sin él. PROYECTO TRANSVERSAL OBLIGATORIO: en la lección 1 el alumno elige UNA marca real y la mantiene todo el curso; cada ejercicio produce un artefacto sobre ESA marca: auditoría de canales, matriz de pilares, parrilla de un mes, guion de una pieza, política de moderación, protocolo de crisis y reporte mensual. Basado en el material de investigación."
+research_file = "social-media.md"
+
+[voice]
+voice_name = "es-VE-SebastianNeural-Male"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#65A30D"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

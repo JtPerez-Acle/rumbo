@@ -1,0 +1,30 @@
+# Canal 2 — Código IA: programar con IA, Claude Code, vibe coding
+name = "Código IA"
+slug = "codigo-ia"
+niche = "Programar con IA: Claude Code, agentes, crear apps describiendo lo que quieres"
+audience = "Aspirantes a dev, estudiantes, devs junior hispanohablantes"
+tone = "Entusiasta pero concreto, muestra resultados, desmitifica programar"
+cta = "Sígueme en Código IA y aprende a crear tus propios proyectos con inteligencia artificial."
+
+[voice]
+voice_name = "es-MX-JorgeNeural-Male"
+voice_rate = 1.1
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#16A34A"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.15
+
+[publish]
+upload_post_username = ""
+platforms = ["tiktok", "instagram", "youtube"]
+# Devs en la noche: 21h aprovecha el pico nocturno tardío
+publish_slot = "21:00"

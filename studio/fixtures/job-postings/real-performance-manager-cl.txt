@@ -1,0 +1,27 @@
+Performance Manager — Santiago, Chile
+Fuente: chiletrabajos.cl/trabajo/performance-manager-3860693 (agosto 2026)
+
+Responsabilidades principales:
+- Planificar, implementar y optimizar campañas en Meta Ads, Google Ads y TikTok Ads.
+- Administrar múltiples cuentas y presupuestos publicitarios de alto volumen.
+- Construir dashboards y reportes en Looker Studio.
+- Analizar el desempeño de campañas mediante Google Analytics 4 (GA4).
+- Elaborar planes de medios y estrategias de inversión digital.
+- Optimizar métricas: ROAS, CPA, CTR, CPC y tasa de conversión.
+- Trabajar junto a equipos creativos para maximizar el rendimiento de las campañas.
+- Identificar oportunidades de mejora mediante análisis de datos.
+
+Requisitos de experiencia:
+- Mínimo 4 años en Performance Marketing o Paid Media.
+- Experiencia en agencias o gestionando múltiples clientes.
+- Experiencia en campañas de e-commerce (excluyente).
+- Experiencia en campañas de Apps (deseable).
+
+Conocimientos técnicos excluyentes:
+Meta Ads, Google Ads, TikTok Ads, Google Analytics 4 (GA4), Looker Studio,
+Excel intermedio, gestión de grandes presupuestos publicitarios, planificación
+de medios digitales.
+
+Conocimientos técnicos deseables:
+Google Tag Manager, tracking (píxeles, eventos y Conversion API), herramientas
+de IA aplicadas al marketing digital.

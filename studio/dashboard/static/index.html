@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estudio IA · Observabilidad</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d212b; --border:#262b36;
+    --ink:#e7eaf0; --ink2:#9aa3b2; --muted:#6b7280; --accent:#38bdf8;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0}
+  body{background:var(--bg); color:var(--ink);
+    font:14px/1.5 Inter,-apple-system,"Segoe UI",system-ui,sans-serif; padding:24px}
+  h1{font-size:20px; font-weight:700}
+  h2{font-size:13px; font-weight:600; color:var(--ink2); text-transform:uppercase;
+    letter-spacing:.08em; margin:28px 0 12px}
+  .topbar{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+  .pulse{width:8px;height:8px;border-radius:50%;background:#22c55e;
+    animation:pulse 2s infinite}
+  @keyframes pulse{50%{opacity:.35}}
+  .topbar .meta{color:var(--muted); font-size:12px; margin-left:auto}
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+    gap:12px; margin-top:18px}
+  .tile{background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius); padding:14px 16px}
+  .tile .label{color:var(--ink2); font-size:12px}
+  .tile .value{font-size:26px; font-weight:700; margin-top:2px}
+  .tile .sub{color:var(--muted); font-size:11px}
+  .channels{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px}
+  .channel{background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius); padding:14px 16px; border-top:3px solid var(--c)}
+  .channel .name{font-weight:700; display:flex; align-items:center; gap:8px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
+  .channel .niche{color:var(--ink2); font-size:12px; margin:6px 0 10px; min-height:36px}
+  .channel .stats{display:flex; gap:14px; color:var(--ink2); font-size:12px}
+  .channel .stats b{color:var(--ink); font-size:15px; display:block}
+  .chip{display:inline-flex; align-items:center; gap:6px; background:var(--card2);
+    border:1px solid var(--border); color:var(--ink2); border-radius:999px;
+    padding:2px 10px; font-size:11px; font-family:inherit}
+  .panel{background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius); padding:16px}
+  .legend{display:flex; gap:16px; flex-wrap:wrap; margin-bottom:8px; font-size:12px;
+    color:var(--ink2)}
+  .legend span{display:inline-flex; align-items:center; gap:6px}
+  #chart svg{width:100%; display:block}
+  .tooltip{position:fixed; pointer-events:none; background:#0b0d11; color:var(--ink);
+    border:1px solid var(--border); border-radius:10px; padding:8px 12px; font-size:12px;
+    opacity:0; transition:opacity .12s; z-index:50; max-width:260px}
+  .filters{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px}
+  .fchip{cursor:pointer; user-select:none}
+  .fchip.active{color:var(--ink); border-color:var(--c,var(--accent));
+    background:color-mix(in srgb, var(--c,var(--accent)) 18%, transparent)}
+  #search{background:var(--card2); border:1px solid var(--border); color:var(--ink);
+    border-radius:999px; padding:6px 14px; font-size:13px; width:220px; outline:none}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px}
+  .vcard{background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius); overflow:hidden; display:flex; flex-direction:column}
+  .vcard video{width:100%; aspect-ratio:9/16; max-height:300px; background:#000; object-fit:contain}
+  .vbody{padding:12px 14px; display:flex; flex-direction:column; gap:8px; flex:1}
+  .vtitle{font-weight:600; font-size:13px; line-height:1.35}
+  .vmeta{color:var(--muted); font-size:11px; display:flex; gap:10px; flex-wrap:wrap}
+  .vactions{display:flex; gap:6px; align-items:center; margin-top:auto}
+  .pub{cursor:pointer; border:1px solid var(--border); background:var(--card2);
+    color:var(--muted); border-radius:8px; padding:3px 8px; font-size:11px}
+  .pub.on{color:#0f1115; background:#22c55e; border-color:#22c55e; font-weight:600}
+  .btn{cursor:pointer; border:1px solid var(--border); background:var(--card2);
+    color:var(--ink2); border-radius:8px; padding:3px 10px; font-size:11px; margin-left:auto}
+  .btn:hover,.pub:hover{border-color:var(--accent)}
+  .qrow{display:flex; align-items:center; gap:10px; padding:10px 0;
+    border-bottom:1px solid var(--border); font-size:13px}
+  .qrow:last-child{border-bottom:none}
+  .qrow .subject{flex:1}
+  .empty{color:var(--muted); font-size:13px; padding:8px 0}
+  dialog{background:var(--card); color:var(--ink); border:1px solid var(--border);
+    border-radius:var(--radius); max-width:640px; width:92vw; padding:22px;
+    max-height:86vh; overflow:auto}
+  dialog::backdrop{background:rgba(0,0,0,.6)}
+  .params{display:grid; grid-template-columns:auto 1fr; gap:4px 16px; font-size:12px;
+    margin:12px 0}
+  .params dt{color:var(--muted)} .params dd{margin:0}
+  .swatch{display:inline-block; width:10px; height:10px; border-radius:3px;
+    vertical-align:-1px; margin-right:5px; border:1px solid var(--border)}
+  .script{background:var(--card2); border:1px solid var(--border); border-radius:10px;
+    padding:12px; font-size:13px; white-space:pre-wrap; margin:8px 0}
+  .tags{display:flex; gap:6px; flex-wrap:wrap; margin:8px 0}
+  .modal-head{display:flex; justify-content:space-between; align-items:start; gap:10px}
+  .close{cursor:pointer; background:none; border:none; color:var(--muted); font-size:20px}
+
+  /* ---- reading a learner's work: the alpha's highest-signal surface ---- */
+  #modal.wide{max-width:820px}
+  .wsub{border:1px solid var(--border); border-radius:12px; padding:14px; margin:12px 0;
+    background:var(--card2)}
+  .wsub.flagged{border-color:#f59e0b; background:color-mix(in srgb,#f59e0b 8%, var(--card2))}
+  .wsub .whead{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+  .wsub .wtitle{font-weight:600; font-size:13px}
+  .wsub .wdate{color:var(--muted); font-size:11px; margin-left:auto}
+  .wsub .learner-text{background:var(--bg); border:1px solid var(--border); border-left:3px solid var(--accent);
+    border-radius:8px; padding:11px 13px; font-size:13px; white-space:pre-wrap; margin:8px 0; line-height:1.55}
+  .wsub .tutor{font-size:12.5px; color:var(--ink2); background:rgba(56,189,248,.06);
+    border:1px solid rgba(56,189,248,.18); border-radius:8px; padding:10px 12px; margin:8px 0}
+  .wsub .tutor b{color:var(--ink)}
+  .wsub .dims{display:flex; gap:10px; flex-wrap:wrap; font-size:11px; color:var(--muted); margin:6px 0}
+  .wsub .flagrow{display:flex; gap:8px; align-items:center; margin-top:10px}
+  .wsub .flagrow input{flex:1; background:var(--bg); border:1px solid var(--border); color:var(--ink);
+    border-radius:8px; padding:6px 10px; font-size:12px; font-family:inherit; outline:none}
+  .score-b{font-weight:700; font-variant-numeric:tabular-nums; padding:2px 8px; border-radius:6px; font-size:12px}
+  .score-b.hi{background:rgba(34,197,94,.16); color:#4ade80}
+  .score-b.mid{background:rgba(245,158,11,.16); color:#fbbf24}
+  .score-b.lo{background:rgba(248,113,113,.14); color:#f87171}
+  .wsection{color:var(--ink2); font-size:12px; text-transform:uppercase; letter-spacing:.08em;
+    font-weight:600; margin:20px 0 6px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="pulse"></div>
+  <h1>Estudio IA · Observabilidad</h1>
+  <span class="chip" id="refreshChip">auto-refresh 20s</span>
+  <button class="chip fchip" onclick="runJob('produce')" title="Generar guiones y renderizar 1 video por canal">▶ Producir ahora</button>
+  <button class="chip fchip" onclick="runJob('publish')" title="Publicar el siguiente video aprobado del slot más cercano">▶ Publicar ahora</button>
+  <span class="meta" id="updatedAt"></span>
+</div>
+
+<div class="tiles" id="tiles"></div>
+
+<h2>Esperando acceso</h2>
+<div class="panel" id="access"><div class="empty">Cargando…</div></div>
+
+<h2>Demanda · qué quieren ser y qué no cubrimos</h2>
+<div class="panel" id="demand"><div class="empty">Cargando…</div></div>
+
+<h2>Solicitudes de cursos</h2>
+<div class="panel" id="requests"><div class="empty">Cargando…</div></div>
+
+<h2>Códigos de invitación</h2>
+<div class="panel" id="invites"><div class="empty">Cargando…</div></div>
+<div class="panel" style="margin-top:8px">
+  <div class="qrow">
+    <span class="subject"><input id="inv-label" placeholder="Para quién es (ej: cohorte agosto, LinkedIn)" style="width:100%"></span>
+    <input id="inv-max" type="number" min="1" max="500" value="1" title="cuántas personas pueden usarlo" style="width:70px;text-align:center">
+    <button class="btn" id="inv-new">Crear código</button>
+  </div>
+  <div id="inv-msg" style="color:var(--muted);font-size:12px;margin-top:6px"></div>
+</div>
+
+<h2>Alumnos</h2>
+<div class="panel" id="learners"><div class="empty">Cargando…</div></div>
+
+<h2>Lista de espera</h2>
+<div class="panel" id="waitlist"><div class="empty">Cargando…</div></div>
+
+<h2>Canales</h2>
+<div class="channels" id="channels"></div>
+
+<h2>Producción · últimos 14 días</h2>
+<div class="panel">
+  <div class="legend" id="legend"></div>
+  <div id="chart"></div>
+</div>
+
+<h2>Cola de producción</h2>
+<div class="panel" id="queue"></div>
+
+<h2>Biblioteca</h2>
+<div class="filters">
+  <button class="chip fchip active" data-ch="">Todos</button>
+  <span id="channelFilters"></span>
+  <input id="search" placeholder="Buscar título o tema…">
+</div>
+<div class="grid" id="library"></div>
+
+<dialog id="modal"></dialog>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+let STATE = null;
+let filterChannel = "";
+let searchTerm = "";
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g,
+  c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const channelOf = slug => STATE.channels.find(c => c.slug === slug) || {};
+const PLATFORM_LABEL = {tiktok:"TikTok", instagram:"IG", youtube:"YT"};
+
+async function refresh(){
+  const res = await fetch("/api/state");
+  STATE = await res.json();
+  render();
+}
+
+function render(){
+  const s = STATE.summary;
+  $("#updatedAt").textContent = "actualizado " +
+    new Date(STATE.generated_at).toLocaleTimeString("es-MX");
+  $("#tiles").innerHTML = `
+    ${tile("Videos generados", s.total_videos, "en 4 canales")}
+    ${tile("En cola", s.pending, "pendientes de render")}
+    ${tile("Aprobados en espera", s.approved_waiting ?? 0, "listos para publicar")}
+    ${tile("Publicados", s.published, s.unpublished + " sin publicar")}`;
+
+  $("#channels").innerHTML = STATE.channels.map(c => `
+    <div class="channel" style="--c:${c.color}">
+      <div class="name"><span class="dot"></span>${esc(c.name)}</div>
+      <div class="niche">${esc(c.niche)}</div>
+      <div class="stats">
+        <span><b>${c.video_count}</b>videos</span>
+        <span><b>${c.published_count}</b>publicados</span>
+        <span><b>${c.last_render ? timeAgo(c.last_render) : "—"}</b>último render</span>
+      </div>
+      <div style="margin-top:10px"><span class="chip">🎙 ${esc(c.voice.replace("Neural",""))}</span></div>
+    </div>`).join("");
+
+  $("#channelFilters").innerHTML = STATE.channels.map(c =>
+    `<button class="chip fchip ${filterChannel===c.slug?"active":""}" data-ch="${c.slug}"
+       style="--c:${c.color}"><span class="dot" style="background:${c.color}"></span>${esc(c.name)}</button>`
+  ).join("");
+  document.querySelectorAll(".fchip").forEach(el => el.onclick = () => {
+    filterChannel = el.dataset.ch ?? "";
+    document.querySelectorAll(".fchip").forEach(x => x.classList.toggle("active",
+      (x.dataset.ch ?? "") === filterChannel));
+    renderLibrary();
+  });
+
+  renderChart();
+  renderQueue();
+  renderLibrary();
+}
+
+const tile = (label, value, sub) => `
+  <div class="tile"><div class="label">${label}</div>
+  <div class="value">${value}</div><div class="sub">${sub}</div></div>`;
+
+function timeAgo(iso){
+  const mins = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (mins < 60) return mins + " min";
+  if (mins < 1440) return Math.round(mins/60) + " h";
+  return Math.round(mins/1440) + " d";
+}
+
+function renderQueue(){
+  const pending = STATE.queue.pending;
+  $("#queue").innerHTML = pending.length ? pending.map(q => {
+    const ch = channelOf(q.channel);
+    return `<div class="qrow">
+      <span class="dot" style="background:${ch.color}"></span>
+      <span class="chip">${esc(ch.name || q.channel)}</span>
+      <span class="subject">${esc(q.subject)}</span>
+      <span class="chip">${esc(q._file)}</span>
+    </div>`;
+  }).join("") : `<div class="empty">Cola vacía — todo lo encolado ya fue renderizado.</div>`;
+}
+
+function renderLibrary(){
+  const q = searchTerm.toLowerCase();
+  const items = STATE.videos.filter(v =>
+    (!filterChannel || v.channel === filterChannel) &&
+    (!q || (v.title + v.subject).toLowerCase().includes(q)));
+  $("#library").innerHTML = items.length ? items.map(v => {
+    const ch = channelOf(v.channel);
+    return `<div class="vcard">
+      <video src="${v.url}" controls preload="metadata"></video>
+      <div class="vbody">
+        <div class="vtitle">${esc(v.title)}</div>
+        <div class="vmeta">
+          <span class="chip"><span class="dot" style="background:${ch.color}"></span>${esc(ch.name)}</span>
+          <span>${v.date}</span>
+          ${v.duration ? `<span>${Math.round(v.duration)}s</span>` : ""}
+          <span>${v.size_mb} MB</span>
+        </div>
+        <div class="vactions">
+          <button class="pub ${v.approved ? "on" : ""}"
+            title="${v.approved ? "Aprobado " + v.approved + " — clic para revocar" : "Aprobar para publicación automática"}"
+            onclick="toggleApprove('${v.channel}','${v.file}',${!v.approved})">${v.approved ? "✓ Aprobado" : "Aprobar"}</button>
+          ${["tiktok","instagram","youtube"].map(p => `
+            <button class="pub ${v.published[p] ? "on" : ""}"
+              title="${v.published[p] ? "Publicado " + v.published[p] : "Marcar publicado en " + PLATFORM_LABEL[p]}"
+              onclick="togglePublish('${v.channel}','${v.file}','${p}',${!v.published[p]})">${PLATFORM_LABEL[p]}</button>`).join("")}
+          <button class="btn" onclick="openDetails('${v.channel}','${v.file}')">Detalles</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("") : `<div class="empty">Sin videos para este filtro.</div>`;
+}
+
+async function toggleApprove(channel, file, value){
+  await fetch(`/api/videos/${channel}/${file}/approve`, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({value})});
+  refresh();
+}
+
+async function runJob(job){
+  const res = await fetch(`/api/jobs/${job}`, {method:"POST"});
+  if (res.status === 409) alert("Ya hay un proceso en ejecución.");
+  else if (!res.ok) alert("Error al iniciar el proceso.");
+  else alert(job === "produce" ? "Producción iniciada — los videos aparecerán al terminar cada render." : "Publicación iniciada.");
+}
+
+async function togglePublish(channel, file, platform, value){
+  await fetch(`/api/videos/${channel}/${file}/published`, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({platform, value})});
+  refresh();
+}
+
+async function openDetails(channel, file){
+  const res = await fetch(`/api/videos/${channel}/${file}/details`);
+  const d = await res.json();
+  const m = d.meta || {}, p = d.params || {};
+  const ch = channelOf(channel);
+  const row = (k, v) => v ? `<dt>${k}</dt><dd>${v}</dd>` : "";
+  const color = c => c ? `<span class="swatch" style="background:${esc(c)}"></span>${esc(c)}` : "";
+  $("#modal").className = "";
+  $("#modal").innerHTML = `
+    <div class="modal-head">
+      <div>
+        <div class="chip" style="margin-bottom:6px">
+          <span class="dot" style="background:${ch.color}"></span>${esc(ch.name)}</div>
+        <h1 style="font-size:16px">${esc(m.title || file)}</h1>
+      </div>
+      <button class="close" onclick="modal.close()">✕</button>
+    </div>
+    <dl class="params">
+      ${row("Task ID", esc(m.task_id))}
+      ${row("Fecha", esc(m.date))}
+      ${row("Voz", esc(p.voice_name))}
+      ${row("Velocidad voz", p.voice_rate ? "×" + p.voice_rate : "")}
+      ${row("Fuente", esc(p.font_name) + (p.font_size ? " · " + p.font_size + "px" : ""))}
+      ${row("Color subtítulo", color(p.text_fore_color))}
+      ${row("Color borde", color(p.stroke_color))}
+      ${row("Aspecto", esc(p.video_aspect))}
+      ${row("Duración de clips", p.video_clip_duration ? p.video_clip_duration + "s" : "")}
+      ${row("Transición", esc(p.video_transition_mode))}
+      ${row("Vol. música", p.bgm_volume)}
+      ${row("Posición subtítulos", esc(p.subtitle_position) +
+        (p.custom_position ? " (" + p.custom_position + "%)" : ""))}
+      ${row("Fuente de clips", esc(p.video_source))}
+    </dl>
+    ${m.description ? `<div class="script" style="font-style:italic">${esc(m.description)}</div>` : ""}
+    <h2 style="margin-top:10px">Guion</h2>
+    <div class="script">${esc(d.script || "—")}</div>
+    <h2>Términos de búsqueda (Pexels)</h2>
+    <div class="tags">${(d.search_terms || []).map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>
+    <h2>Hashtags</h2>
+    <div class="tags">${(m.hashtags || []).map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>
+    <div style="display:flex; gap:8px; margin-top:14px">
+      <button class="btn" style="margin:0" onclick='copyText(${JSON.stringify(m.title || "")})'>Copiar título</button>
+      <button class="btn" style="margin:0" onclick='copyText(${JSON.stringify((m.description || "") + "\n" + (m.hashtags || []).join(" "))})'>Copiar descripción + hashtags</button>
+    </div>`;
+  modal.showModal();
+}
+
+function copyText(t){ navigator.clipboard.writeText(t); }
+
+/* ---- production chart: stacked bars, last 14 days, per channel ---- */
+function renderChart(){
+  const days = [...Array(14)].map((_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (13 - i));
+    return d.toISOString().slice(0, 10);
+  });
+  const channels = STATE.channels;
+  const counts = days.map(day => channels.map(ch =>
+    STATE.videos.filter(v => v.channel === ch.slug && v.date === day).length));
+  const totals = counts.map(row => row.reduce((a, b) => a + b, 0));
+  const maxY = Math.max(4, ...totals);
+
+  const W = 940, H = 190, padL = 26, padB = 22, padT = 8;
+  const bw = (W - padL) / days.length;
+  const y = v => H - padB - v * (H - padB - padT) / maxY;
+
+  let bars = "";
+  days.forEach((day, i) => {
+    let acc = 0;
+    const x = padL + i * bw + 5;
+    counts[i].forEach((n, ci) => {
+      if (!n) return;
+      const isTop = counts[i].slice(ci + 1).every(m => !m);
+      const y1 = y(acc + n), h = y(acc) - y(acc + n);
+      bars += `<rect x="${x}" y="${y1}" width="${bw - 10}" height="${Math.max(h - 2, 1.5)}"
+        rx="${isTop ? 4 : 0}" fill="${channels[ci].color}"
+        data-day="${day}" data-i="${i}"></rect>`;
+      acc += n;
+    });
+    bars += `<rect x="${padL + i * bw}" y="${padT}" width="${bw}" height="${H - padB - padT}"
+      fill="transparent" data-day="${day}" data-i="${i}" class="hover-col"></rect>`;
+  });
+
+  const gridLines = [...Array(3)].map((_, i) => {
+    const v = Math.round(maxY * (i + 1) / 3);
+    return `<line x1="${padL}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#262b36" stroke-width="1"/>
+      <text x="${padL - 6}" y="${y(v) + 4}" text-anchor="end" fill="#6b7280" font-size="10">${v}</text>`;
+  }).join("");
+
+  const labels = days.map((d, i) => (i % 2 === 0) ?
+    `<text x="${padL + i * bw + bw / 2}" y="${H - 6}" text-anchor="middle" fill="#6b7280"
+      font-size="10">${d.slice(5).replace("-", "/")}</text>` : "").join("");
+
+  $("#legend").innerHTML = channels.map(c =>
+    `<span><span class="dot" style="background:${c.color}"></span>${esc(c.name)}</span>`).join("");
+  $("#chart").innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}">${gridLines}${bars}${labels}</svg>`;
+
+  const tip = $("#tooltip");
+  $("#chart").querySelectorAll("rect").forEach(r => {
+    r.addEventListener("mousemove", e => {
+      const i = +r.dataset.i;
+      const rows = channels.map((c, ci) => counts[i][ci] ?
+        `<div><span class="dot" style="background:${c.color};display:inline-block"></span>
+         ${esc(c.name)}: <b>${counts[i][ci]}</b></div>` : "").join("");
+      tip.innerHTML = `<b>${r.dataset.day}</b> · ${totals[i]} videos${rows ? "<div style='margin-top:4px'>" + rows + "</div>" : ""}`;
+      tip.style.opacity = 1;
+      tip.style.left = Math.min(e.clientX + 14, innerWidth - 280) + "px";
+      tip.style.top = (e.clientY + 14) + "px";
+    });
+    r.addEventListener("mouseleave", () => tip.style.opacity = 0);
+  });
+}
+
+/* ---- course concierge: learner requests triage ---- */
+const REQ_STATUSES = [["new","Recibida"],["reviewing","En revisión"],["building","En producción"],["published","Disponible"],["rejected","Descartada"]];
+const REQ_OPEN = ["new","reviewing","building"];
+
+// Loaded on boot and after saves only — not on the 20s tick, so in-progress
+// edits in the selects/inputs never get wiped mid-typing.
+async function loadRequests(){
+  const res = await fetch("/api/requests");
+  const d = await res.json();
+  const rows = d.requests || [];
+  const open = rows.filter(r => REQ_OPEN.includes(r.status)).length;
+  $("#requests").innerHTML = rows.length ? `
+    <div style="color:var(--ink2);font-size:12px;margin-bottom:8px">${rows.length} solicitudes · <b style="color:var(--ink)">${open} abiertas</b></div>` +
+    rows.map(r => `
+    <div class="qrow" style="align-items:start;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
+        <div><b>${esc(r.topic)}</b></div>
+        ${r.detail ? `<div style="color:var(--ink2);font-size:12px;margin-top:2px">${esc(r.detail)}</div>` : ""}
+        <div style="color:var(--muted);font-size:11px;margin-top:4px">
+          ${esc(r.learner_name || r.learner_email)} · ${esc(r.learner_email)} · ${String(r.created_at).slice(0,10)}</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <select id="req-st-${r.id}" class="pub" style="cursor:pointer">
+          ${REQ_STATUSES.map(([v,l]) => `<option value="${v}" ${r.status===v?"selected":""}>${l}</option>`).join("")}
+        </select>
+        <input id="req-slug-${r.id}" class="pub" style="width:150px" placeholder="slug del curso"
+          value="${esc(r.course_slug || "")}" title="Al marcar Disponible, el slug enlaza la solicitud con el curso">
+        <button class="pub" onclick="saveRequest(${r.id})">Guardar</button>
+      </div>
+    </div>`).join("") : `<div class="empty">Sin solicitudes todavía — aparecerán cuando los alumnos pidan cursos desde la app.</div>`;
+}
+
+async function saveRequest(id){
+  const status = $(`#req-st-${id}`).value;
+  const course_slug = $(`#req-slug-${id}`).value.trim();
+  if (status === "published" && !course_slug){
+    alert("Para marcar Disponible indica el slug del curso (así la solicitud enlaza al temario).");
+    return;
+  }
+  const res = await fetch(`/api/requests/${id}`, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({status, course_slug})});
+  if (!res.ok) alert("No se pudo guardar el cambio.");
+  loadRequests();
+}
+
+/* ---- learners roster + access links (lockout escape hatch) ---- */
+async function loadLearners(){
+  const res = await fetch("/api/learners");
+  const d = await res.json();
+  const rows = d.learners || [];
+  $("#learners").innerHTML = rows.length ? rows.map(l => `
+    <div class="qrow">
+      <span class="subject"><b>${esc(l.name || "—")}</b>
+        <span style="color:var(--muted)"> · ${esc(l.email)}</span></span>
+      <span class="chip">${l.lessons_done} lecciones</span>
+      <span class="chip">${l.last_activity ? "activo " + timeAgo(l.last_activity) : "sin actividad"}</span>
+      <button class="pub" onclick="openWork(${l.id})">📖 Leer su trabajo</button>
+      <button class="pub" onclick="accessLink(${l.id}, this)">🔗 Enlace de acceso</button>
+    </div>`).join("") : `<div class="empty">Sin alumnos todavía.</div>`;
+}
+
+/* ---- read everything one learner wrote, with the tutor's evaluation of each.
+   At alpha scale this is 100% of our real usage data — read it, and flag any
+   evaluation the tutor got wrong so we can tune it. ---- */
+const KIND_LABEL = {explain:"Explicación", exercise:"Ejercicio", capstone:"Reto"};
+const scoreClass = s => s >= 80 ? "hi" : s >= 60 ? "mid" : "lo";
+
+async function openWork(id){
+  const res = await fetch(`/api/learners/${id}/work`);
+  if (!res.ok){ alert("No se pudo cargar."); return; }
+  const d = await res.json();
+  const L = d.learner;
+  const prog = (d.progress || []).map(p =>
+    `<span class="chip">${esc(p.course_title)}: ${p.done}/${p.total}</span>`).join(" ")
+    || `<span class="empty">sin progreso todavía</span>`;
+  const docs = (d.documents || []).map(x =>
+    `<a class="chip" href="/aprende/doc/${x.share_token}" target="_blank">📄 ${esc(x.title)}</a>`).join(" ");
+  const reqs = (d.requests || []).map(r =>
+    `<span class="chip">${esc(r.topic)} · ${esc(r.status)}</span>`).join(" ");
+
+  const subs = (d.submissions || []).map(s => {
+    const shown = s.final_score ?? s.score;
+    const D = s.dimensions;
+    const dims = D ? `<div class="dims">
+        <span>Aplicación <b>${D.aplicacion}</b>/40</span>
+        <span>Criterio <b>${D.criterio}</b>/30</span>
+        <span>Ejecución <b>${D.ejecucion}</b>/30</span>
+        ${s.predicted != null ? `<span>· se predijo <b>${s.predicted}</b></span>` : ""}
+      </div>` : "";
+    const missing = (s.missing || []).length
+      ? `<div class="tutor"><b>Le faltó para 100:</b><ul style="margin:4px 0 0 16px">
+          ${s.missing.map(m => `<li>${esc(m)}</li>`).join("")}</ul></div>` : "";
+    const misco = s.misconception
+      ? `<div class="tutor"><b>Error de concepto detectado:</b> ${esc(s.misconception)}</div>` : "";
+    const conv = s.defense_question ? `<div class="tutor">
+        <b>Conversación:</b> ${esc(s.defense_question)}
+        ${s.defense ? `<div style="margin-top:6px"><i>Respondió:</i> ${esc(s.defense.answer || "")}</div>
+          <div style="margin-top:4px">→ <b>+${s.defense.bonus}</b>${
+            s.defense_best != null && s.defense_best !== s.defense.bonus ? ` (mejor: +${s.defense_best})` : ""}${
+            s.defense_attempts > 1 ? ` · ${s.defense_attempts} intentos` : ""} — ${esc(s.defense.comment || "")}</div>`
+          : `<div style="margin-top:6px;color:var(--muted)">sin responder</div>`}
+      </div>` : "";
+    return `<div class="wsub ${s.flagged ? "flagged" : ""}" id="wsub-${s.id}">
+      <div class="whead">
+        <span class="chip">${KIND_LABEL[s.kind] || s.kind}</span>
+        <span class="wtitle">${s.position ? "L" + s.position + " · " : ""}${esc(s.title)}</span>
+        ${s.verdict
+          ? `<span class="score-b ${s.verdict === "lo_tienes" ? "hi" : s.verdict === "casi" ? "mid" : "lo"}">${
+              {lo_tienes:"Lo tienes", casi:"Casi", todavia_no:"Todavía no"}[s.verdict]}</span>`
+          : (shown != null ? `<span class="score-b ${scoreClass(shown)}">${shown}</span>` : "")}
+        <span class="wdate">${esc(s.course_title)} · ${s.created_at.replace("T", " ")}</span>
+      </div>
+      ${dims}
+      <div class="learner-text">${esc(s.content)}</div>
+      ${s.feedback ? `<div class="tutor"><b>Tutora:</b> ${esc(s.feedback)}</div>` : ""}
+      ${misco}${missing}${conv}
+      <div class="flagrow">
+        <button class="pub ${s.flagged ? "on" : ""}" onclick="toggleFlag(${s.id}, this)">
+          ${s.flagged ? "✓ Marcada" : "⚑ Evaluación incorrecta"}</button>
+        <input id="flagnote-${s.id}" placeholder="qué estuvo mal (opcional)" value="${esc(s.flag_note)}">
+      </div>
+    </div>`;
+  }).join("") || `<div class="empty">Todavía no ha enviado trabajo.</div>`;
+
+  $("#modal").className = "wide";
+  $("#modal").innerHTML = `
+    <div class="modal-head">
+      <div>
+        <h1 style="font-size:17px">${esc(L.name || "—")}</h1>
+        <div style="color:var(--muted);font-size:12px;margin-top:2px">${esc(L.email)} · desde ${L.joined}</div>
+      </div>
+      <button class="close" onclick="modal.close()">✕</button>
+    </div>
+    <div style="margin-top:10px">${prog}</div>
+    ${docs ? `<div class="wsection">Documentos compilados</div><div>${docs}</div>` : ""}
+    ${reqs ? `<div class="wsection">Cursos que pidió</div><div>${reqs}</div>` : ""}
+    <div class="wsection">Su trabajo · ${(d.submissions || []).length} entregas (cronológico)</div>
+    ${subs}`;
+  modal.showModal();
+}
+
+async function toggleFlag(id, btn){
+  const on = !btn.classList.contains("on");
+  const note = ($(`#flagnote-${id}`) || {}).value || "";
+  const res = await fetch(`/api/submissions/${id}/flag`, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({flagged:on, note})});
+  if (!res.ok){ alert("No se pudo guardar."); return; }
+  btn.classList.toggle("on", on);
+  btn.textContent = on ? "✓ Marcada" : "⚑ Evaluación incorrecta";
+  $(`#wsub-${id}`).classList.toggle("flagged", on);
+}
+
+async function accessLink(id, btn){
+  btn.disabled = true; btn.textContent = "Generando…";
+  const res = await fetch(`/api/learners/${id}/login-link`, {method:"POST"});
+  if (!res.ok){ btn.disabled = false; btn.textContent = "🔗 Enlace de acceso"; alert("No se pudo generar."); return; }
+  const d = await res.json();
+  await navigator.clipboard.writeText(d.link);
+  btn.textContent = "✓ Copiado (24h)";
+  setTimeout(() => { btn.disabled = false; btn.textContent = "🔗 Enlace de acceso"; }, 4000);
+  loadAccessRequests();   // minting the link answered the request
+}
+
+$("#search").addEventListener("input", e => { searchTerm = e.target.value; renderLibrary(); });
+const modal = $("#modal");
+/* Invite codes: one place to grab a shareable link. Codes are credentials, so
+   this panel only ever renders behind the dashboard token. */
+async function loadInvites(){
+  const res = await fetch("/api/invites");
+  const d = await res.json();
+  const rows = d.invites || [];
+  $("#invites").innerHTML = rows.length ? rows.map(v => `
+    <div class="qrow">
+      <span class="subject">
+        <b style="font-family:ui-monospace,Menlo,monospace">${esc(v.code)}</b>
+        <span style="color:var(--muted)"> · ${esc(v.label)}</span>
+        ${v.learners && v.learners.length
+          ? `<div style="color:var(--ink2);font-size:12px;margin-top:2px">Lo usaron: ${v.learners.map(esc).join(", ")}</div>`
+          : ""}
+      </span>
+      <span class="chip">${v.uses}/${v.max_uses} usos</span>
+      <span class="chip" style="${v.usable ? "" : "opacity:.55"}">${v.usable ? "disponible" : (v.active ? "agotado" : "desactivado")}</span>
+      <button class="btn" data-copy="${esc(v.link)}">Copiar enlace</button>
+      <button class="btn" data-toggle="${esc(v.code)}" data-next="${v.active ? "0" : "1"}">${v.active ? "Desactivar" : "Reactivar"}</button>
+    </div>`).join("") : `<div class="empty">No hay códigos todavía. Crea uno abajo.</div>`;
+  $("#invites").querySelectorAll("[data-copy]").forEach(b => b.onclick = async () => {
+    try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "✓ Copiado"; }
+    catch (e) { b.textContent = b.dataset.copy; }   // clipboard blocked: show it to copy by hand
+  });
+  $("#invites").querySelectorAll("[data-toggle]").forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    await fetch(`/api/invites/${encodeURIComponent(b.dataset.toggle)}/toggle?active=${b.dataset.next === "1"}`, {method:"POST"});
+    loadInvites();
+  });
+}
+
+async function loadWaitlist(){
+  const res = await fetch("/api/waitlist");
+  const d = await res.json();
+  const rows = d.waitlist || [];
+  $("#waitlist").innerHTML = rows.length ? rows.map(w => `
+    <div class="qrow">
+      <span class="subject"><b>${esc(w.name || "—")}</b>
+        <span style="color:var(--muted)"> · ${esc(w.email)}</span>
+        ${w.motivo ? `<div style="color:var(--ink2);font-size:12px;margin-top:2px">${esc(w.motivo)}</div>` : ""}</span>
+      <span class="chip">${String(w.created_at).slice(0,10)}</span>
+      <span class="chip">${esc(w.status)}</span>
+    </div>`).join("") : `<div class="empty">Nadie en lista de espera todavía. Aparecerán desde la página pública.</div>`;
+}
+
+/* ---- Demanda: what people want to be, and what we cannot teach them ----
+   Every public analysis computes an honest gap list and used to bury it in
+   JSONB. This is the read side. Two tables on purpose: gaps are the demand
+   signal (build when one RECURS, never on a single sighting), and the module
+   coverage below is the check on building more catalog than anyone routes to. */
+/* ---- Esperando acceso: learners locked out, waiting on a link ----
+   This queue is a consequence of closing the account-takeover hole: a returning
+   learner cannot let themselves back in until email delivery exists. It should
+   sit empty the moment RESEND_API_KEY is set — and if it starts filling AFTER
+   that, email is broken and this is the alarm. */
+async function loadAccessRequests(){
+  const res = await fetch("/api/access-requests");
+  const d = await res.json();
+  const rows = d.requests || [];
+  const box = $("#access");
+  const banner = !d.email_configured
+    ? `<div class="qrow" style="background:rgba(220,160,40,.10)"><span class="subject">
+         Sin <b>RESEND_API_KEY</b>: nadie puede volver a entrar solo. Cada persona
+         que pierda su sesión aparece aquí y necesita que le mandes el enlace a mano.</span></div>`
+    : d.sender_is_test
+      /* Worse than off: works for one inbox, 403s for everyone else. */
+      ? `<div class="qrow" style="background:rgba(248,113,113,.12)"><span class="subject">
+           <b>Correo en modo prueba.</b> Estás enviando desde <code>${esc(d.sender)}</code>,
+           que <b>solo llega a la cuenta dueña de Resend</b>: al resto le da 403 y aparecerán
+           aquí abajo. Verifica tu dominio en resend.com/domains y cambia
+           <code>EMAIL_FROM</code> a una dirección de ese dominio antes de invitar a la cohorte.</span></div>`
+      : "";
+  if (!rows.length){
+    box.innerHTML = banner + `<div class="empty">Nadie esperando acceso.</div>`;
+    return;
+  }
+  box.innerHTML = banner + rows.map(r => `
+    <div class="qrow">
+      <span class="subject"><b>${esc(r.learner_name || r.email)}</b>
+        <span style="color:var(--muted)"> · ${esc(r.email)}</span>
+        <div style="color:var(--ink2);font-size:12px;margin-top:2px">${esc(r.reason)}</div></span>
+      <span class="chip">${esc(String(r.created_at).replace("T"," ").slice(0,16))}</span>
+      ${r.learner_id
+        ? `<button class="pub" onclick="accessLink(${r.learner_id}, this)">🔗 Enlace de acceso</button>`
+        : `<span class="chip">sin cuenta</span>`}
+    </div>`).join("");
+}
+
+async function loadDemand(){
+  const res = await fetch("/api/demand");
+  const d = await res.json();
+  const box = $("#demand");
+  if (!d.analyses) {
+    box.innerHTML = `<div class="empty">Nadie ha analizado una oferta todavía.
+      Cada análisis público deja aquí el puesto que quieren y lo que no cubrimos.</div>`;
+    return;
+  }
+  const cand = d.build_candidates || [];
+  const dead = (d.modules || []).filter(m => !m.times_routed);
+  const gapRows = (d.gaps || []).slice(0, 25).map(g => `
+    <div class="qrow">
+      <span class="chip" style="min-width:34px;text-align:center">${g.count}×</span>
+      <span class="subject"><b>${esc(g.gap)}</b>
+        <div style="color:var(--ink2);font-size:12px;margin-top:2px">${esc((g.roles||[]).join(" · "))}</div></span>
+      <span class="chip">${esc(g.severity || "—")}</span>
+      <span class="chip">${esc(g.last_seen)}</span>
+    </div>`).join("");
+  const deadRows = dead.slice(0, 12).map(m => `
+    <div class="qrow">
+      <span class="subject">${esc(m.course_slug)} · M${m.module_no}
+        <span style="color:var(--muted)"> — ${esc(m.title || "")}</span></span>
+      <span class="chip">${m.lessons} lecciones</span>
+    </div>`).join("");
+  box.innerHTML = `
+    <div class="qrow"><span class="subject">
+      <b>${d.analyses}</b> análisis · <b>${d.anonymous}</b> anónimos ·
+      cobertura mediana <b>${d.median_coverage ?? "—"}%</b> ·
+      <b>${d.modules_never_routed}</b> de ${d.modules_total} módulos nunca ruteados
+    </span></div>
+    ${cand.length
+      ? `<div class="qrow" style="background:rgba(220,160,40,.10)"><span class="subject">
+           <b>Candidatos a curso nuevo</b> (repetidos ${d.threshold}+ veces):
+           ${cand.map(g => esc(g.gap)).join(" · ")}</span></div>`
+      : `<div class="qrow"><span class="subject" style="color:var(--ink2)">
+           Ningún hueco se repite ${d.threshold}+ veces todavía — no hay evidencia
+           para construir un curso nuevo. Un hueco visto una vez es una oferta, no un mercado.</span></div>`}
+    <div style="margin:14px 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Lo que piden y no cubrimos</div>
+    ${gapRows || `<div class="empty">Sin huecos registrados.</div>`}
+    <div style="margin:16px 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">
+      Módulos que ninguna ruta ha pedido nunca (${dead.length})</div>
+    ${deadRows || `<div class="empty">Todos los módulos han servido a alguna meta.</div>`}
+    ${dead.length > 12 ? `<div class="qrow"><span class="subject" style="color:var(--ink2)">…y ${dead.length - 12} más. Antes de generar otro curso, vale la pena preguntarse por estos.</span></div>` : ""}`;
+}
+
+refresh();
+$("#inv-new").onclick = async () => {
+  const btn = $("#inv-new"), msg = $("#inv-msg");
+  btn.disabled = true; msg.textContent = "Creando…";
+  const res = await fetch("/api/invites", {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({label: $("#inv-label").value, max_uses: parseInt($("#inv-max").value || "1", 10)})});
+  const d = await res.json();
+  btn.disabled = false;
+  if (d.ok) { msg.textContent = `Código ${d.code} creado. Copia su enlace arriba.`; $("#inv-label").value = ""; loadInvites(); }
+  else { msg.textContent = d.detail || "No se pudo crear el código."; }
+};
+
+loadAccessRequests();
+loadDemand();
+loadRequests();
+loadLearners();
+loadInvites();
+loadWaitlist();
+setInterval(refresh, 20000);
+</script>
+</body>
+</html>

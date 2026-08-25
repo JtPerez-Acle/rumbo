@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ruta de estudio · Aprende IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  /* Paper, like doc.html and caso.html — this is meant to be shared and read,
+     not browsed. The gap list is deliberately as prominent as the route: a
+     platform publishing what it does NOT teach is the remarkable part. */
+  :root{--paper:#ffffff; --ink:#1a1d27; --muted:#5c6270; --accent:#8a5a00;
+        --line:#e4e6ec; --gap:#a4442a; --ok:#3f6212}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#eef0f4;color:var(--ink);line-height:1.65;
+    font-family:Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased}
+  .sheet{max-width:760px;margin:24px auto 60px;background:var(--paper);border:1px solid var(--line);
+    border-radius:4px;box-shadow:0 2px 14px rgba(20,24,40,.08);padding:56px 60px}
+  .sans{font-family:-apple-system,"Segoe UI",system-ui,sans-serif}
+  .eyebrow{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:12px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+  h1{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:30px;line-height:1.15;
+    letter-spacing:-.01em;margin:8px 0 6px}
+  h2{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:13.5px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:.1em;margin:34px 0 12px;padding-top:14px;
+    border-top:1px solid var(--line)}
+  p{font-size:15.5px;margin:8px 0}
+  .muted{color:var(--muted)}
+  .cov{display:flex;align-items:baseline;gap:10px;margin-top:18px}
+  .cov b{font-family:"Fraunces",Georgia,serif;font-size:40px;font-weight:600;line-height:1}
+  .bar{height:8px;border-radius:99px;background:#eceef3;overflow:hidden;margin-top:10px}
+  .bar i{display:block;height:100%;border-radius:99px;background:var(--accent);width:0;
+    transition:width .9s cubic-bezier(.2,.7,.3,1)}
+  .course{border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-bottom:10px}
+  .course .t{font-weight:700;font-size:16px}
+  .course .d{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:11.5px;
+    color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+  .course .w{font-size:14.5px;color:var(--muted);margin-top:8px}
+  .phase{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:12px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:22px 0 10px}
+  .gap{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:15px}
+  .gap .x{color:var(--gap);font-weight:700;flex:none}
+  .honest{background:#fbf7ef;border:1px solid #ecdfc6;border-radius:6px;padding:14px 16px;
+    font-size:14.5px;color:#5b4a2a;margin-top:12px}
+  .cta{display:block;text-align:center;margin-top:34px;padding:14px 18px;border-radius:8px;
+    background:#1a1d27;color:#fff;text-decoration:none;font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+    font-weight:700;font-size:15px}
+  .credit{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:11.5px;color:#9aa0ac}
+  .credit a{color:#8a5a00;text-decoration:none}
+  .err{text-align:center;color:var(--muted);padding:80px 0;
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif}
+  @media(max-width:700px){.sheet{padding:32px 22px;margin:10px 10px 40px}h1{font-size:25px}}
+</style>
+</head>
+<body>
+<div class="sheet"><div id="content"><p class="err">Cargando…</p></div></div>
+<script>
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* v2 routes carry a module set; v1 only a depth. Skipped modules must read
+   honestly ("Módulos 1 y 3"), never as a prefix. */
+const modLabel=(r)=>{
+  const m=r.modules&&r.modules.length?r.modules:null;
+  if(!m)return 'Hasta módulo '+r.through_module;
+  const seq=m.length===m[m.length-1]-m[0]+1;
+  if(seq&&m[0]===1)return m.length===1?'Módulo 1':'Hasta módulo '+m[m.length-1];
+  if(m.length===1)return 'Módulo '+m[0];
+  return 'Módulos '+m.slice(0,-1).join(', ')+' y '+m[m.length-1];
+};
+(async()=>{
+  const token=location.pathname.split('/').pop();
+  const box=document.getElementById('content');
+  try{
+    const r=await fetch('/api/learn/public/ruta/'+encodeURIComponent(token));
+    if(!r.ok)throw 0;
+    const d=await r.json(), a=d.analysis;
+    const nucleo=(a.ruta||[]).filter(x=>x.phase==='nucleo');
+    const later=(a.ruta||[]).filter(x=>x.phase!=='nucleo');
+    const card=(x)=>`<div class="course"><div class="t">${esc(x.course_title)}</div>
+      <div class="d">${modLabel(x)} · ${x.lessons} lecciones</div>
+      ${x.why?`<div class="w">${esc(x.why)}</div>`:''}</div>`;
+    let h=`<div class="eyebrow">Ruta de estudio</div>
+      <h1>${esc(a.role_title||'Este puesto')}</h1>
+      ${a.company?`<p class="muted">${esc(a.company)}</p>`:''}
+      <div class="cov"><b>${a.coverage}%</b><span class="muted">de lo que pide el puesto lo cubrimos</span></div>
+      <div class="bar"><i id="bar"></i></div>`;
+    if(a.ruta&&a.ruta.length){
+      h+=`<p class="muted" style="margin-top:14px">La ruta completa son <b>${a.total_lessons} lecciones</b>.
+        Se empieza por ${a.core_lessons}.</p><h2>Por dónde se empieza</h2>`;
+      h+=nucleo.map(card).join('');
+      if(later.length)h+=`<div class="phase">Después, para completar el perfil</div>`+later.map(card).join('');
+    }else{
+      h+=`<p style="margin-top:16px">Para este puesto no tenemos con qué preparar a nadie todavía.
+        Preferimos decirlo.</p>`;
+    }
+    if(a.gaps&&a.gaps.length){
+      h+=`<h2>Esto lo pide el puesto y no lo cubrimos</h2>`;
+      h+=a.gaps.map(g=>`<div class="gap"><span class="x">✕</span><span>${esc(g.name)}</span></div>`).join('');
+      h+=`<div class="honest">Lo publicamos a propósito. Un curso que promete cubrirlo todo
+        no está diciendo la verdad, y preferimos que sepas qué vas a tener que aprender en otra parte.</div>`;
+    }
+    if(a.doc_type){
+      h+=`<h2>Con qué llegarías a la entrevista</h2>
+        <p><b>${esc(a.doc_type)}</b></p>
+        ${a.doc_title?`<p class="muted">«${esc(a.doc_title)}»</p>`:''}
+        ${a.pitch?`<p style="margin-top:10px">${esc(a.pitch)}</p>`:''}`;
+    }
+    h+=`<a class="cta" href="/aprende">Analizar la oferta que tú quieres →</a>
+      <div class="credit">Ruta generada por <a href="/aprende">Aprende IA</a> a partir de una oferta
+      de trabajo real. Cada curso termina en un documento que puedes mostrar.</div>`;
+    box.innerHTML=h;
+    document.title=`Ruta para ${a.role_title||'un puesto'} · Aprende IA`;
+    setTimeout(()=>{const b=document.getElementById('bar'); if(b)b.style.width=a.coverage+'%';},80);
+  }catch(e){box.innerHTML='<p class="err">Esta ruta no existe o ya no está disponible.</p>';}
+})();
+</script>
+</body>
+</html>

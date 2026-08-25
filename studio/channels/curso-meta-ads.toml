@@ -1,0 +1,33 @@
+# Curso: "Meta Ads en 30 días" (Facebook + Instagram vía Meta Ads Manager).
+# Scaffold — se genera cuando research/meta-ads.md tenga la investigación.
+kind = "course"
+name = "Meta Ads"
+slug = "curso-meta-ads"
+niche = "De cero a campañas rentables en Facebook e Instagram: píxel, públicos, creatividades y escalado"
+category = "Publicidad digital"
+audience = "Marketers y dueños de negocio hispanohablantes que quieren dominar la publicidad en Facebook e Instagram"
+tone = "Profesora práctica: cada lección deja algo que HACES en el Administrador de Anuncios. Ejemplos con números reales de campañas."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre Meta Ads Manager para principiantes: estructura de cuenta y píxel, públicos y segmentación, creatividades y copy, tipos de campaña y objetivos, presupuesto y pujas, medición y escalado. Proyecto transversal: montar, lanzar y optimizar una campaña real del negocio del alumno. Basado en el material de investigación (funciones y pasos actuales de la plataforma)."
+research_file = "meta-ads.md"
+
+[voice]
+voice_name = "es-CO-SalomeNeural-Female"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#0866FF"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

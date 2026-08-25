@@ -1,0 +1,66 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# What must never be published.
+#
+# This working tree is ~56 GB and contains a live product's operational data.
+# Everything excluded here is either enormous, regenerable, third-party, or
+# private. Read the reasons before removing a line.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# PRIVATE — learner data. Offsite DB exports: real people's email addresses and
+# every word of coursework they submitted. Never publish.
+backups/
+
+# Third-party. MoneyPrinterTurbo is a separate MIT-licensed project kept as a
+# clean clone for `git pull` (45 GB with its venv). It is a dependency, not our
+# source — see README for how to obtain it.
+MoneyPrinterTurbo/
+
+# Rendered course videos: 10.6 GB, regenerable from the factory.
+studio/output/
+
+# Generated pipeline artifacts.
+studio/queue/pending/
+studio/queue/done/
+graphify-out/
+
+# Raw source material and personal working files that are not build inputs.
+# (The research the factory actually reads lives in studio/research/.)
+liv-docs/
+researches/
+*.docx
+resumen_carrera_influencer_marketing.pdf
+
+# Video composition working files. The finished cut is committed; the 114 MB
+# Chrome cache and node_modules behind it are not.
+brag-output/composition/node_modules/
+brag-output/composition/renders/
+brag-output/*.jpg
+!brag-output/brag.jpg
+
+# Secrets. This project reads every credential from Railway at runtime and has
+# no secrets in source — this is a tripwire, not a cleanup.
+.env
+.env.local
+*.key
+*.pem
+config.toml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Third-party audio. The music bed and SFX ship with the /brag plugin, whose own
+# README says redistribution terms must be verified first — they have not been.
+# The rendered video embeds them (ordinary use of a bundled asset); the raw
+# tracks are not ours to republish. See brag-output/README.md to restore them.
+brag-output/composition/assets/audio/

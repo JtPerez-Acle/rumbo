@@ -1,0 +1,53 @@
+Copyright (c) 2026 José Tomás Pérez-Acle. All rights reserved.
+
+                    SOURCE-AVAILABLE, EVALUATION-ONLY LICENSE
+
+This repository is published so that prospective employers, collaborators, and
+other interested parties can READ it and assess the author's work. It is not
+open source, and no open-source license applies to it.
+
+GRANT
+
+You are permitted to:
+
+  (a) view, read, and clone this repository for the sole purpose of evaluating
+      the author's technical and product work; and
+  (b) quote short excerpts when discussing that evaluation (for example, in an
+      interview, a hiring assessment, or a review), with attribution.
+
+RESTRICTIONS
+
+Except as stated above, and without the author's prior written permission, you
+may NOT:
+
+  (a) use this software or any part of it, in whole or in part, for any purpose
+      — personal, academic, internal, commercial, or otherwise;
+  (b) run, host, deploy, or operate it, or offer it as a service;
+  (c) copy, modify, adapt, translate, or create derivative works from it;
+  (d) redistribute, sublicense, sell, or publish it or any derivative;
+  (e) use it, or any content within it, as training data for machine-learning
+      models; or
+  (f) remove or alter this notice.
+
+All rights not expressly granted above are reserved by the author.
+
+THIRD-PARTY COMPONENTS
+
+This repository depends on, but does not include, MoneyPrinterTurbo
+(https://github.com/harry0703/MoneyPrinterTurbo), which is distributed under its
+own MIT license and remains subject to that license. Course research documents,
+generated course content, and rendered media produced by this system are the
+author's own work and are covered by this license.
+
+NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR BE
+LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+CONTACT
+
+For any use beyond evaluation, contact the author to request permission.

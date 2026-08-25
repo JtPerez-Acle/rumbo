@@ -1,0 +1,36 @@
+# Curso: "Analítica y métricas de marketing en 30 días".
+# DEPENDENCIA COMPARTIDA del catálogo: aquí se define cada métrica UNA vez, de
+# forma canónica, para que los demás cursos la citen en vez de reexplicarla.
+# También cierra la brecha que el matcher de ofertas midió de verdad
+# (Looker Studio, GA4, planificación de medios) en un puesto real.
+kind = "course"
+name = "Analítica y métricas de marketing"
+slug = "curso-analitica-marketing"
+niche = "CTR, CAC, LTV y ROAS bien calculados, GA4 y un tablero en Looker Studio que sí sirve para decidir"
+category = "Analítica y automatización"
+audience = "Marketers, freelancers y analistas junior hispanohablantes que reportan resultados y necesitan medir bien: definiciones correctas, GA4, atribución y un tablero propio"
+tone = "Analista que arma la medición de verdad: exige la fórmula detrás de cada número, desconfía de los benchmarks sin fuente y prefiere un dato honesto a uno bonito."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre analítica, métricas y reportería de marketing. ROL ESPECIAL: es la dependencia compartida del catálogo — otros cursos (publicidad, email, SEO, redes, influencers) usan estas métricas y hoy cada uno las explica a su manera; aquí se define cada una UNA vez de forma canónica (nombre, fórmula exacta, unidad, qué decisión habilita, cómo se malinterpreta, con qué se confunde). Progresión: (1) diccionario canónico — impresiones, alcance, frecuencia, clics, CTR, CPC, CPM, CPA, tasa de conversión, apertura y clic de email, engagement rate, ROAS, incluyendo por qué la tasa de apertura dejó de ser confiable tras Apple Mail Privacy Protection; (2) economía unitaria — CAC, LTV, margen, payback y la relación LTV:CAC (de dónde sale la regla 3:1, cuándo NO aplica, por qué es fácil de inflar), calculadas con datos imperfectos reales; (3) medición técnica sin pagar nada — GA4 (eventos, conversiones, límites reales), Google Tag Manager, consentimiento y su impacto en los datos, convención de UTMs que no se rompa, y por qué las cifras de la plataforma nunca cuadran con GA4; (4) atribución y causalidad — último clic y sus mentiras, modelos, ventanas, incrementalidad, y cómo diseñar una prueba honesta con presupuesto pequeño; (5) reportería y decisión — tablero en Looker Studio conectado a GA4 y Sheets, jerarquía de métricas (north star vs diagnósticas vs vanidad), reporte ejecutivo de una página, y cómo presentar un mal resultado sin maquillarlo. RESTRICCIÓN DE HERRAMIENTAS: solo gratuitas y accesibles (GA4, Looker Studio, Google Sheets, Tag Manager, analíticas nativas). Nada de Tableau, Power BI, Amplitude ni suites de atribución de pago. Los benchmarks de industria son el mayor foco de cifras inventadas del rubro: si no hay fuente, mercado y año, no se da el número. PROYECTO TRANSVERSAL OBLIGATORIO: en la lección 1 el alumno elige UN negocio o marca real y lo mantiene todo el curso; cada ejercicio produce un artefacto sobre ESE negocio: diccionario de métricas propio, cálculo de CAC y LTV con los datos que realmente tiene, convención de UTMs, plan de medición, tablero y reporte ejecutivo final. Basado en el material de investigación."
+research_file = "analitica-marketing.md"
+
+[voice]
+voice_name = "es-US-AlonsoNeural-Male"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#475569"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

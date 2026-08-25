@@ -1,0 +1,35 @@
+# Curso: "Vóleibol de alto rendimiento en 30 días" (nivel experto, internacional).
+# OJO: este curso se apoya mucho más en la guía escrita y los diagramas que en el
+# video — no se puede enseñar una rotación 5-1 sobre metraje de stock. El material
+# de investigación trae 173 tablas y estructuras diagramables por esa razón.
+kind = "course"
+name = "Vóleibol de alto rendimiento"
+slug = "curso-voleibol"
+niche = "Sistemas, scouting y dirección de equipos en alto rendimiento internacional, con tu plan de temporada al final"
+category = "Deporte"
+audience = "Entrenadores de vóleibol con experiencia que ya dirigen equipos y quieren nivel internacional: sistemas, táctica de élite, scouting con datos y gestión del alto rendimiento"
+tone = "Entrenador de alto rendimiento hablando con otro entrenador: vocabulario técnico sin explicaciones de iniciación, criterios de decisión y trade-offs, nunca un esquema presentado como universal."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) de vóleibol internacional de NIVEL EXPERTO. El destinatario ya entrena: no explicar qué es un bloqueo, ir directo a decisiones, sistemas, criterios y trade-offs. Progresión: (1) sistemas de juego y rotaciones — 5-1 vs 6-2, las seis rotaciones con fortalezas y agujeros, recepción con 2 y 3 receptores, solapamientos, ajustes por rival; (2) táctica de side-out y break point — distribución del colocador y sus criterios, tempos, pipe/bic, saque como arma por zonas y objetivos, sistemas de bloqueo (lectura, commit, release) y defensas asociadas (perimetral, rotacional), transición y contraataque; (3) técnica de élite y su corrección — saque en salto vs flotante, mecánica del brazo de ataque, ángulos de plataforma, y los errores que aparecen bajo presión internacional; (4) dirección de equipos y grupos humanos — estructura del cuerpo técnico, capitanía y los tres liderazgos (institucional, técnico, emocional), comunicación en cancha, manejo de conflicto y de banca, gestión del tiempo muerto, convivencia en gira; (5) administración del alto rendimiento — planificación anual y ciclo olímpico, periodización y diálogo con preparación física, control de carga, criterios de convocatoria, scouting y análisis de datos (qué métricas se usan de verdad y cómo se leen), estructura competitiva FIVB y su impacto en la planificación. IMPORTANTE PARA LA GENERACIÓN: este contenido es intrínsecamente visual-táctico y el video es metraje de stock, así que el video debe cargar SOLO el concepto y el porqué, mientras la guía escrita y los diagramas cargan rotaciones, esquemas y árboles de decisión — usa tablas y diagramas de forma intensiva. El reglamento citado es FIVB 2025-2028 con fecha de consulta; el curso enseña el hábito de descargar el reglamento vigente cada temporada. PROYECTO TRANSVERSAL OBLIGATORIO: en la lección 1 el entrenador elige SU equipo real (o uno internacional que pueda observar) y lo mantiene todo el curso; cada ejercicio produce un artefacto sobre ESE equipo: informe de scouting, plan de rotaciones ajustado a un rival, sesión de entrenamiento con criterios de éxito, plan de temporada, protocolo de manejo de un conflicto de plantel. Basado en el material de investigación."
+research_file = "voleibol.md"
+
+[voice]
+voice_name = "es-AR-ElenaNeural-Female"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#F97316"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

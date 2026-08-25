@@ -1,0 +1,32 @@
+# Perfil de render del CURSO (no es un canal social): "Marketing con IA en 30 días"
+# kind = "course" hace que el producer diario y el publisher lo ignoren.
+kind = "course"
+name = "Marketing con IA"
+slug = "curso-marketing-ia"
+niche = "De cero a una estrategia de marketing real hecha con IA: investigación, copy, contenido y campañas"
+category = "Marketing y contenido"
+audience = "Marketers y emprendedores hispanohablantes que quieren aplicar IA ya; alumna alfa: motivada, principiante en IA, con ganas de resultados aplicables"
+tone = "Profesora cercana y práctica: cero humo, cada lección termina en algo que HACES. Ejemplos siempre de marketing real (campañas, copy, audiencias, métricas)"
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+
+[voice]
+voice_name = "es-CO-SalomeNeural-Female"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#F59E0B"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+# Sin publish_slot: el publisher nunca lo toca. Los videos van al learner app, no a redes.
+upload_post_username = ""
+platforms = []

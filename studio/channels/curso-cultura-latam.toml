@@ -1,0 +1,34 @@
+# Curso: "Cultura latinoamericana en 30 días" (el concepto, desde las ciencias sociales).
+# Campo en DISPUTA: la investigación preserva los desacuerdos en vez de sintetizarlos.
+# Un curso que suene armónico sobre esto sería un curso falso.
+kind = "course"
+name = "Cultura latinoamericana"
+slug = "curso-cultura-latam"
+niche = "Autores, corrientes y tensiones del debate sobre lo latinoamericano, y cómo abordar su cultura con criterio"
+category = "Ciencias sociales"
+audience = "Gestores culturales, docentes, investigadores y profesionales de museos, ministerios y ONG hispanohablantes que trabajan con cultura en la región y necesitan un marco conceptual y ético defendible"
+tone = "Investigador que conoce el campo y sus peleas: expone los desacuerdos en vez de resolverlos, distingue lo que un autor dijo de lo que se le atribuye, y nunca presenta a nadie como palabra final."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre el concepto y la definición de 'cultura latinoamericana' desde las ciencias sociales. Progresión: (1) la invención de la categoría — cómo y cuándo se construye América Latina como unidad, el ensayo fundacional (Martí, Rodó, Mariátegui, Vasconcelos) y el proyecto político de cada uno; (2) mestizaje, transculturación e hibridación — Ortiz, Freyre, Rama, Bonfil Batalla, García Canclini, Cornejo Polar, con lo que cada concepto resuelve y lo que borra; (3) el giro decolonial y sus antecedentes — dependencia, Quijano y la colonialidad del poder, Dussel, Mignolo, Escobar; (4) impugnaciones desde adentro — críticas indígenas y afrodescendientes al marco mestizo, Rivera Cusicanqui y el ch'ixi contra el decolonialismo académico, Segato, Martín-Barbero, Sarlo, Monsiváis; (5) ética y pertinencia en la práctica — extractivismo epistémico, consentimiento, coautoría con comunidades, restitución, quién habla por quién, protocolos vigentes de investigación con pueblos indígenas. REGLA CENTRAL: este es un campo en disputa; cuando dos autores se contradicen hay que exponer la contradicción, quién la sostiene y qué está en juego políticamente — nunca sintetizar en consenso. Distinguir siempre lo que el autor dijo de lo que se le atribuye popularmente. PROYECTO TRANSVERSAL OBLIGATORIO: en la lección 1 el alumno elige UN fenómeno cultural concreto y situado (una fiesta, un género musical, una política pública de cultura, un museo, una disputa patrimonial real) y lo mantiene todo el curso; cada ejercicio produce un artefacto sobre ESE fenómeno (análisis posicionado, crítica de una nota de prensa, mapeo de actores, protocolo ético de trabajo de campo). Los ejercicios se evalúan por qué tan fundamentado y situado está el análisis en el fenómeno elegido, NUNCA por datos de negocio. Nada de celebración identitaria sin argumento ni 'riqueza cultural' como categoría analítica. Basado en el material de investigación."
+research_file = "cultura-latam.md"
+
+[voice]
+voice_name = "es-PE-CamilaNeural-Female"
+voice_rate = 1.0
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#E11D48"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

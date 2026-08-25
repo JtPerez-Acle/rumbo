@@ -1,0 +1,161 @@
+{
+ "analysis": {
+  "role_title": "Especialista en Marketing de Contenidos",
+  "company": "",
+  "seniority": "semi-senior",
+  "competencies": [
+   {
+    "name": "Copywriting",
+    "evidence": "Experiencia en Copywriting... redacción persuasiva orientada a la conversión. Sabes escribir títulos que llaman la atención, textos para anuncios que logran clics (CTAs), líneas de asunto para emails que se abren y descripciones de producto que se venden."
+   },
+   {
+    "name": "SEO y AEO orientado a contenidos y e-commerce",
+    "evidence": "Conocimiento de SEO y AEO orientado a contenidos y e-commerce: ... En e-commerce: saber cómo nombrar categorías y productos usando las palabras exactas que la gente busca para comprar."
+   },
+   {
+    "name": "Gestión de redes sociales y planificación de calendarios",
+    "evidence": "Experiencia administrando redes sociales: ... Saber gestionar la presencia de la marca en canales digitales (Instagram, TikTok, LinkedIn, Facebook), planificar calendarios de publicación y entender qué tipo de contenido funciona en cada plataforma."
+   },
+   {
+    "name": "Conocimiento de formatos publicitarios para Meta y Google",
+    "evidence": "Conocimiento de formatos publicitarios para Meta y Google: ... Performance Max (Google) ... Demand Gen (Google) ... Shopping ... Carruseles y Reels (Meta)."
+   },
+   {
+    "name": "Manejo de plataformas de email marketing",
+    "evidence": "Conocimiento de plataformas de Email Marketing: Manejo de herramientas como Klaviyo, Mailchimp, ActiveCampaign o Brevo. Sabes cómo enviar newsletters y configurar automatizaciones clave para e-commerce (secuencia de bienvenida, carrito abandonado, recuperaciones de clientes)."
+   },
+   {
+    "name": "Uso de herramientas de IA para marketing",
+    "evidence": "Manejo de herramientas de Inteligencia Artificial aplicadas a marketing: ... usar herramientas como ChatGPT, Claude, Midjourney, Canva AI o Jasper para acelerar procesos: generar ideas, armar estructuras de artículos, redactar variaciones de copy para anuncios o crear conceptos visuales rápidamente."
+   },
+   {
+    "name": "Manejo de herramientas de planificación (Trello, ClickUp, Notion)",
+    "evidence": "Manejo de herramientas de planificación (Trello, ClickUp, Notion, etc.)"
+   }
+  ],
+  "ruta": [
+   {
+    "course_slug": "curso-marketing-ia",
+    "course_title": "Marketing con IA en 30 días",
+    "through_module": 4,
+    "lessons": 24,
+    "phase": "nucleo",
+    "covers": [
+     {
+      "competency": "Copywriting",
+      "module_no": 3
+     },
+     {
+      "competency": "Uso de herramientas de IA para marketing",
+      "module_no": 4
+     }
+    ],
+    "why": "Aprenderás a usar ChatGPT y otras IAs para escribir copys que venden, generar ideas de contenido y crear conceptos visuales, bases de este rol.",
+    "modules": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "course_slug": "curso-seo-aeo",
+    "course_title": "SEO + AEO en 30 días",
+    "through_module": 5,
+    "lessons": 30,
+    "phase": "nucleo",
+    "covers": [
+     {
+      "competency": "SEO y AEO orientado a contenidos y e-commerce",
+      "module_no": 5
+     }
+    ],
+    "why": "Entenderás cómo posicionar productos para que los motores de IA como ChatGPT recomienden tu marca, clave para este puesto.",
+    "modules": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "course_slug": "curso-email-marketing",
+    "course_title": "Email marketing en 30 días",
+    "through_module": 4,
+    "lessons": 24,
+    "phase": "nucleo",
+    "covers": [
+     {
+      "competency": "Manejo de plataformas de email marketing",
+      "module_no": 4
+     }
+    ],
+    "why": "Montarás automatizaciones reales (carrito abandonado, bienvenida) y campañas de email que abren, justo lo que pide la oferta.",
+    "modules": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "course_slug": "curso-google-ads",
+    "course_title": "Google Ads en 30 días",
+    "through_module": 4,
+    "lessons": 24,
+    "phase": "despues",
+    "covers": [
+     {
+      "competency": "Conocimiento de formatos publicitarios para Meta y Google",
+      "module_no": 4
+     }
+    ],
+    "why": "Conocerás Performance Max, Demand Gen y Shopping para diseñar contenidos que encajen en los formatos de Google.",
+    "modules": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "course_slug": "curso-meta-ads",
+    "course_title": "Meta Ads en 30 días",
+    "through_module": 3,
+    "lessons": 12,
+    "phase": "despues",
+    "covers": [
+     {
+      "competency": "Conocimiento de formatos publicitarios para Meta y Google",
+      "module_no": 3
+     }
+    ],
+    "why": "Aprenderás a crear anuncios en carrusel, Reels y otros formatos de Meta, para pensar contenido que funcione en cada uno.",
+    "modules": [
+     1,
+     3
+    ]
+   }
+  ],
+  "gaps": [
+   {
+    "name": "Gestión de redes sociales y planificación de calendarios",
+    "evidence": "Experiencia administrando redes sociales: ... planificar calendarios de publicación y entender qué tipo de contenido funciona en cada plataforma.",
+    "severity": "media"
+   },
+   {
+    "name": "Manejo de herramientas de planificación (Trello, ClickUp, Notion)",
+    "evidence": "Manejo de herramientas de planificación (Trello, ClickUp, Notion, etc.)",
+    "severity": "baja"
+   }
+  ],
+  "coverage": 71,
+  "doc_type": "Estrategia de contenido y email marketing con IA y SEO/AEO",
+  "doc_title": "Propuesta para una marca de e-commerce: contenido, email y visibilidad en IA",
+  "pitch": "Traje una propuesta de contenido y email marketing para e-commerce, optimizada para motores de IA, que muestra cómo usaría las herramientas para generar ventas y visibilidad desde el día uno.",
+  "total_lessons": 114,
+  "core_lessons": 78,
+  "spec_version": 2
+ }
+}

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documento · Aprende IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  /* A professional deliverable: paper-first, the author's name on the byline.
+     Screen mimics the printed page; print output is the actual portfolio PDF. */
+  :root{--paper:#ffffff; --ink:#1a1d27; --muted:#5c6270; --accent:#8a5a00; --line:#e4e6ec}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#eef0f4;color:var(--ink);line-height:1.65;
+    font-family:Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased}
+  .toolbar{max-width:760px;margin:0 auto;padding:14px 20px;display:flex;gap:10px;justify-content:flex-end;
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif}
+  .toolbar button{cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;border:1px solid #c9cdd6;
+    background:#fff;color:#333;border-radius:8px;padding:8px 14px}
+  .toolbar button:hover{border-color:#8a8f9c}
+  .sheet{max-width:760px;margin:0 auto 60px;background:var(--paper);border:1px solid var(--line);
+    border-radius:4px;box-shadow:0 2px 14px rgba(20,24,40,.08);padding:64px 68px}
+  .byline{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:12px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-bottom:10px}
+  .doc h1{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:31px;line-height:1.15;letter-spacing:-.01em;margin:4px 0 26px}
+  .doc h2{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:.1em;margin:32px 0 12px;padding-top:14px;border-top:1px solid var(--line)}
+  .doc h3{font-size:16px;margin:18px 0 8px}
+  .doc p{font-size:15.5px;margin:10px 0}
+  .doc ul,.doc ol{margin:10px 0 10px 24px;font-size:15.5px}
+  .doc li{margin-bottom:6px}
+  .doc table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif}
+  .doc th,.doc td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  .doc th{background:#f6f7fa;font-weight:700}
+  .doc blockquote{border-left:3px solid var(--accent);padding:4px 16px;margin:14px 0;color:#3d4250;font-style:italic}
+  .doc strong{color:#000}
+  .doc code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:#f4f5f8;padding:1px 5px;border-radius:4px}
+  .credit{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:11.5px;color:#9aa0ac}
+  .credit a{color:#8a5a00;text-decoration:none}
+  .err{text-align:center;color:var(--muted);padding:80px 0;font-family:-apple-system,"Segoe UI",system-ui,sans-serif}
+  @media(max-width:700px){.sheet{padding:34px 24px;margin:0 10px 40px}}
+  @media print{
+    body{background:#fff}
+    .toolbar{display:none}
+    .sheet{box-shadow:none;border:none;max-width:none;margin:0;padding:0;border-radius:0}
+    .doc h2{break-after:avoid} .doc h3{break-after:avoid}
+    .doc table,.doc blockquote{break-inside:avoid}
+    @page{margin:22mm 18mm}
+  }
+</style>
+<!-- Pinned to an exact version with SRI: a floating @12 tag plus no integrity
+     attribute meant a CDN compromise (or a bad 12.x) executed on a page that
+     carries a learner's portfolio. DOMPurify is REQUIRED here, not optional:
+     marked emits raw HTML by design and content_md is compiled from learner
+     submissions. -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"
+        integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"
+        integrity="sha384-+VfUPEb0PdtChMwmBcBmykRMDd+v6D/oFmB3rZM/puCMDYcIvF968OimRh4KQY9a" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="toolbar" id="toolbar" style="display:none">
+  <button id="copymd">⧉ Copiar Markdown</button>
+  <button id="pdf">↓ Descargar PDF</button>
+</div>
+<div class="sheet">
+  <div id="content"><p class="err">Cargando…</p></div>
+</div>
+<script>
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const renderMD=(el,md)=>{
+  // Render untrusted Markdown: parse, then STRIP active content. Never assign
+  // marked.parse() straight into innerHTML — that was a stored-XSS sink on a
+  // public page (2026-08-12 audit): marked emits raw HTML by design and
+  // content_md is compiled from learner submissions. If DOMPurify failed to
+  // load, degrade to plain text rather than render unsanitised HTML.
+  if(!window.marked){ el.textContent = md || ''; return; }
+  const html = marked.parse(md || '');
+  if(window.DOMPurify){ el.innerHTML = DOMPurify.sanitize(html); }
+  else { el.textContent = md || ''; }
+};
+
+(async()=>{
+  const token=location.pathname.split('/').pop();
+  const box=document.getElementById('content');
+  try{
+    const r=await fetch('/api/learn/doc/'+encodeURIComponent(token));
+    if(!r.ok)throw 0;
+    const d=await r.json();
+    document.title=d.title;
+    // The document body is learner-derived Markdown: sanitise it. Everything
+    // else on this page is escaped with esc().
+    box.innerHTML=`<div class="byline">${esc(d.learner_name)} · ${esc(d.updated_at)}</div>
+      <div class="doc" id="docbody"></div>
+      <div class="credit">${esc(d.credit || `Documento elaborado por ${d.learner_name} durante el curso «${d.course_title}»`)} · <a href="/aprende">Aprende IA</a></div>`;
+    renderMD(document.getElementById('docbody'), d.content_md);
+    const tb=document.getElementById('toolbar'); tb.style.display='flex';
+    document.getElementById('pdf').onclick=()=>window.print();
+    document.getElementById('copymd').onclick=(e)=>{navigator.clipboard.writeText(d.content_md);e.target.textContent='✓ Copiado';};
+  }catch(e){box.innerHTML='<p class="err">Este documento no existe o ya no está disponible.</p>';}
+})();
+</script>
+</body>
+</html>

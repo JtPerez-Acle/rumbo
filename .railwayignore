@@ -1,0 +1,10 @@
+MoneyPrinterTurbo/.venv
+MoneyPrinterTurbo/.git
+MoneyPrinterTurbo/storage
+MoneyPrinterTurbo/config.toml
+MoneyPrinterTurbo/docs
+MoneyPrinterTurbo/test
+studio/output
+studio/queue/done
+.claude
+**/__pycache__

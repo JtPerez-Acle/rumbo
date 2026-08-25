@@ -1,0 +1,34 @@
+# Curso: "Automatización con IA en 30 días" (Make/Zapier/n8n + IA, sin enterprise).
+# Del roadmap del design partner: eficiencia con IA y herramientas accesibles; complementa
+# los cursos de marketing con la capa operativa.
+kind = "course"
+name = "Automatización con IA"
+slug = "curso-automatizacion-ia"
+niche = "Automatiza tu marketing con Make, Zapier o n8n: flujos reales, costos reales, sin saber programar"
+category = "Analítica y automatización"
+audience = "Marketers solos y dueños de negocios chicos hispanohablantes que pierden horas en tareas repetibles y quieren automatizarlas sin saber programar"
+tone = "Profesora práctica y transparente con los costos: cada lección deja un flujo armado o un paso concreto, con lo que cuesta en dinero real. Nada de automatizar por automatizar."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre automatización de marketing con IA 2026 para no programadores: conceptos base (flujos, disparadores, pasos, APIs — explicados simple); las tres plataformas accesibles (Zapier, Make, n8n) con comparativa honesta de costos y cuál conviene según el caso; cuánto cuesta la IA de verdad (tokens y números concretos); flujos de marketing paso a paso (reportes automáticos, generación de variaciones de anuncios, investigación de competencia, contenido programado) conectando Google Sheets, redes y email; qué automatización rinde y cuál no (orden por retorno real); errores caros típicos; plan de 30 días. Proyecto transversal: automatizar un proceso real del negocio del alumno (o proponer el plan de automatización de una marca real conocida). Basado en el material de investigación."
+research_file = "automatizacion-ia.md"
+
+[voice]
+voice_name = "es-CO-SalomeNeural-Female"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#0EA5E9"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

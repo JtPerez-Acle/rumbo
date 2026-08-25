@@ -1,0 +1,30 @@
+# Canal 4 — IA al Día: noticias y tendencias de IA en 60 segundos
+name = "IA al Día"
+slug = "ia-al-dia"
+niche = "Noticias, lanzamientos y tendencias de IA explicadas en un minuto"
+audience = "Hispanohablantes que quieren estar al día en IA sin leer noticias en inglés"
+tone = "Ágil, tipo noticiero moderno, con contexto de por qué importa"
+cta = "En IA al Día te cuento lo nuevo de la inteligencia artificial, en español y en un minuto. Sígueme."
+
+[voice]
+voice_name = "es-CO-GonzaloNeural-Male"
+voice_rate = 1.1
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#DC2626"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.15
+
+[publish]
+upload_post_username = ""
+platforms = ["tiktok", "instagram", "youtube"]
+# Noticias en el scroll del almuerzo (pico de actividad 12-15h LatAm)
+publish_slot = "12:00"

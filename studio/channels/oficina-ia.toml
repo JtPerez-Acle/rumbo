@@ -1,0 +1,30 @@
+# Canal 3 — Oficina IA: productividad con IA en el trabajo
+name = "Oficina IA"
+slug = "oficina-ia"
+niche = "Herramientas y trucos de IA para el trabajo: correos, documentos, presentaciones, automatización"
+audience = "Oficinistas, freelancers y profesionales hispanohablantes, 25-50"
+tone = "Práctico y directo: tips accionables, ahorro de tiempo medible"
+cta = "En Oficina IA te muestro herramientas y trucos concretos para trabajar menos y lograr más. Sígueme."
+
+[voice]
+voice_name = "es-US-PalomaNeural-Female"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#7C3AED"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.15
+
+[publish]
+upload_post_username = ""
+platforms = ["tiktok", "instagram", "youtube"]
+# Almuerzo laboral: oficinistas scrolleando en su pausa
+publish_slot = "12:00"

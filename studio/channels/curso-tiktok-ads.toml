@@ -1,0 +1,32 @@
+# Curso: "TikTok Ads en 30 días". Scaffold — se genera con research/tiktok-ads.md.
+kind = "course"
+name = "TikTok Ads"
+slug = "curso-tiktok-ads"
+niche = "De cero a anuncios que venden en TikTok: creatividades nativas, pujas, Smart+ y escalado"
+category = "Publicidad digital"
+audience = "Marketers y emprendedores hispanohablantes que quieren vender con anuncios en TikTok"
+tone = "Profesora práctica y al grano: cada lección deja algo hecho en TikTok Ads Manager. Ejemplos con creatividades y métricas reales."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre TikTok Ads Manager para principiantes: cuenta y píxel/eventos, públicos, creatividades nativas (UGC, Spark Ads), objetivos y tipos de campaña, presupuesto/pujas y Smart Performance, medición y escalado. Proyecto transversal: crear, lanzar y optimizar una campaña real del negocio del alumno. Basado en el material de investigación (funciones y pasos actuales)."
+research_file = "tiktok-ads.md"
+
+[voice]
+voice_name = "es-MX-JorgeNeural-Male"
+voice_rate = 1.08
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#25F4EE"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

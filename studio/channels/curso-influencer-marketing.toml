@@ -1,0 +1,35 @@
+# Curso: "Influencer marketing y PR digital en 30 días".
+# Sin herramientas de pago: HypeAuditor/Modash/Klear AUTOMATIZAN el juicio de
+# auditoría de audiencia; aquí se enseña el juicio, reproducible con el perfil
+# público, las analíticas nativas y una planilla.
+kind = "course"
+name = "Influencer marketing y PR digital"
+slug = "curso-influencer-marketing"
+niche = "Audita creadores a mano, negocia tarifas y contratos, y mide una campaña sin depender de herramientas de pago"
+category = "Redes y creadores"
+audience = "Ejecutivos y consultores de marketing, community managers y freelancers hispanohablantes que gestionan campañas con creadores de contenido o quieren entrar al área"
+tone = "Consultor de agencia que ha negociado con creadores y armado reportes para clientes: concreto, con fórmulas y cláusulas reales, sin humo sobre el alcance."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre influencer marketing y PR digital en LatAm. Progresión: (1) el campo y sus actores — macro/micro/nano creadores, agencia vs marca directa, dónde encaja PR; (2) scouting y AUDITORÍA DE AUDIENCIA A MANO — cálculo de engagement rate y variantes, señales de audiencia inflada (curvas de crecimiento anómalas, ratio comentarios/likes, calidad e idioma de comentarios, geografía vs mercado de la marca), y cómo documentar un veredicto defendible; (3) negociación, tarifas y contratos — construcción de tarifa por equivalencia CPM, entregables, exclusividad y usos, contrato y derechos de imagen, y normativa de divulgación publicitaria vigente por país; (4) campaña de punta a punta — brief, mix de creadores, calendario, aprobaciones, activaciones y eventos; (5) medición y PR — engagement, alcance, EMV incluida la CONTROVERSIA sobre su cálculo (cada proveedor lo computa distinto: el curso enseña a exigir la fórmula), ROI, reporte ejecutivo, nota de prensa, clipping y manejo de crisis reputacional. RESTRICCIÓN DE HERRAMIENTAS: el curso NO enseña plataformas de pago ni con seat corporativo (HypeAuditor, Modash, Klear, Storyclash, Heepsy, Sprout Social, Brand24). Esas herramientas automatizan juicios; aquí se enseña el juicio. Todo ejercicio debe ser posible con el perfil público del creador, las analíticas nativas gratuitas y una planilla. Cuando una herramienta de pago sea relevante, explicar QUÉ calcula y cómo reproducirlo a mano, nunca su interfaz. PROYECTO TRANSVERSAL OBLIGATORIO: en la lección 1 el alumno elige UNA marca real y UN mercado y los mantiene todo el curso; cada ejercicio produce un artefacto sobre ESA marca: auditoría de un creador público real, shortlist justificada, brief, propuesta con tarifas razonadas, contrato anotado, plan de medición y reporte ejecutivo. Basado en el material de investigación."
+research_file = "influencer-marketing.md"
+
+[voice]
+voice_name = "es-UY-ValentinaNeural-Female"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#C026D3"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

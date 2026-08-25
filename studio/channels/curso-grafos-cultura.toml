@@ -1,0 +1,34 @@
+# Curso: "Grafos y sistemas complejos en 30 días" (ciencias sociales, énfasis cultura).
+# El documento de investigación trata el Bloque 5 (límites) como primera clase:
+# enseñar centralidad sin enseñar el problema de frontera produce analistas peligrosos.
+kind = "course"
+name = "Grafos y sistemas complejos"
+slug = "curso-grafos-cultura"
+niche = "Modela fenómenos culturales como redes: construye el grafo, interpreta las métricas y reconoce sus límites"
+category = "Ciencias sociales"
+audience = "Investigadores, estudiantes de postgrado y profesionales de ciencias sociales y humanidades hispanohablantes que quieren modelar fenómenos culturales con redes, sin formación matemática previa"
+tone = "Investigador que usa estas herramientas a diario y conoce sus límites: preciso, escéptico, alérgico a la sobreinterpretación. Cada lección deja un artefacto sobre el fenómeno que el alumno eligió."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre modelamiento con grafos y sistemas complejos aplicado a fenómenos sociales, con énfasis en cultura. Progresión: (1) fundamentos — qué es un grafo y qué preguntas sociales admite, nodos/aristas/dirigido/ponderado/bipartito, matriz de adyacencia, y sobre todo QUÉ NO se puede convertir en grafo; (2) métricas y su interpretación social — grado, intermediación, cercanía, eigenvector, densidad, componentes, clustering, cada una con su malinterpretación más común; (3) estructura — comunidades (Louvain/Leiden), homofilia, agujeros estructurales, núcleo-periferia, redes bipartitas de afiliación; (4) dinámica y sistemas complejos — difusión y contagio simple vs complejo, umbrales, redes temporales, modelos basados en agentes, emergencia; (5) alcances y LÍMITES como bloque de primera clase — confusión homofilia/influencia, falacia ecológica, sesgo de frontera y datos faltantes, plataformas digitales como proxy sesgado. Herramientas gratuitas con pasos reales: Gephi, NetworkX, igraph, NetLogo. PROYECTO TRANSVERSAL OBLIGATORIO: en la lección 1 el alumno elige UN fenómeno cultural concreto (una escena musical, una tradición, un campo académico, una red de organizaciones culturales, una feria, un circuito de teatro) y lo mantiene todo el curso; cada ejercicio produce un artefacto real sobre ESE fenómeno (declaracion.md, aristas.csv, visualización, interpretación escrita, crítica metodológica). Los ejercicios se evalúan por qué tan fundamentado está el trabajo en el fenómeno elegido del alumno, no en un negocio. El material clasifica la evidencia [P]/[S] y descarta lo no verificable: el curso enseña esa misma disciplina y jamás afirma causalidad desde datos observacionales de red. Basado en el material de investigación."
+research_file = "grafos-cultura.md"
+
+[voice]
+voice_name = "es-AR-TomasNeural-Male"
+voice_rate = 1.0
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#8B5CF6"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

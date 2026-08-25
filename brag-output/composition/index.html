@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es" data-resolution="landscape">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  /* Palette lifted verbatim from the product's own token layer
+     (studio/dashboard/static/learn.html :root) — "El Taller Nocturno":
+     warm darkness, one amber lamp, and the learner's work as paper. */
+  :root{
+    --ink:#100D17; --panel:#191521; --raised:#221D2E;
+    --line:#2F2839; --line-strong:#453B54;
+    --text:#F2EFE9; --dim:#B2AABB; --faint:#9A90A6;
+    --amber:#F0A43C; --amber-hi:#FFC670; --amber-deep:#AD7423;
+    --paper:#F1E6CE; --paper-ink:#26200F;
+    --terra:#E5825E;
+    --sans:"Archivo",-apple-system,"Segoe UI",system-ui,sans-serif;
+    --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--ink)}
+  body{font-family:var(--sans);color:var(--text)}
+  .clip{position:absolute;inset:0}
+
+  /* la lampara — the one warm light. Everything else is night. */
+  #lamp{position:absolute;left:50%;top:50%;width:2400px;height:2400px;
+    transform:translate(-50%,-50%);pointer-events:none;
+    background:radial-gradient(circle,rgba(240,164,60,.20) 0%,rgba(240,164,60,.07) 28%,rgba(240,164,60,0) 62%)}
+
+  .center{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
+  .serif{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1.06}
+  .eyebrow{font-size:19px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--amber)}
+  .faint{color:var(--faint)} .dim{color:var(--dim)}
+
+  /* scene 2 — the route as a path of capabilities, not a list of products */
+  .stage{position:absolute;left:130px;right:130px;top:120px;bottom:120px;display:flex;gap:56px}
+  .posting{width:430px;background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:26px 28px;font-size:15px;line-height:1.75;color:var(--faint);overflow:hidden}
+  .posting b{color:var(--dim);font-weight:600}
+  .steps{flex:1;display:flex;flex-direction:column;gap:14px;justify-content:center}
+  .step{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--amber);
+    border-radius:14px;padding:20px 26px;opacity:0}
+  .step .no{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700}
+  .step .what{font-family:var(--serif);font-size:30px;font-weight:600;margin-top:8px;line-height:1.2}
+  .step .from{font-size:16px;color:var(--faint);margin-top:8px}
+  .cov{margin-top:26px}
+  .covbar{height:10px;background:var(--raised);border-radius:99px;overflow:hidden;margin-top:12px}
+  .covbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber-deep),var(--amber))}
+
+  /* scene 3 — the gaps, published on purpose */
+  .gaps{display:flex;flex-direction:column;align-items:center;gap:22px}
+  .gapitem{display:flex;align-items:center;gap:16px;font-size:34px;color:var(--dim);opacity:0}
+  .gapx{color:var(--terra);font-size:30px}
+
+  /* scene 4 — the interface is grotesk, the work is serif */
+  .dims{display:flex;flex-direction:column;gap:16px;width:620px}
+  .dimrow{display:flex;align-items:center;gap:18px;font-size:22px;color:var(--dim)}
+  .dimbar{flex:1;height:12px;background:var(--raised);border-radius:99px;overflow:hidden}
+  .dimbar i{display:block;height:100%;width:0;background:var(--amber)}
+  .paper{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:1080px;padding:66px 74px;background:var(--paper);color:var(--paper-ink);
+    border-radius:8px;box-shadow:0 40px 120px rgba(0,0,0,.6);opacity:0}
+  .paper .byline{font-size:17px;letter-spacing:.14em;text-transform:uppercase;color:#7A6B4A;font-weight:700}
+  .paper h2{font-family:var(--serif);font-size:56px;font-weight:600;margin:14px 0 26px;line-height:1.1}
+  .paper .rule{height:1px;background:#D9CBA9;margin:0 0 24px}
+  .paper p{font-size:21px;line-height:1.6;color:#4A4030}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="20" data-width="1920" data-height="1080">
+
+  <div id="lamp"></div>
+
+  <!-- music enters after the hook lands in near-silence -->
+  <audio id="music" data-start="2.6" data-duration="17.4" data-media-start="2.6" data-volume="0.5"
+         src="assets/audio/music.mp3"></audio>
+  <audio id="sfx-click" data-start="6.9" data-duration="1" data-volume="0.35" src="assets/audio/click.ogg"></audio>
+  <audio id="sfx-paper" data-start="17.0" data-duration="1.5" data-volume="0.45" src="assets/audio/paper.ogg"></audio>
+
+  <!-- 1 - HOOK -->
+  <div id="s1" class="clip" data-start="0" data-duration="3.4">
+    <div class="center" id="s1in">
+      <div id="s1line" class="serif" style="font-size:92px;text-align:center">Dinos qué quieres ser.</div>
+      <div id="s1sub" class="dim" style="font-size:26px;margin-top:28px">Nosotros armamos el plan.</div>
+    </div>
+  </div>
+
+  <!-- 2 - THE ROUTE -->
+  <div id="s2" class="clip" data-start="3.4" data-duration="6.2">
+    <div class="stage" id="s2in">
+      <div class="posting" id="posting">
+        <div class="eyebrow" style="margin-bottom:16px">La oferta</div>
+        Buscamos <b>Asistente de Marketing</b> con manejo de <b>redes sociales</b>,
+        <b>SEO</b>, <b>email marketing</b>, creación de contenido con <b>IA</b>,
+        <b>CRM</b>, diseño gráfico y reportería.
+      </div>
+      <div class="steps">
+        <div class="step" id="st1">
+          <div class="no">Paso 1 de 13</div>
+          <div class="what">Sabrás pedirle a la IA exactamente lo que necesitas</div>
+          <div class="from">Marketing con IA · módulo 1</div>
+        </div>
+        <div class="step" id="st2">
+          <div class="no">Paso 2 de 13</div>
+          <div class="what">Tendrás un perfil detallado de tu cliente ideal</div>
+          <div class="from">Marketing con IA · módulo 2</div>
+        </div>
+        <div class="step" id="st3">
+          <div class="no">Paso 6 de 13</div>
+          <div class="what">Diagnosticarás dónde apareces en Google y en ChatGPT</div>
+          <div class="from">SEO + AEO · módulo 1</div>
+        </div>
+        <div class="cov" id="cov">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span class="faint" style="font-size:18px">de lo que pide el puesto lo cubrimos</span>
+            <span class="serif" id="covnum" style="font-size:40px;color:var(--amber)">0%</span>
+          </div>
+          <div class="covbar"><i id="covfill"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 - THE GAP -->
+  <div id="s3" class="clip" data-start="9.6" data-duration="4.9">
+    <div class="center" id="s3in">
+      <div id="s3title" class="serif" style="font-size:60px;text-align:center;max-width:1300px">
+        Esto lo pide el puesto y no lo cubrimos
+      </div>
+      <div class="gaps" style="margin-top:44px">
+        <div class="gapitem" id="g1"><span class="gapx">✕</span><span>CRM</span></div>
+        <div class="gapitem" id="g2"><span class="gapx">✕</span><span>Community management</span></div>
+        <div class="gapitem" id="g3"><span class="gapx">✕</span><span>Diseño gráfico</span></div>
+      </div>
+      <div id="s3punch" class="serif" style="font-size:52px;color:var(--amber);margin-top:52px;opacity:0">
+        Lo publicamos a propósito.
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 - THE WORK BECOMES PAPER -->
+  <div id="s4" class="clip" data-start="14.5" data-duration="4.0">
+    <div class="center" id="s4in" data-layout-allow-overlap>
+      <div id="s4dims" class="dims">
+        <div class="eyebrow" style="text-align:center;margin-bottom:10px">Tu tutora leyó tu trabajo</div>
+        <div class="dimrow"><span style="width:130px">Aplicación</span><span class="dimbar"><i id="d1"></i></span><span class="serif" style="width:90px;text-align:right">38/40</span></div>
+        <div class="dimrow"><span style="width:130px">Criterio</span><span class="dimbar"><i id="d2"></i></span><span class="serif" style="width:90px;text-align:right">28/30</span></div>
+        <div class="dimrow"><span style="width:130px">Ejecución</span><span class="dimbar"><i id="d3"></i></span><span class="serif" style="width:90px;text-align:right">27/30</span></div>
+      </div>
+      <div class="paper" id="paper">
+        <div class="byline">Documento elaborado por Camila Torres</div>
+        <h2>Estrategia de marketing digital — Tejidos Ruca</h2>
+        <div class="rule"></div>
+        <p>Objetivo: subir la venta de chalecos de 12 a 20 unidades al mes entre marzo
+        y mayo, con un tope de 60.000 CLP en pauta, medido en el panel de pedidos.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 - OUTRO -->
+  <div id="s5" class="clip" data-start="18.5" data-duration="1.5">
+    <div class="center">
+      <div id="s5line" class="serif" style="font-size:76px;text-align:center">No un certificado. Tu trabajo.</div>
+      <div id="s5mark" style="margin-top:34px;font-size:24px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--amber)">Aprende IA</div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.__timelines = window.__timelines || {};
+const tl = gsap.timeline({ paused: true });
+
+/* 1 - HOOK: the lamp resolves out of black, then the question. */
+tl.fromTo("#lamp", {opacity:0, scale:.82}, {opacity:1, scale:1, duration:1.4, ease:"power2.out"}, 0);
+tl.from("#s1line", {opacity:0, y:26, duration:1.0, ease:"power3.out"}, 0.35);
+tl.from("#s1sub",  {opacity:0, y:16, duration:0.7, ease:"power2.out"}, 1.15);
+tl.to("#s1in", {opacity:0, duration:0.45, ease:"power1.in"}, 2.95);
+tl.set("#s1in", {opacity:0}, 3.40);
+
+/* 2 - THE ROUTE: posting dims, capabilities land on the beat grid. */
+tl.from("#posting", {opacity:0, x:-30, duration:0.6, ease:"power2.out"}, 3.5);
+tl.to("#posting", {opacity:.42, duration:0.5}, 6.9);
+tl.to("#st1", {opacity:1, duration:0.5, ease:"power2.out"}, 4.6);
+tl.from("#st1", {y:18, duration:0.5, ease:"power2.out"}, 4.6);
+tl.to("#st2", {opacity:1, duration:0.5, ease:"power2.out"}, 5.6);
+tl.from("#st2", {y:18, duration:0.5, ease:"power2.out"}, 5.6);
+tl.to("#st3", {opacity:1, duration:0.5, ease:"power2.out"}, 6.6);
+tl.from("#st3", {y:18, duration:0.5, ease:"power2.out"}, 6.6);
+tl.to("#covfill", {width:"83%", duration:1.1, ease:"power2.inOut"}, 7.4);
+tl.to({v:0}, {v:83, duration:1.1, ease:"power2.inOut",
+  onUpdate(){ document.getElementById("covnum").textContent = Math.round(this.targets()[0].v) + "%"; }}, 7.4);
+tl.to("#s2in", {opacity:0, duration:0.4, ease:"power1.in"}, 9.2);
+tl.set("#s2in", {opacity:0}, 9.60);
+
+/* 3 - THE GAP: stated plainly and held long enough to read. No riser: the
+   point is that it is admitted, not sold. */
+tl.from("#s3title", {opacity:0, y:22, duration:0.7, ease:"power3.out"}, 9.7);
+tl.to("#g1", {opacity:1, duration:0.4}, 10.5);
+tl.to("#g2", {opacity:1, duration:0.4}, 10.9);
+tl.to("#g3", {opacity:1, duration:0.4}, 11.3);
+tl.to("#s3punch", {opacity:1, duration:0.8, ease:"power2.out"}, 12.1);
+tl.to("#s3in", {opacity:0, duration:0.4, ease:"power1.in"}, 14.1);
+tl.set("#s3in", {opacity:0}, 14.50);
+
+/* 4 - WORK becomes PAPER, on the 17.02s strong cue. */
+tl.from("#s4dims", {opacity:0, y:18, duration:0.5, ease:"power2.out"}, 14.6);
+tl.to("#d1", {width:"95%", duration:0.7, ease:"power2.out"}, 14.9);
+tl.to("#d2", {width:"93%", duration:0.7, ease:"power2.out"}, 15.1);
+tl.to("#d3", {width:"90%", duration:0.7, ease:"power2.out"}, 15.3);
+tl.to("#s4dims", {opacity:0, scale:.96, duration:0.5, ease:"power2.in"}, 16.7);
+tl.fromTo("#paper", {opacity:0, y:40}, {opacity:1, y:0, duration:0.9, ease:"power3.out"}, 17.0);
+tl.to("#lamp", {opacity:1, duration:0.9, ease:"power2.out"}, 17.0);
+tl.to("#s4in", {opacity:0, duration:0.4, ease:"power1.in"}, 18.2);
+tl.set("#s4in", {opacity:0}, 18.50);
+
+/* 5 - OUTRO: the claim, then the lamp dims. */
+tl.from("#s5line", {opacity:0, y:20, duration:0.6, ease:"power3.out"}, 18.6);
+tl.from("#s5mark", {opacity:0, duration:0.5, ease:"power2.out"}, 19.0);
+tl.to("#lamp", {opacity:.35, duration:1.2, ease:"power2.inOut"}, 18.8);
+
+window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

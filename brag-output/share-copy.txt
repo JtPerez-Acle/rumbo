@@ -1,0 +1,7 @@
+Construimos una plataforma que publica lo que *no* te puede enseñar.
+
+Le pegas la oferta de trabajo que quieres y te arma la ruta: qué estudiar, en qué
+orden, y qué pide el puesto que nosotros no cubrimos. Haces el trabajo real, tu
+tutora IA lo evalúa, y terminas con un documento tuyo — no un certificado.
+
+En español, para LatAm. Aprende IA.

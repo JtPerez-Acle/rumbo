@@ -1,0 +1,34 @@
+# Curso: "SEO + AEO en 30 días" (posicionamiento en Google y en motores de IA).
+# Del roadmap del design partner: SEO/AEO orientado a contenidos y e-commerce es requisito
+# de empleo 2026 y casi nadie lo enseña bien en español.
+kind = "course"
+name = "SEO + AEO"
+slug = "curso-seo-aeo"
+niche = "Aparece en Google y en las respuestas de la IA (ChatGPT, Perplexity): SEO y AEO con método y sin humo"
+category = "Marketing y contenido"
+audience = "Marketers, creadores de contenido y dueños de e-commerce hispanohablantes que necesitan aparecer en Google y en las respuestas de la IA"
+tone = "Profesora práctica y escéptica: enseña a verificar cada dato y cada técnica; cero promesas mágicas de tráfico. Cada lección deja algo que HACES en tu sitio o tus contenidos."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre SEO y AEO/GEO 2026 para principiantes: cómo funcionan hoy Google (AI Overviews) y los motores de respuesta (ChatGPT, Perplexity, Gemini) al citar fuentes; SEO on-page para blogs y fichas de producto (intención de búsqueda, títulos, keyword research con IA); SEO técnico mínimo viable; AEO con evidencia real (datos estructurados/schema, contenido citable, autoridad, monitoreo de menciones de marca en LLMs); e-commerce: categorías y productos con las palabras exactas de compra; flujo de trabajo semanal para una persona. IMPORTANTE: el material de investigación clasifica la evidencia (primaria/vendor/no verificable) — el curso enseña esa misma disciplina y NUNCA repite cifras inventadas del nicho. Proyecto transversal: auditoría SEO+AEO completa de un sitio real (el del alumno o una marca real conocida que le gustaría trabajar). Basado en el material de investigación."
+research_file = "seo-aeo.md"
+
+[voice]
+voice_name = "es-CO-GonzaloNeural-Male"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#059669"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

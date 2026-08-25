@@ -1,0 +1,33 @@
+# Curso: "Google Ads en 30 días" (Search, Performance Max, Demand Gen, Shopping).
+# Pedido por la alumna alfa (su búsqueda laboral exige formatos de Google Ads).
+kind = "course"
+name = "Google Ads"
+slug = "curso-google-ads"
+niche = "De cero a campañas que convierten en Google: Search, Performance Max, Demand Gen y Shopping"
+category = "Publicidad digital"
+audience = "Marketers y dueños de negocio hispanohablantes que necesitan dominar Google Ads y sus formatos creativos para trabajar o vender"
+tone = "Profesora práctica: cada lección deja algo que HACES en la cuenta de Google Ads o en tus creatividades. Ejemplos con números reales."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre Google Ads 2026 para principiantes con foco en FORMATOS y creatividades (lo que piden los empleos de marketing): fundamentos y medición (Google Tag/GTM, conversiones, Enhanced Conversions, GA4), campañas de Búsqueda y anuncios responsivos (RSA, palabras clave, negativas), Performance Max (grupos de activos, señales de audiencia, specs de imagen/video/texto), Demand Gen y Shopping/Merchant Center (formatos visuales, carruseles, feed y títulos de producto), y pujas/presupuesto/optimización semanal. Proyecto transversal: montar la estructura y las creatividades de una campaña real del negocio del alumno. Basado en el material de investigación (funciones, formatos y pasos actuales de la plataforma)."
+research_file = "google-ads.md"
+
+[voice]
+voice_name = "es-MX-DaliaNeural-Female"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#4285F4"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

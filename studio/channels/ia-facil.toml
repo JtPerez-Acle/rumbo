@@ -1,0 +1,31 @@
+# Canal 1 — IA Fácil: alfabetización en IA para el público general
+name = "IA Fácil"
+slug = "ia-facil"
+niche = "Qué es la IA, mitos, ejemplos cotidianos, sin tecnicismos"
+audience = "Público general hispanohablante, 25-55, curioso pero no técnico"
+tone = "Cercano, claro, cero jerga, analogías de la vida diaria"
+cta = "Sígueme en IA Fácil, donde te explico la inteligencia artificial en español y sin tecnicismos."
+
+[voice]
+voice_name = "es-MX-DaliaNeural-Female"
+voice_rate = 1.1
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#0284C7"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.15
+
+[publish]
+# Rellenar cuando se conecte Upload-Post; un perfil (username) por canal.
+upload_post_username = ""
+platforms = ["tiktok", "instagram", "youtube"]
+# Wind-down nocturno: pico 19-22h para audiencia general
+publish_slot = "19:00"

@@ -1,0 +1,1981 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aprende IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     EL TALLER NOCTURNO — design tokens.
+     One rule: the interface is grotesk (Archivo), the work is
+     serif (Fraunces) and glows paper-white in the dark studio.
+     Change values here; components below only consume tokens.
+     ============================================================ */
+  :root{
+    /* night */
+    --ink:#100D17; --panel:#191521; --raised:#221D2E;
+    --line:#2F2839; --line-strong:#453B54;
+    /* text */
+    /* --faint was #7E7589 = 4.39:1 on the workshop background, just under
+       WCAG AA's 4.5 for the 11px labels that use it (microlabel, .faint).
+       Nudged up to clear AA without touching the palette's character. */
+    --text:#F2EFE9; --dim:#B2AABB; --faint:#8B8296;
+    /* la lámpara (brand) */
+    --amber:#F0A43C; --amber-hi:#FFC670; --amber-deep:#AD7423; --amber-ink:#241603;
+    /* el papel (the work) */
+    --paper:#F1E6CE; --paper-dim:#CFC3A8; --paper-ink:#26200F;
+    /* semantics (earth, not neon) */
+    --sage:#A9C48F; --sage-ink:#1C2A12;
+    --terra:#E5825E; --terra-ink:#33170C;
+    /* type scale — six sizes, no more */
+    --fs-xs:11px; --fs-sm:12.5px; --fs-base:14px; --fs-md:15.5px; --fs-lg:18px; --fs-xl:22px;
+    --fd-md:26px; --fd-lg:31px; --fd-num:42px;
+    /* space scale */
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+    /* radii */
+    --r-sm:10px; --r-md:14px; --r-lg:20px;
+    --sans:"Archivo",-apple-system,"Segoe UI",system-ui,sans-serif;
+    --serif:"Fraunces",Georgia,serif;
+    --glow-amber:0 12px 34px -12px rgba(240,164,60,.5);
+    --glow-paper:0 10px 32px -14px rgba(241,230,206,.28);
+    --dur:.38s; --ease:cubic-bezier(.22,.9,.3,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ink);color:var(--text);font-family:var(--sans);line-height:1.5;
+    font-size:var(--fs-base);-webkit-font-smoothing:antialiased}
+  /* the lamp: one warm glow from above, plus a whisper of grain */
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(640px 420px at 50% -120px, rgba(240,164,60,.10), transparent 65%)}
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")}
+  .app{position:relative;z-index:1;max-width:560px;margin:0 auto;min-height:100svh;
+    padding:var(--s5) var(--s4) calc(84px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;gap:var(--s4)}
+  /* staged page-enter: one orchestrated rise per view, nothing scattered */
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .app>*{animation:rise var(--dur) var(--ease) both}
+  .app>:nth-child(2){animation-delay:.04s}.app>:nth-child(3){animation-delay:.08s}
+  .app>:nth-child(4){animation-delay:.12s}.app>:nth-child(5){animation-delay:.16s}
+  .app>:nth-child(6){animation-delay:.20s}.app>:nth-child(7){animation-delay:.24s}
+  .app>:nth-child(n+8){animation-delay:.28s}
+
+  /* ---- type ---- */
+  h1,h2{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.08;text-wrap:balance}
+  h1{font-size:var(--fd-lg)} h2{font-size:var(--fd-md)}
+  h3{font-size:var(--fs-lg);font-weight:700;letter-spacing:-.015em;line-height:1.2}
+  .eyebrow{font-size:var(--fs-xs);font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+  .microlabel{font-size:var(--fs-xs);letter-spacing:.13em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  .muted{color:var(--dim)} .faint{color:var(--faint)}
+  .t-sm{font-size:var(--fs-sm)} .t-base{font-size:var(--fs-base)} .t-md{font-size:var(--fs-md)}
+  .serifnum{font-family:var(--serif);font-weight:600;font-variant-numeric:tabular-nums}
+
+  /* ---- icons ---- */
+  .ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+  .ic-s{width:15px;height:15px} .ic-l{width:24px;height:24px}
+
+  /* ---- buttons ---- */
+  button{font-family:inherit;cursor:pointer;border:none;color:inherit;background:none}
+  .btn{display:flex;align-items:center;justify-content:center;gap:var(--s2);width:100%;
+    font-weight:700;font-size:var(--fs-md);border-radius:999px;padding:14px 22px;
+    transition:transform .15s var(--ease),box-shadow .2s}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:linear-gradient(140deg,var(--amber-hi),var(--amber));color:var(--amber-ink);box-shadow:var(--glow-amber)}
+  .btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--line-strong)}
+  .btn-paper{background:linear-gradient(150deg,#FBF3E1,var(--paper));color:var(--paper-ink);box-shadow:var(--glow-paper)}
+  .btn-sm{width:auto;font-size:var(--fs-sm);padding:9px 14px;font-weight:700}
+
+  /* ---- surfaces: three tiers ---- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s4)}
+  .card-hero{background:linear-gradient(165deg,var(--raised),var(--panel));border:1px solid rgba(240,164,60,.35);
+    border-radius:var(--r-lg);padding:var(--s5) var(--s4);box-shadow:var(--glow-amber)}
+  .card-paper{background:var(--panel);border:1px solid rgba(241,230,206,.3);border-radius:var(--r-lg);
+    padding:var(--s4);box-shadow:var(--glow-paper)}
+  .card-spot{background:linear-gradient(160deg,var(--raised),var(--panel));border:1px solid var(--amber);
+    border-radius:var(--r-lg);padding:var(--s4);box-shadow:var(--glow-amber)}
+  .quiet{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s3) var(--s4)}
+
+  /* ---- forms ---- */
+  input,textarea{width:100%;font-family:inherit;font-size:var(--fs-md);color:var(--text);
+    background:var(--raised);border:1px solid var(--line);border-radius:var(--r-md);padding:14px;outline:none;
+    transition:border-color .2s}
+  input:focus,textarea:focus{border-color:var(--amber)}
+  textarea{resize:vertical;min-height:74px}
+  label{font-size:var(--fs-sm);color:var(--dim);font-weight:600;display:block;margin-bottom:var(--s1)}
+
+  /* ---- brand / topbar ---- */
+  .brandrow{display:flex;align-items:center;gap:11px}
+  .brandmark{width:32px;height:32px;border-radius:9px;position:relative;flex:none;
+    background:linear-gradient(150deg,var(--amber-hi),var(--amber-deep));box-shadow:0 0 22px rgba(240,164,60,.5)}
+  .brandmark::after{content:"";position:absolute;inset:9px;border-radius:3px;background:var(--ink)}
+  .brandname{font-weight:800;font-size:var(--fs-md);letter-spacing:-.01em}
+  .brandname small{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .topbar{display:flex;justify-content:space-between;align-items:center}
+  .back{color:var(--dim);font-size:var(--fs-sm);cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-weight:600}
+  .back:hover{color:var(--text)}
+
+  /* ---- streak flame: ember → lit → roaring ---- */
+  .flame{display:flex;align-items:center;gap:6px;font-weight:800;font-size:var(--fs-base);
+    padding:6px 12px;border-radius:999px;font-variant-numeric:tabular-nums;border:1px solid var(--line);color:var(--faint);background:var(--panel)}
+  .flame.lit{color:var(--amber);border-color:rgba(240,164,60,.35);background:rgba(240,164,60,.10)}
+  .flame.hot{color:var(--amber-hi);border-color:rgba(240,164,60,.55);background:rgba(240,164,60,.14);box-shadow:0 0 18px -4px rgba(240,164,60,.55)}
+
+  /* ---- progress ---- */
+  .prog{height:7px;border-radius:99px;background:var(--raised);overflow:hidden;border:1px solid var(--line)}
+  .prog>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--amber-deep),var(--amber-hi));
+    transition:width .8s var(--ease)}
+
+  .row{display:flex;align-items:center;gap:10px}
+
+  /* ---- catalog clusters: tap to expand; the relevant one starts open ---- */
+  .cluster{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);cursor:pointer;
+    background:var(--raised);border:1px solid var(--line);border-radius:var(--r-md);color:var(--amber)}
+  .cluster .ct{flex:1;font-weight:800;font-size:var(--fs-md);letter-spacing:-.01em;color:var(--text)}
+  .cluster .cn{font-size:var(--fs-xs);color:var(--faint);font-weight:700;letter-spacing:.06em}
+  .cluster .chev{display:flex;color:var(--faint);transition:transform .25s var(--ease)}
+  .cluster.open .chev{transform:rotate(90deg)}
+  .cluster-body{display:flex;flex-direction:column;gap:var(--s4)}
+
+  /* ---- catalog cards: title / promise / deliverable / progress / meta ---- */
+  .course-card{cursor:pointer;position:relative;overflow:hidden}
+  .course-card:not(.soon){border-color:rgba(240,164,60,.3)}
+  .course-card.soon{cursor:default;opacity:.7}
+  .course-card h3{margin-bottom:var(--s1);padding-right:70px}
+  .course-card .desc{font-size:var(--fs-sm);color:var(--dim);margin:0 0 var(--s2);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .delivers{font-size:var(--fs-sm);color:var(--paper);margin:0 0 var(--s3);display:flex;align-items:center;gap:7px;font-weight:600}
+  .course-card .meta{display:flex;justify-content:space-between;align-items:center;margin-top:var(--s3);font-size:var(--fs-sm);color:var(--faint)}
+
+  /* ---- pills ---- */
+  .pill{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+  .pill.soon{background:var(--raised);color:var(--faint);border:1px solid var(--line)}
+  .pill.go{background:rgba(240,164,60,.16);color:var(--amber)}
+  .pill.st-new{background:var(--raised);color:var(--dim);border:1px solid var(--line)}
+  .pill.st-reviewing{background:rgba(240,164,60,.16);color:var(--amber)}
+  .pill.st-building{background:rgba(241,230,206,.12);color:var(--paper)}
+  .pill.st-published{background:rgba(169,196,143,.16);color:var(--sage)}
+  .pill.st-rejected{background:var(--raised);color:var(--faint);border:1px solid var(--line)}
+
+  .req-row{display:flex;align-items:center;gap:10px;padding:var(--s3) var(--s4);border:1px solid var(--line);
+    border-radius:var(--r-md);background:var(--panel);margin-bottom:var(--s2)}
+  .req-row .rt{flex:1;font-size:var(--fs-base);font-weight:600;line-height:1.3}
+  .req-row .rd{font-size:var(--fs-xs);color:var(--faint);margin-top:2px}
+  .req-row.ready{border-color:rgba(169,196,143,.45);cursor:pointer}
+
+  /* ---- evaluation ---- */
+  .scorepill{flex:none;min-width:46px;text-align:center;font-weight:800;font-size:var(--fs-base);
+    padding:6px 10px;border-radius:var(--r-sm);font-variant-numeric:tabular-nums}
+  .scorepill.hi{background:rgba(169,196,143,.16);color:var(--sage);border:1px solid rgba(169,196,143,.4)}
+  .scorepill.mid{background:rgba(240,164,60,.15);color:var(--amber);border:1px solid rgba(240,164,60,.4)}
+  .scorepill.lo{background:rgba(229,130,94,.14);color:var(--terra);border:1px solid rgba(229,130,94,.35)}
+  .scorebig{font-family:var(--serif);font-weight:700;font-size:var(--fd-num);line-height:1;
+    font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  /* Comprehension verdicts: states of understanding, never school grades. */
+  .verdict{font-family:var(--serif);font-weight:600;font-size:var(--fs-xl);line-height:1;letter-spacing:-.01em;flex:none}
+  .verdict.lo_tienes{color:var(--sage)} .verdict.casi{color:var(--amber-hi)} .verdict.todavia_no{color:var(--terra)}
+  .vchip{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 10px;border-radius:999px;flex:none}
+  .vchip.lo_tienes{background:rgba(169,196,143,.16);color:var(--sage);border:1px solid rgba(169,196,143,.4)}
+  .vchip.casi{background:rgba(240,164,60,.15);color:var(--amber);border:1px solid rgba(240,164,60,.4)}
+  .vchip.todavia_no{background:rgba(229,130,94,.14);color:var(--terra);border:1px solid rgba(229,130,94,.35)}
+  .scorebig.hi{color:var(--sage)} .scorebig.mid{color:var(--amber-hi)} .scorebig.lo{color:var(--terra)}
+  .note{font-size:var(--fs-sm);border-radius:var(--r-sm);padding:var(--s3);margin-top:var(--s2);line-height:1.5}
+  .note-warn{color:var(--amber-hi);background:rgba(240,164,60,.08);border:1px solid rgba(240,164,60,.3)}
+  .note-goal{color:var(--dim);background:rgba(241,230,206,.05);border:1px solid rgba(241,230,206,.18)}
+  .note-goal b{color:var(--paper)}
+  .dimrow{display:flex;align-items:center;gap:var(--s2);margin-top:5px}
+  .dimrow span:first-child{font-size:var(--fs-xs);color:var(--dim);width:78px;flex:none}
+  .dimrow span:last-child{font-size:var(--fs-xs);color:var(--dim);width:42px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
+  .dimrow .prog{flex:1;height:5px}
+  /* la tutora está leyendo: anticipation, not a dead button */
+  .reading{display:flex;flex-direction:column;gap:var(--s3)}
+  .readline{height:3px;border-radius:99px;background:var(--raised);overflow:hidden}
+  .readline i{display:block;height:100%;width:40%;border-radius:99px;
+    background:linear-gradient(90deg,transparent,var(--amber),transparent);animation:sweep 1.4s var(--ease) infinite}
+  @keyframes sweep{from{transform:translateX(-100%)}to{transform:translateX(350%)}}
+
+  /* ---- job analysis: a two-minute wait, told honestly ----
+     The analysis really does take ~2 min (the model reasons over 35 module
+     contracts). We name the wait up front, show what is actually happening at
+     each stage, and run a real elapsed clock instead of a fake percentage. */
+  .jstage{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) 0;
+    border-bottom:1px solid var(--line);opacity:.4;transition:opacity var(--dur) var(--ease)}
+  .jstage:last-child{border-bottom:0}
+  .jstage.done,.jstage.now{opacity:1}
+  .jdot{flex:none;width:18px;height:18px;border-radius:99px;border:1.7px solid var(--line-strong);
+    margin-top:2px;display:grid;place-items:center;color:transparent}
+  .jstage.done .jdot{border-color:var(--sage);color:var(--sage)}
+  .jstage.now .jdot{border-color:var(--amber);box-shadow:0 0 0 4px rgba(240,164,60,.13)}
+  .jstage .jtxt{flex:1;font-size:var(--fs-base);color:var(--dim)}
+  .jstage.now .jtxt{color:var(--text)}
+  .jstage.done .jtxt{color:var(--dim)}
+  .jstage .jsub{display:none;margin-top:6px}
+  .jstage.now .jsub{display:block}
+  .jclock{font-variant-numeric:tabular-nums;color:var(--faint);font-size:var(--fs-sm)}
+  .jslow{margin-top:var(--s3)}
+  /* coverage read-out on the result */
+  .covbar{height:8px;border-radius:99px;background:var(--raised);overflow:hidden;margin-top:var(--s2)}
+  .covbar i{display:block;height:100%;border-radius:99px;background:var(--amber);
+    transition:width .9s var(--ease)}
+  .gaprow{display:flex;gap:var(--s2);align-items:flex-start;padding:var(--s2) 0;
+    font-size:var(--fs-sm);color:var(--dim)}
+  .gaprow .gx{flex:none;color:var(--terra);margin-top:1px}
+  .jcourse{border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);
+    padding:var(--s3) var(--s4);margin-bottom:var(--s2)}
+  .jcourse .jtitle{font-weight:700;font-size:var(--fs-md)}
+  .jcourse .jdepth{font-size:var(--fs-xs);color:var(--amber);letter-spacing:.04em;
+    text-transform:uppercase;margin-top:2px}
+  .jcourse .jwhy{font-size:var(--fs-sm);color:var(--dim);margin-top:var(--s2)}
+  .phasehead{font-size:var(--fs-sm);font-weight:800;color:var(--amber);letter-spacing:.04em;
+    margin:var(--s4) 0 var(--s2)}
+  .phasehead.later{color:var(--faint)}
+
+  .caprow{border-color:rgba(240,164,60,.4)!important;background:linear-gradient(140deg,rgba(240,164,60,.08),var(--panel))}
+  .pf-row{border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);
+    padding:var(--s3) var(--s4);margin-bottom:var(--s2);cursor:pointer}
+  .pf-row .fb{display:none;font-size:var(--fs-sm);color:var(--dim);margin-top:var(--s2);white-space:pre-wrap}
+  .pf-row.open .fb{display:block}
+
+  /* ---- temario rows ---- */
+  .modhead{font-size:var(--fs-sm);font-weight:800;color:var(--amber);letter-spacing:.04em;margin:var(--s4) 0 var(--s2)}
+  .lrow{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border:1px solid var(--line);
+    border-radius:var(--r-md);background:var(--panel);margin-bottom:var(--s2)}
+  .lrow.done{border-color:rgba(169,196,143,.3)} .lrow.current{border-color:rgba(240,164,60,.5)}
+  .lrow.locked,.lrow.coming{opacity:.55} .lrow.clickable{cursor:pointer}
+  .lrow .num{width:28px;height:28px;flex:none;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    font-size:var(--fs-sm);font-weight:800;background:var(--ink);border:1px solid var(--line);color:var(--dim)}
+  .lrow.done .num{background:var(--sage);color:var(--sage-ink);border-color:var(--sage)}
+  .lrow.current .num{background:var(--amber);color:var(--amber-ink);border-color:var(--amber)}
+  .lrow .lt{flex:1;font-size:var(--fs-base);font-weight:600;line-height:1.25}
+  .lrow .st{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
+  .lrow .obj{flex-basis:100%;font-size:var(--fs-sm);color:var(--dim);padding-top:var(--s1)}
+
+  /* ---- lesson ---- */
+  video{width:100%;border-radius:var(--r-lg);background:#000;aspect-ratio:9/16;max-height:60svh;object-fit:contain}
+  .lesson-head{display:flex;justify-content:space-between;align-items:center}
+  .navbtns{display:flex;gap:var(--s2)}
+  .navbtns button{flex:1;font-size:var(--fs-sm);font-weight:700;padding:11px;border-radius:var(--r-sm);
+    background:var(--panel);border:1px solid var(--line);color:var(--text)}
+  .navbtns button:disabled{opacity:.35}
+  .seg{display:flex;gap:var(--s2)}
+  .seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:var(--fs-sm);font-weight:700;
+    padding:11px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--dim);transition:all .2s}
+  .seg button.on{color:var(--amber);border-color:var(--amber);background:rgba(240,164,60,.08)}
+  .opt{width:100%;text-align:left;font-size:var(--fs-base);color:var(--text);background:var(--panel);
+    border:1px solid var(--line);border-radius:var(--r-md);padding:14px;display:flex;gap:11px;align-items:center;transition:border-color .15s}
+  .opt .key{width:24px;height:24px;flex:none;border-radius:7px;background:var(--ink);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:var(--fs-sm);font-weight:800;color:var(--dim)}
+  .opt.correct{border-color:var(--sage);background:rgba(169,196,143,.10)} .opt.correct .key{background:var(--sage);color:var(--sage-ink)}
+  .opt.wrong{border-color:var(--terra);background:rgba(229,130,94,.09)} .opt.wrong .key{background:var(--terra);color:var(--terra-ink)}
+  .explain{font-size:var(--fs-sm);color:var(--dim);background:rgba(241,230,206,.05);border:1px solid rgba(241,230,206,.16);
+    border-radius:var(--r-sm);padding:var(--s3);margin-top:var(--s2)}
+  .qblock{display:flex;flex-direction:column;gap:9px} .qblock h4{font-size:var(--fs-md);font-weight:700;line-height:1.3}
+
+  /* ---- taller tag (was ai-tag): the workshop label, paper-toned ---- */
+  .ai-tag{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:800;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--paper)}
+  .ai-tag .dot{width:6px;height:6px;border-radius:99px;background:var(--paper);box-shadow:0 0 8px rgba(241,230,206,.8)}
+  .ai-card{border-color:rgba(241,230,206,.28)}
+  .prompt{font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-xs);color:#E8DFC8;background:var(--ink);
+    border:1px solid rgba(241,230,206,.2);border-radius:var(--r-sm);padding:var(--s3);line-height:1.6;white-space:pre-wrap;margin-top:var(--s2)}
+  .copybtn{margin-top:9px;display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:700;
+    color:var(--paper);background:rgba(241,230,206,.08);border:1px solid rgba(241,230,206,.25);border-radius:8px;padding:8px 12px}
+
+  /* ---- written guide ---- */
+  .written h2{font-family:var(--serif);font-size:var(--fs-lg);margin:var(--s4) 0 var(--s2)}
+  .written h3{font-size:var(--fs-md);margin:var(--s3) 0 var(--s1)}
+  .written p{font-size:var(--fs-base);margin:var(--s2) 0}
+  .written ul,.written ol{margin:var(--s2) 0 var(--s2) 20px;font-size:var(--fs-base)} .written li{margin-bottom:6px}
+  .written table{width:100%;border-collapse:collapse;margin:var(--s3) 0;font-size:var(--fs-sm)}
+  .written th,.written td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+  .written th{background:var(--raised);color:var(--amber);font-weight:700}
+  .written code{background:var(--raised);padding:2px 5px;border-radius:5px;font-size:var(--fs-sm)}
+  .diagram{background:#fff;border-radius:var(--r-md);padding:var(--s4);margin:var(--s3) 0;overflow-x:auto}
+  .diagram-title{font-size:var(--fs-sm);font-weight:700;color:var(--amber);margin-bottom:var(--s2)}
+
+  /* ---- celebration ---- */
+  .celebrate{text-align:center;display:flex;flex-direction:column;align-items:center;gap:var(--s2);padding-top:var(--s5)}
+  .medal{width:92px;height:92px;border-radius:99px;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 35% 30%,var(--amber-hi),var(--amber-deep));
+    box-shadow:0 0 54px rgba(240,164,60,.55);color:var(--amber-ink);animation:pop .55s cubic-bezier(.2,1.4,.4,1)}
+  .medal .ic{width:40px;height:40px;stroke-width:2}
+  @keyframes pop{0%{transform:scale(0) rotate(-12deg)}100%{transform:scale(1) rotate(0)}}
+  .bigstreak{font-family:var(--serif);font-weight:700;font-size:56px;line-height:1;margin-top:var(--s2);
+    font-variant-numeric:tabular-nums;background:linear-gradient(120deg,var(--amber-hi),var(--amber-deep));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* ---- the paper mock (landing hero): the work, literally glowing ---- */
+  .docmock{background:linear-gradient(160deg,#FBF4E3,var(--paper));color:var(--paper-ink);border-radius:6px;
+    padding:22px 20px;transform:rotate(-1.6deg);box-shadow:0 18px 44px -14px rgba(241,230,206,.3),0 4px 14px rgba(0,0,0,.4);
+    cursor:pointer;margin:var(--s3) var(--s2) var(--s2)}
+  .docmock .dm-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:#8a6d3a}
+  .docmock .dm-title{font-family:var(--serif);font-weight:600;font-size:17px;line-height:1.2;margin:6px 0 12px}
+  .docmock .dm-line{height:5px;border-radius:3px;background:rgba(38,32,15,.16);margin-bottom:7px}
+  .docmock .w9{width:92%}.docmock .w7{width:70%}.docmock .w8{width:82%}.docmock .w5{width:55%}
+  .docmock .dm-sig{font-family:var(--serif);font-style:italic;font-size:12px;margin-top:12px;color:#6b5327;text-align:right}
+
+  /* ---- bottom nav ---- */
+  .tabbar{position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(16,13,23,.9);backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);display:flex;justify-content:space-around;
+    padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+  .tabbar button{color:var(--faint);font-size:10px;font-weight:700;display:flex;flex-direction:column;
+    align-items:center;gap:3px;padding:4px 14px;letter-spacing:.02em}
+  .tabbar button .ic{width:21px;height:21px}
+  .tabbar button.on{color:var(--amber)}
+
+  .hide{display:none!important}
+  a.textlink{color:var(--amber);font-weight:700;text-decoration:none}
+  .center{text-align:center}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<!-- Pinned to an exact version with SRI: a floating @12 tag plus no integrity
+     attribute meant a CDN compromise (or a bad 12.x) executed on a page that
+     carries a learner's portfolio. DOMPurify is REQUIRED here, not optional:
+     marked emits raw HTML by design and content_md is compiled from learner
+     submissions. -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"
+        integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"
+        integrity="sha384-+VfUPEb0PdtChMwmBcBmykRMDd+v6D/oFmB3rZM/puCMDYcIvF968OimRh4KQY9a" crossorigin="anonymous"></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({startOnLoad:false, theme:'default', securityLevel:'loose'});
+  window.renderMermaid=async(el)=>{try{await mermaid.run({nodes:[el]});}catch(e){el.textContent='(diagrama no disponible)';}};
+</script>
+</head>
+<body>
+<div class="app" id="app"><div class="center muted" style="margin-top:40px">Cargando…</div></div>
+<div class="tabbar hide" id="tabbar"></div>
+
+<script>
+const $=(h)=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const app=document.getElementById('app'), tabbar=document.getElementById('tabbar');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// Render untrusted Markdown: parse, then STRIP active content. Never assign
+// marked.parse() straight into innerHTML — that was a stored-XSS sink on the
+// public share pages (2026-08-12 audit): marked emits raw HTML by design and
+// content_md is compiled from learner submissions. Degrades to plain text if
+// DOMPurify did not load, rather than rendering unsanitised HTML.
+const renderMD=(el,md)=>{
+  if(!el) return;
+  if(!window.marked){ el.textContent = md || ''; return; }
+  const html = marked.parse(md || '');
+  if(window.DOMPurify){ el.innerHTML = DOMPurify.sanitize(html); }
+  else { el.textContent = md || ''; }
+};
+async function api(p,o){const r=await fetch('/api/learn'+p,{headers:{'Content-Type':'application/json'},...o}); if(r.status===401)return{__unauth:true}; return r.json();}
+
+/* Evaluations really take 25-35s (measured), and there was no timeout anywhere:
+   a stalled request left the "tu tutora está leyendo" card spinning forever with
+   the send button hidden, and the only way out — reload — destroyed the work,
+   because nothing was ever saved. Both halves are fixed here. */
+const EVAL_TIMEOUT_MS=90000;
+async function postWithTimeout(path,body,ms){
+  const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),ms||EVAL_TIMEOUT_MS);
+  try{
+    const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body),signal:ctl.signal});
+    return {res:r, data:await r.json().catch(()=>({}))};
+  }catch(e){
+    return {res:null, data:{detail: e&&e.name==='AbortError'
+      ? 'La evaluación está tardando más de lo normal. Tu trabajo sigue aquí — vuelve a enviarlo.'
+      : 'Se cortó la conexión. Tu trabajo sigue aquí — vuelve a enviarlo cuando tengas señal.'}};
+  }finally{ clearTimeout(t); }
+}
+/* Drafts: keyed per work item so two lessons never overwrite each other. */
+const draftKey=(kind,id)=>`aprende_draft_${kind}_${id}`;
+function attachDraft(ta,kind,id){
+  if(!ta)return;
+  const k=draftKey(kind,id);
+  try{ const saved=localStorage.getItem(k); if(saved&&!ta.value)ta.value=saved; }catch(e){}
+  let timer=null;
+  ta.addEventListener('input',()=>{ clearTimeout(timer);
+    timer=setTimeout(()=>{ try{ localStorage.setItem(k,ta.value); }catch(e){} },400); });
+}
+function clearDraft(kind,id){ try{ localStorage.removeItem(draftKey(kind,id)); }catch(e){} }
+let STATE={tab:'cursos'};
+
+/* ---- drawn icons: one stroke weight, currentColor, no emoji in the chrome ---- */
+const PATHS={
+  play:'M8 5.8v12.4c0 .8.9 1.3 1.6.9l10-6.2c.6-.4.6-1.4 0-1.8l-10-6.2c-.7-.4-1.6.1-1.6.9Z',
+  book:'M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z',
+  tool:'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
+  flame:'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z',
+  flag:'M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7',
+  doc:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8',
+  mic:'M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3ZM19 10v2a7 7 0 0 1-14 0v-2M12 19v3',
+  target:'M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0-20 0M12 12m-6 0a6 6 0 1 0 12 0a6 6 0 1 0-12 0M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0',
+  redo:'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8M3 3v5h5',
+  lock:'M3 11h18v11H3zM7 11V7a5 5 0 0 1 10 0v4',
+  check:'M20 6 9 17l-5-5',
+  arrow:'m9 18 6-6-6-6',
+  spark:'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.9 2.6L22.5 18l-2.6.9L19 21.5l-.9-2.6L15.5 18l2.6-.9z',
+  clock:'M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0-20 0M12 6v6l4 2',
+  send:'m22 2-7 20-4-9-9-4ZM22 2 11 13',
+  copy:'M9 9h13v13H9zM5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1',
+  pen:'M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z',
+  alert:'M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01',
+  sun:'M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0-8 0M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4',
+  user:'M12 8m-4 0a4 4 0 1 0 8 0a4 4 0 1 0-8 0M20 21a8 8 0 0 0-16 0',
+  down:'M12 3v14m0 0 5-5m-5 5-5-5M5 21h14'
+};
+const I=(n,cls='ic')=>`<svg class="${cls}" viewBox="0 0 24 24"><path d="${PATHS[n]||''}"/></svg>`;
+
+/* catalog clustering: categories come from the course TOMLs; unknowns bucket
+   into 'Más cursos'. One cluster starts open — the relevant one — the rest
+   show a count. Built for the catalog this becomes, not the one it is. */
+const CAT_ICON={'Marketing y contenido':'pen','Publicidad digital':'target','IA y automatización':'spark'};
+function clusterize(courses){
+  const m=new Map();
+  courses.forEach(c=>{const k=c.category||'Más cursos';if(!m.has(k))m.set(k,[]);m.get(k).push(c);});
+  return [...m.entries()];
+}
+function renderClusters(cats, openCat, renderCourse){
+  cats.forEach(([cat,items])=>{
+    const open=cat===openCat;
+    const head=$(`<div class="cluster ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<span class="ct">${esc(cat)}</span><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
+    const body=$(`<div class="cluster-body ${open?'':'hide'}"></div>`);
+    items.forEach(c=>body.append(renderCourse(c)));
+    head.onclick=()=>{head.classList.toggle('open');body.classList.toggle('hide');};
+    app.append(head); app.append(body);
+  });
+}
+
+/* streak chip: ember (0) → lit (1-6) → roaring (7+) */
+const flameChip=(n)=>`<div class="flame ${n>=7?'hot':n>=1?'lit':''}">${I('flame','ic ic-s')} ${n}</div>`;
+/* the tutor is reading: anticipation state for every evaluation wait */
+const readingCard=(msg)=>$(`<div class="card reading"><div class="row" style="gap:8px;color:var(--dim);font-size:var(--fs-base)">${I('spark','ic ic-s')} <span>${msg}</span></div><div class="readline"><i></i></div></div>`);
+/* Route entries: v2 carries a module set, v1 only a depth. One formatter for both,
+   so a skipped module reads honestly ("Módulos 1 y 3") instead of as a prefix. */
+const modLabel=(r)=>{
+  const m=r.modules&&r.modules.length?r.modules:null;
+  if(!m)return 'Hasta módulo '+r.through_module;
+  const seq=m.length===m[m.length-1]-m[0]+1;
+  if(seq&&m[0]===1)return m.length===1?'Módulo 1':'Hasta módulo '+m[m.length-1];
+  if(m.length===1)return 'Módulo '+m[0];
+  return 'Módulos '+m.slice(0,-1).join(', ')+' y '+m[m.length-1];
+};
+
+let AUTH=false;
+/* Hash router: back button, refresh and deep links all work. Public views for
+   strangers; the app for learners. Mid-lesson steps stay function-driven. */
+function nav(hash){ if(location.hash===hash)route(); else location.hash=hash; }
+window.addEventListener('hashchange', route);
+async function route(){
+  const h=location.hash.replace(/^#\/?/,'');
+  const [seg,arg,step]=h.split('/');
+  if(!AUTH){
+    if(seg==='login')renderLogin(new URLSearchParams(location.search).get('error'));
+    else if(seg==='lista')renderWaitlistForm();
+    else if(seg==='oferta')renderJobBox();
+    else if(seg==='explora'&&arg)renderPublicOutline(arg);
+    else renderLanding();
+    return;
+  }
+  const tabOf={hoy:'hoy',objetivo:'hoy',cursos:'cursos',curso:'cursos',leccion:'cursos',reto:'cursos',
+               portafolio:'portafolio',documento:'portafolio','caso-view':'portafolio',perfil:'perfil'};
+  STATE.tab=tabOf[seg]||'hoy';
+  showTabs();
+  if(seg==='objetivo')viewObjetivo();
+  // Reachable while logged in too: an existing learner who finds a new offer
+  // must be able to analyse it. This branch was missing, so the "Pega tu oferta"
+  // button inside #/objetivo silently dropped authed learners on Hoy.
+  else if(seg==='oferta')renderJobBox();
+  else if(seg==='cursos')viewCatalog();
+  else if(seg==='curso'&&arg)viewOutline(arg);
+  else if(seg==='leccion'&&arg)openLesson(parseInt(arg,10),step);
+  else if(seg==='reto'&&arg)openCapstone(parseInt(arg,10));
+  else if(seg==='portafolio')viewPortfolio();
+  else if(seg==='documento'&&arg)viewProjectDoc(arg);
+  else if(seg==='caso-view'&&arg)viewCaseStudy(arg);
+  else if(seg==='perfil')viewProfile();
+  else if(seg==='como-funciona')renderOrientation(true);
+  else viewToday();
+}
+async function boot(){
+  const me=await api('/me');
+  AUTH=!!me.authenticated;
+  STATE.me=me;   // carries the declared project; the exercise step and Perfil read it
+  // A route analysed before signing up is the reason many people sign up at all.
+  // It lives in localStorage until there is a session to attach it to; without
+  // this the most motivating artifact we can produce evaporates at the door.
+  if(AUTH){
+    let jt=null; try{ jt=localStorage.getItem('aprende_job_token'); }catch(e){}
+    if(jt){
+      try{
+        await api('/job-target/claim',{method:'POST',body:JSON.stringify({token:jt})});
+        localStorage.removeItem('aprende_job_token');
+      }catch(e){}   // non-fatal: never block boot on this
+    }
+  }
+  const invite=new URLSearchParams(location.search).get('invite');
+  if(!AUTH&&invite){renderLogin();return;}   // invited links go straight to login
+  if(AUTH&&!localStorage.getItem('aprende_onboarded')){renderOrientation(false);return;}
+  route();
+}
+
+/* ---------- login ---------- */
+function renderLogin(err){
+  tabbar.classList.add('hide'); app.innerHTML='';
+  const back=$(`<div class="back" style="margin-bottom:10px">‹ Conocer Aprende IA</div>`);
+  back.onclick=()=>nav('#/'); app.append(back);
+  app.append($(`<div class="brandrow"><div class="brandmark"></div><div class="brandname">Aprende IA<small>Aprende haciendo, con tutora IA</small></div></div>`));
+  const box=$(`<div style="margin:auto 0;display:flex;flex-direction:column;gap:15px">
+    <div><div class="eyebrow">Tu clase de hoy te espera</div>
+    <h1 style="margin-top:10px">Aprende haciendo, un día a la vez.</h1>
+    <p class="muted" style="margin-top:10px">Entra con tu código de invitación. Cada día: un video corto, algo real que hacer, y feedback de tu tutora IA. Terminas con un portafolio, no con un certificado.</p></div>
+    ${err?`<div class="card" style="border-color:var(--terra);color:var(--terra);font-size:var(--fs-sm)">El enlace no es válido o expiró. Pide uno nuevo.</div>`:''}
+    <div><label>Tu nombre</label><input id="name" placeholder="Ana"></div>
+    <div><label>Tu correo</label><input id="email" type="email" placeholder="tu@correo.com" autocomplete="email"></div>
+    <div><label>Código de invitación</label><input id="invite" placeholder="Tu código de acceso"></div>
+    <input id="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
+    <button class="btn btn-primary" id="go">Entrar</button>
+    <div id="loginmsg" class="center muted t-sm"></div></div>`);
+  app.append(box);
+  const pre=new URLSearchParams(location.search).get('invite'); if(pre)box.querySelector('#invite').value=pre;
+  box.querySelector('#go').onclick=doLogin;
+}
+async function doLogin(){
+  const email=app.querySelector('#email').value.trim(), name=app.querySelector('#name').value.trim();
+  const invite=app.querySelector('#invite').value.trim(), company=app.querySelector('#company').value;
+  const msg=app.querySelector('#loginmsg');
+  if(!email.includes('@')){msg.textContent='Escribe un correo válido.';return;}
+  msg.textContent='Un momento…';
+  const res=await fetch('/api/learn/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,name,invite,company})});
+  if(res.status===429){msg.textContent='Demasiados intentos. Espera unos minutos.';return;}
+  if(res.status===403){msg.textContent='Necesitas un código de invitación válido para entrar.';return;}
+  const r=await res.json();
+  if(r.sent)msg.innerHTML='Te enviamos un enlace a tu correo. Ábrelo para entrar.';
+  else if(r.dev_link)window.location=r.dev_link;
+  else msg.textContent='No pudimos generar tu acceso.';
+}
+
+/* ---------- public layer: the platform's face for strangers ---------- */
+/* "Cómo funciona" on two axes, because those are the two questions a stranger
+   actually has: QUÉ HAGO (numbered steps, in order) and QUÉ RECIBO (artifacts).
+   One source, rendered on the public landing AND in first-login orientation, so
+   the two can never drift — the previous single list had gone stale describing a
+   course-shaped product after the goal engine shipped. */
+const STEPS=[
+  ['Dinos qué quieres ser','Pega la oferta de trabajo que te interesa, o solo el nombre del puesto. En unos dos minutos sabes qué pide de verdad, qué parte cubrimos, qué no, y tu ruta: qué cursos y qué módulos, en qué orden.'],
+  ['Elige tu proyecto real','Tu negocio, o una marca donde te gustaría trabajar. Todos los ejercicios se hacen sobre ese mismo proyecto, y por eso lo que produces te sirve fuera de aquí.'],
+  ['Una lección al día','Un video corto con el porqué, una guía escrita con el cómo, lo explicas con tus palabras, y un ejercicio donde pegas el trabajo que hiciste de verdad.'],
+  ['Tu tutora lo lee y te contesta','Recibes un puntaje, qué te falta para llegar a 100, y una pregunta que solo puede contestar quien hizo el trabajo. Reintentas sin límite y siempre se queda tu mejor intento. Usar IA está permitido: evaluamos que el trabajo sea tuyo, no quién escribió el primer borrador.']
+];
+const GETS=[
+  ['doc','El documento que vas a mostrar','Tus entregas compiladas en un entregable profesional con tu nombre: una estrategia, un plan de campaña, una auditoría. Con enlace para compartir y PDF para imprimir.'],
+  ['target','Tu ruta, siempre a la vista','Cuánto llevas del puesto que quieres, curso por curso y módulo por módulo. Empiezas por lo que más pesa, no por el principio de todo.'],
+  ['alert','Lo que te falta, dicho por su nombre','Si el puesto pide algo que no enseñamos, te lo decimos y te lo listamos. Preferimos eso a venderte un curso que no lo cubre.']
+];
+const howCard=([ic,t,p])=>$(`<div class="card"><div class="row" style="gap:10px;color:var(--amber)">${I(ic)}<b class="t-md" style="color:var(--text)">${t}</b></div><p class="muted t-sm" style="margin-top:8px">${p}</p></div>`);
+const stepCard=(i,[t,p])=>$(`<div class="card"><div class="row" style="gap:10px">
+  <span style="width:26px;height:26px;flex:none;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-size:var(--fs-sm);font-weight:800;background:var(--amber);color:var(--amber-ink)">${i}</span>
+  <b class="t-md">${t}</b></div><p class="muted t-sm" style="margin-top:8px">${p}</p></div>`);
+function renderHow(target){
+  target.append($(`<div class="microlabel" style="margin-top:16px">Cómo funciona · cuatro pasos</div>`));
+  STEPS.forEach((s,i)=>target.append(stepCard(i+1,s)));
+  target.append($(`<div class="microlabel" style="margin-top:16px">Qué te llevas</div>`));
+  GETS.forEach(g=>target.append(howCard(g)));
+  target.append($(`<p class="faint t-sm" style="margin:12px 2px 0">No damos certificados: nadie contrata por uno nuestro. Damos el trabajo que hiciste, con tu nombre.</p>`));
+}
+
+async function renderLanding(){
+  tabbar.classList.add('hide'); app.innerHTML='';
+  app.append($(`<div class="brandrow"><div class="brandmark"></div><div class="brandname">Aprende IA<small>Aprende haciendo, con tutora IA</small></div></div>`));
+  // Lead with the goal engine, not a list of subjects: the catalog now spans six
+  // clusters and enumerating them ages badly (this line still said "marketing,
+  // publicidad y automatización" after seven more courses shipped). The promise
+  // that stays true as the catalog grows is the mechanism, not its contents.
+  app.append($(`<div style="margin-top:14px"><div class="eyebrow">Aprende haciendo</div>
+    <h1 style="font-size:36px;margin-top:10px">Dinos qué quieres ser. Nosotros armamos el plan.</h1>
+    <p class="muted" style="margin-top:10px">Pega la oferta de trabajo que quieres, o solo el puesto. Te decimos qué pide de verdad, qué te falta, qué estudiar y en qué orden — y terminas con un documento profesional tuyo para llevar a la entrevista. En español, para LatAm, con tutora IA.</p></div>`));
+  const mock=$(`<div class="docmock">
+    <!-- Ejemplo, no una alumna real: este documento se armó con entregas de
+         demostración (la cuenta no tiene lecciones completadas). Decía
+         "documento real de una alumna", y la honestidad editorial es
+         literalmente la marca (docs/01) — se corrige hasta que haya un
+         documento de verdad que mostrar. -->
+    <div class="dm-eyebrow">Ejemplo del documento que armas aquí</div>
+    <div class="dm-title">Auditoría SEO + AEO — Casaideas</div>
+    <div class="dm-line w9"></div><div class="dm-line w7"></div><div class="dm-line w8"></div><div class="dm-line w5"></div>
+    <div class="dm-sig">Ejemplo · ver completo →</div></div>`);
+  mock.onclick=()=>window.open('/aprende/doc/ZgLgHKMdSPwMIfed','_blank');
+  app.append(mock);
+  // The job-posting box is the front door: it turns "aprender IA" into
+  // "conseguir ESTE trabajo", which is the only motivation that survives
+  // contact with a 30-day course. See docs/08-job-target.md.
+  const cta=$(`<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+    <button class="btn btn-primary" id="joboffer">Dinos qué quieres ser ${I('arrow','ic ic-s')}</button>
+    <p class="faint t-sm center" style="margin:-2px 0 6px">Pega una oferta real o solo el puesto: te armamos el plan y el documento para la entrevista.</p>
+    <button class="btn btn-ghost" id="join">Quiero entrar</button>
+    <button class="btn btn-ghost" id="haveinvite">Tengo una invitación</button></div>`);
+  cta.querySelector('#joboffer').onclick=()=>nav('#/oferta');
+  cta.querySelector('#join').onclick=()=>nav('#/lista');
+  cta.querySelector('#haveinvite').onclick=()=>nav('#/login');
+  app.append(cta);
+  renderHow(app);
+  app.append($(`<div class="microlabel" style="margin-top:16px">Las áreas · toca una para ver sus cursos y temarios</div>`));
+  const d=await api('/public/catalog');
+  const pubCard=(c)=>{
+    const card=$(`<div class="card course-card">
+      <h3 style="padding-right:10px">${esc(c.title)}</h3>
+      ${c.description?`<p class="desc">${esc(c.description)}</p>`:''}
+      ${c.doc_type?`<p class="delivers">${I('doc','ic ic-s')} Termina con: ${esc(c.doc_type)}</p>`:''}
+      <div class="meta"><span>${c.total} lecciones · ${c.modules} módulos</span>${I('arrow','ic ic-s')}</div></div>`);
+    card.onclick=()=>nav('#/explora/'+c.slug); return card;
+  };
+  const cats=clusterize(d.courses||[]);
+  renderClusters(cats, cats[0]?cats[0][0]:null, pubCard);
+  app.append($(`<p class="muted t-sm center" style="margin:14px 0 0">¿Tu tema no está? Dentro de la plataforma puedes <b>pedir tu curso</b> y lo construimos.</p>`));
+  app.append($(`<p class="faint t-sm center" style="margin:10px 0 8px">Acceso por invitación mientras estamos en fase alfa.</p>`));
+}
+async function renderPublicOutline(slug){
+  tabbar.classList.add('hide'); app.innerHTML='';
+  const d=await api('/public/course/'+slug);
+  if(d.detail){nav('#/');return;}
+  const back=$(`<div class="back">‹ Volver</div>`); back.onclick=()=>nav('#/'); app.append(back);
+  app.append($(`<div style="margin-top:6px"><h2>${esc(d.title)}</h2>
+    ${d.description?`<p class="muted t-sm" style="margin-top:8px">${esc(d.description)}</p>`:''}
+    ${d.doc_type?`<p class="delivers" style="margin-top:8px">${I('doc','ic ic-s')} Termina con: ${esc(d.doc_type)}</p>`:''}</div>`));
+  d.modules.forEach(m=>{
+    app.append($(`<div class="modhead">Módulo ${m.module_no} · ${esc(m.module_title)}</div>`));
+    if(m.module_description)app.append($(`<p class="muted t-sm" style="margin:-2px 0 10px">${esc(m.module_description)}</p>`));
+    m.lessons.forEach(l=>{
+      app.append($(`<div class="lrow" style="flex-wrap:wrap"><div class="num">${l.position}</div><div class="lt">${esc(l.title)}</div>
+        ${l.objectives?`<div class="obj">Al terminar podrás: ${esc(l.objectives)}</div>`:''}</div>`));
+    });
+  });
+  const cta=$(`<button class="btn btn-primary" style="margin-top:10px">Quiero tomar este curso ${I('arrow','ic ic-s')}</button>`);
+  cta.onclick=()=>nav('#/lista'); app.append(cta);
+}
+function renderWaitlistForm(){
+  tabbar.classList.add('hide'); app.innerHTML='';
+  const back=$(`<div class="back">‹ Volver</div>`); back.onclick=()=>nav('#/'); app.append(back);
+  const box=$(`<div style="margin-top:14px;display:flex;flex-direction:column;gap:15px">
+    <div><div class="eyebrow">Lista de espera</div>
+    <h1 style="margin-top:10px">Te avisamos cuando se abra tu cupo.</h1>
+    <p class="muted" style="margin-top:8px">Estamos en fase alfa con acceso por invitación. Déjanos tu correo y cuéntanos qué quieres aprender.</p></div>
+    <div><label>Tu nombre</label><input id="wname" placeholder="Ana"></div>
+    <div><label>Tu correo</label><input id="wemail" type="email" placeholder="tu@correo.com"></div>
+    <div><label>¿Qué quieres lograr? (opcional)</label><textarea id="wmotivo" maxlength="500" placeholder="Ej: conseguir trabajo en marketing digital, hacer crecer mi tienda..."></textarea></div>
+    <!-- If they came from a job analysis, the role IS the answer. Prefilling it
+         costs them nothing and turns the waitlist into a real demand signal. -->
+    <input id="wcompany" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
+    <button class="btn btn-primary" id="wsend">Anotarme</button>
+    <div id="wmsg" class="center muted t-sm"></div></div>`);
+  app.append(box);
+  let jobRole=''; try{ jobRole=sessionStorage.getItem('aprende_job_role')||''; }catch(e){}
+  if(jobRole)box.querySelector('#wmotivo').value='Quiero postular a: '+jobRole;
+  box.querySelector('#wsend').onclick=async()=>{
+    const email=box.querySelector('#wemail').value.trim(), msg=box.querySelector('#wmsg');
+    if(!email.includes('@')){msg.textContent='Escribe un correo válido.';return;}
+    const res=await fetch('/api/learn/waitlist',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:box.querySelector('#wname').value.trim(),email,
+        motivo:box.querySelector('#wmotivo').value.trim(),company:box.querySelector('#wcompany').value})});
+    if(!res.ok){msg.textContent='No pudimos anotarte, intenta de nuevo.';return;}
+    box.innerHTML=`<div class="celebrate"><div class="medal">${I('send','ic')}</div><h2 style="margin-top:18px">¡Listo!</h2><p class="muted">Te escribiremos cuando tu cupo esté disponible.</p></div>`;
+  };
+}
+
+/* ---------- job target: paste a posting, get a route ----------
+   The analysis genuinely takes ~2 minutes: the model reads the whole posting and
+   crosses it against all 35 module contracts. We say so BEFORE they start, then
+   show what is actually happening at each step and run a real elapsed clock.
+   No fake percentage — the house rule is that we don't lie to people. */
+const JOB_STAGES=[
+  [0,  'Leyendo la oferta completa','Cada requisito, incluso los que vienen escondidos en la descripción.'],
+  [12, 'Separando lo que de verdad se estudia','Las competencias que puedes aprender, no los años de experiencia ni "ortografía impecable".'],
+  [34, 'Cruzando con las 210 lecciones','Los 35 módulos del catálogo, uno por uno, para ver cuál cubre cada competencia.'],
+  [72, 'Decidiendo hasta dónde tienes que llegar','Casi nunca necesitas el curso completo: depende de lo que pida el puesto.'],
+  [104,'Escribiendo tu ruta y tu documento','Qué estudiar, en qué orden, y qué vas a poder llevar a la entrevista.']
+];
+const JOB_SLOW_AT=170;   // seconds — past this we say so instead of pretending
+
+function renderJobBox(){
+  // Authed learners keep their tab bar and go back to their goal, not to the
+  // public landing — this screen is reachable from inside the app now.
+  tabbar.classList.toggle('hide',!AUTH); app.innerHTML='';
+  const back=$(`<div class="back">${AUTH?'‹ Mi objetivo':'‹ Volver'}</div>`);
+  back.onclick=()=>nav(AUTH?'#/objetivo':'#/'); app.append(back);
+  // Two front doors, one matcher (docs/09 item 4): a real posting, or just the
+  // role/skill the person wants. Same honesty either way.
+  const box=$(`<div style="margin-top:14px;display:flex;flex-direction:column;gap:15px">
+    <div><div class="eyebrow">Tu próximo trabajo</div>
+    <h1 style="margin-top:10px">Dinos qué quieres.</h1>
+    <p class="muted" style="margin-top:8px">Te armamos el plan de estudio y te decimos qué documento llevar a la entrevista. Te decimos también lo que el puesto pide y nosotros <b>no</b> cubrimos.</p></div>
+    <div class="seg"><button id="moferta" class="on">Tengo una oferta</button><button id="mpuesto">Solo sé el puesto</button></div>
+    <div id="fofferta"><label>La oferta de trabajo</label>
+      <textarea id="jtext" rows="10" maxlength="12000" placeholder="Pega aquí las funciones y los requisitos de la oferta…"></textarea>
+      <p class="faint t-sm" style="margin-top:6px">Mientras más completa la pegues, mejor la ruta. Solo funciones y requisitos basta.</p></div>
+    <div id="fpuesto" class="hide"><label>El puesto o la habilidad que quieres</label>
+      <input id="jgoal" maxlength="140" placeholder="Ej: community manager / especialista en Google Ads">
+      <p class="faint t-sm" style="margin-top:6px">Armamos la ruta con lo que ese rol exige típicamente hoy. Con una oferta real la ruta sale más precisa.</p></div>
+    <input id="jcompany" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
+    <div class="note note-warn">${I('clock','ic ic-s')} <span>El análisis tarda <b>cerca de dos minutos</b>. Tu tutora lo cruza con las lecciones del catálogo, módulo por módulo. No cierres esta pestaña.</span></div>
+    <button class="btn btn-primary" id="jgo">Armar mi ruta ${I('arrow','ic ic-s')}</button>
+    <div id="jmsg" class="center muted t-sm"></div></div>`);
+  app.append(box);
+  let mode='oferta';
+  const seg=(m)=>{mode=m;
+    box.querySelector('#moferta').classList.toggle('on',m==='oferta');
+    box.querySelector('#mpuesto').classList.toggle('on',m==='puesto');
+    box.querySelector('#fofferta').classList.toggle('hide',m!=='oferta');
+    box.querySelector('#fpuesto').classList.toggle('hide',m!=='puesto');};
+  box.querySelector('#moferta').onclick=()=>seg('oferta');
+  box.querySelector('#mpuesto').onclick=()=>seg('puesto');
+  box.querySelector('#jgo').onclick=()=>{
+    const msg=box.querySelector('#jmsg'), hp=box.querySelector('#jcompany').value;
+    if(mode==='puesto'){
+      const goal=box.querySelector('#jgoal').value.trim();
+      if(goal.length<5){msg.textContent='Dinos el puesto o la habilidad en una frase.';return;}
+      runJobAnalysis({goal}, hp);
+    }else{
+      const posting=box.querySelector('#jtext').value.trim();
+      if(posting.length<200){msg.textContent='Pega la oferta completa: necesitamos los requisitos para armarte una ruta real.';return;}
+      runJobAnalysis({posting}, hp);
+    }
+  };
+}
+
+async function runJobAnalysis(body, honeypot){
+  const isGoal=!!body.goal;
+  app.innerHTML='';
+  app.append($(`<div style="margin-top:10px"><div class="eyebrow">${isGoal?'Analizando tu objetivo':'Analizando tu oferta'}</div>
+    <h2 style="margin-top:10px">Tu tutora está trabajando.</h2>
+    <p class="muted t-sm" style="margin-top:8px">Esto tarda cerca de dos minutos. No es una barra de adorno: abajo ves en qué va.</p></div>`));
+  const card=$(`<div class="card" style="margin-top:14px"></div>`);
+  const stages=JOB_STAGES.map((s,i)=>i===0&&isGoal
+    ?[s[0],'Entendiendo qué exige ese rol hoy','Lo que se le pide típicamente a alguien en ese puesto en LatAm.']
+    :s);
+  stages.forEach(([,t,sub],i)=>card.append($(`<div class="jstage" data-i="${i}">
+    <div class="jdot">${I('check','ic ic-s')}</div>
+    <div class="jtxt"><div>${esc(t)}</div><div class="jsub"><p class="faint t-sm" style="margin:0 0 8px">${esc(sub)}</p><div class="readline"><i></i></div></div></div></div>`)));
+  app.append(card);
+  const foot=$(`<div class="row" style="justify-content:space-between;margin-top:10px">
+    <span class="faint t-sm">No cierres esta pestaña</span><span class="jclock" id="jclock">0:00</span></div>`);
+  app.append(foot);
+  const slow=$(`<div class="note note-warn jslow hide">${I('alert','ic ic-s')} <span>Está tardando más de lo normal. Sigue trabajando — a veces la oferta es larga y hay más que cruzar.</span></div>`);
+  app.append(slow);
+
+  const t0=Date.now(); let done=false;
+  const paint=()=>{
+    const el=Math.floor((Date.now()-t0)/1000);
+    document.getElementById('jclock').textContent=Math.floor(el/60)+':'+String(el%60).padStart(2,'0');
+    let active=0;
+    JOB_STAGES.forEach(([at],i)=>{ if(el>=at)active=i; });
+    card.querySelectorAll('.jstage').forEach(s=>{
+      const i=+s.dataset.i;
+      s.classList.toggle('done', done || i<active);
+      s.classList.toggle('now', !done && i===active);
+    });
+    if(el>=JOB_SLOW_AT)slow.classList.remove('hide');
+  };
+  paint(); const tick=setInterval(paint,1000);
+
+  let res, data;
+  try{
+    res=await fetch('/api/learn/public/job-analysis',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({...body,company:honeypot||''})});
+    data=await res.json();
+  }catch(e){ data={__net:true}; }
+  done=true; clearInterval(tick); paint();
+
+  if(!res||!res.ok||data.__net){
+    const why = data && data.__net ? 'Se cortó la conexión.'
+      : res && res.status===429 ? 'Ya analizamos varias ofertas desde aquí. Espera un rato.'
+      : res && res.status===503 ? 'Estamos analizando varias ofertas ahora mismo. Intenta en un par de minutos.'
+      : (data && data.detail) || 'No pudimos analizar esa oferta.';
+    app.append($(`<div class="note note-warn" style="margin-top:14px">${I('alert','ic ic-s')} <span>${esc(why)}</span></div>`));
+    const again=$(`<button class="btn btn-ghost" style="margin-top:10px">Intentar de nuevo</button>`);
+    again.onclick=()=>renderJobBox(); app.append(again);
+    return;
+  }
+  try{ localStorage.setItem('aprende_job_token', data.token); }catch(e){}
+  renderJobResult(data.analysis, data.token, data.progress);
+}
+
+function renderJobResult(a, token, progress){
+  app.innerHTML='';
+  const back=$(`<div class="back">‹ Analizar otra oferta</div>`); back.onclick=()=>nav('#/oferta'); app.append(back);
+  app.append($(`<div style="margin-top:6px"><div class="eyebrow">Tu ruta</div>
+    <h1 style="margin-top:10px">${esc(a.role_title||'Esta oferta')}</h1>
+    ${a.company?`<p class="muted t-sm" style="margin-top:6px">${esc(a.company)}</p>`:''}</div>`));
+
+  // Coverage, stated plainly in both directions.
+  const cov=$(`<div class="card" style="margin-top:14px">
+    <div class="row" style="justify-content:space-between">
+      <b class="t-md">Cubrimos ${a.coverage}% de lo que pide</b>
+      <span class="faint t-sm">${a.competencies.length} competencias</span></div>
+    <div class="covbar"><i style="width:0"></i></div>
+    <p class="muted t-sm" style="margin-top:10px">${a.ruta.length
+      ? `Tu ruta son <b>${a.total_lessons} lecciones</b>. Empiezas por ${a.core_lessons} — con eso ya tienes algo que mostrar.`
+      : 'Para este puesto no tenemos con qué prepararte todavía. Preferimos decírtelo.'}</p></div>`);
+  app.append(cov);
+  setTimeout(()=>{const i=cov.querySelector('.covbar i'); if(i)i.style.width=a.coverage+'%';},60);
+  // Work already done counts toward this route: progress is per lesson, not per
+  // goal. Changing objective carries your work forward — say so before they
+  // decide, or switching reads as starting over.
+  if(progress&&progress.done>0){
+    app.append($(`<div class="note note-goal" style="margin-top:10px">${I('check','ic ic-s')}
+      <span>Ya llevas <b>${progress.done} de ${progress.total}</b> lecciones de esta ruta:
+      lo que estudiaste antes cuenta aquí. No empiezas de cero.</span></div>`));
+  }
+
+  const courseCard=(r)=>$(`<div class="jcourse">
+    <div class="jtitle">${esc(r.course_title)}</div>
+    <div class="jdepth">${modLabel(r)} · ${r.lessons} lecciones</div>
+    ${r.why?`<div class="jwhy">${esc(r.why)}</div>`:''}</div>`);
+  const nucleo=a.ruta.filter(r=>r.phase==='nucleo'), later=a.ruta.filter(r=>r.phase!=='nucleo');
+  if(nucleo.length){
+    app.append($(`<div class="phasehead">Empieza por aquí · ${a.core_lessons} lecciones</div>`));
+    nucleo.forEach(r=>app.append(courseCard(r)));
+  }
+  if(later.length){
+    app.append($(`<div class="phasehead later">Después, para completar el perfil</div>`));
+    later.forEach(r=>app.append(courseCard(r)));
+  }
+
+  if(a.gaps.length){
+    app.append($(`<div class="microlabel" style="margin-top:16px">Esto lo pide el puesto y no lo cubrimos</div>`));
+    const g=$(`<div class="card"></div>`);
+    a.gaps.forEach(x=>g.append($(`<div class="gaprow"><span class="gx">${I('alert','ic ic-s')}</span><span>${esc(x.name)}</span></div>`)));
+    g.append($(`<p class="faint t-sm" style="margin:10px 0 0">Preferimos decírtelo a venderte un curso que no lo enseña.</p>`));
+    app.append(g);
+  }
+
+  if(a.doc_type){
+    app.append($(`<div class="microlabel" style="margin-top:16px">Lo que vas a llevar a la entrevista</div>`));
+    app.append($(`<div class="card card-paper">
+      <div class="row" style="gap:8px">${I('doc','ic ic-s')}<b class="t-md">${esc(a.doc_type)}</b></div>
+      ${a.doc_title?`<p class="t-sm" style="margin-top:8px;font-family:var(--serif)">«${esc(a.doc_title)}»</p>`:''}
+      ${a.pitch?`<p class="t-sm" style="margin-top:10px;opacity:.8">${esc(a.pitch)}</p>`:''}</div>`));
+  }
+
+  // Shareable at first contact — the portfolio document needs 3+ submissions to
+  // exist, this exists two minutes in, and the gap list is the part worth sharing.
+  if(token){
+    const url=location.origin+'/aprende/ruta/'+token;
+    const sh=$(`<div class="card" style="margin-top:16px">
+      <div class="row" style="gap:8px">${I('send','ic ic-s')}<b class="t-md">Comparte esta ruta</b></div>
+      <p class="muted t-sm" style="margin-top:8px">Un enlace público con lo que pide el puesto, lo que
+      cubrimos y lo que no. Útil si estás buscando trabajo y quieres mostrar tu plan.</p>
+      <button class="btn btn-ghost" id="jshare" style="margin-top:10px">Copiar enlace</button></div>`);
+    sh.querySelector('#jshare').onclick=async(e)=>{
+      try{
+        if(navigator.share){await navigator.share({title:'Mi ruta de estudio',url});return;}
+        await navigator.clipboard.writeText(url); e.target.textContent='Enlace copiado';
+      }catch(err){ e.target.textContent=url; }
+    };
+    app.append(sh);
+  }
+  // An existing learner needs a decision, not a signup: make this the goal, or
+  // keep the current one. A stranger needs the door.
+  if(AUTH){
+    const cta=$(`<div style="display:flex;flex-direction:column;gap:8px;margin-top:18px">
+      ${a.ruta.length?`<button class="btn btn-primary" id="jset">Hacer este mi objetivo ${I('arrow','ic ic-s')}</button>`:''}
+      <button class="btn btn-ghost" id="jkeep">${a.ruta.length?'Guardarlo y seguir con el actual':'Volver'}</button>
+      <div id="jsmsg" class="center muted t-sm"></div></div>`);
+    app.append(cta);
+    const set=cta.querySelector('#jset');
+    if(set)set.onclick=async()=>{
+      set.disabled=true; const msg=cta.querySelector('#jsmsg');
+      msg.textContent='Activando tu objetivo…';
+      const r=await api('/job-target/claim',{method:'POST',body:JSON.stringify({token})});
+      if(r&&r.ok){ try{localStorage.removeItem('aprende_job_token');}catch(e){} nav('#/objetivo'); }
+      else { set.disabled=false; msg.textContent=(r&&r.detail)||'No pudimos activarlo, intenta de nuevo.'; }
+    };
+    cta.querySelector('#jkeep').onclick=()=>nav('#/objetivo');
+    return;
+  }
+  const cta=$(`<div style="display:flex;flex-direction:column;gap:8px;margin-top:18px">
+    <button class="btn btn-primary" id="jjoin">${a.ruta.length?'Quiero esta ruta':'Avísame cuando lo cubran'} ${I('arrow','ic ic-s')}</button>
+    <button class="btn btn-ghost" id="jinv">Tengo una invitación</button></div>`);
+  cta.querySelector('#jjoin').onclick=()=>{
+    try{ sessionStorage.setItem('aprende_job_role', a.role_title||''); }catch(e){}
+    nav('#/lista');
+  };
+  cta.querySelector('#jinv').onclick=()=>nav('#/login');
+  app.append(cta);
+}
+
+/* ---------- orientation: thirty seconds on how this works ---------- */
+function renderOrientation(revisit){
+  tabbar.classList.toggle('hide',!revisit); app.innerHTML='';
+  if(revisit){const back=$(`<div class="back">‹ Perfil</div>`); back.onclick=()=>nav('#/perfil'); app.append(back);}
+  app.append($(`<div style="margin-top:10px"><div class="eyebrow">${revisit?'Cómo funciona':'Bienvenida a Aprende IA'}</div>
+    <h1 style="margin-top:10px">Así vas a trabajar aquí.</h1></div>`));
+  // On a phone the four how-it-works cards ran ~1700px, which buried the project
+  // form and its buttons below them: every learner so far scrolled past it and
+  // took "lo defino después". The decision that shapes every later evaluation
+  // now comes first, and the explainer sits underneath it.
+  if(!revisit){
+    // The transversal project, declared ONCE at the learner level (docs/09):
+    // every exercise in every course builds on it, the tutor evaluates against
+    // it, and it is what lets work compile across courses into one document.
+    const pf=$(`<div class="card" style="margin-top:8px">
+      <div class="row" style="gap:10px;color:var(--amber)">${I('target')}<b class="t-md" style="color:var(--text)">Tu proyecto, antes de empezar</b></div>
+      <p class="muted t-sm" style="margin:8px 0 12px">Todos tus ejercicios construyen sobre UN proyecto real: tu negocio, o una marca o empresa donde te gustaría trabajar. Tu tutora evalúa contra este contexto y tu trabajo se acumula en un documento profesional.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+      <div><label>Tu proyecto o marca</label><input id="pname" maxlength="120" placeholder="Ej: Dulce Rosa, mi pastelería / Falabella (propuesta)"></div>
+      <div><label>De qué se trata (una línea)</label><input id="pdesc" maxlength="500" placeholder="Ej: pastelería artesanal en Santiago, vende por Instagram"></div>
+      <div><label>Tu meta</label><input id="pgoal" maxlength="200" placeholder="Ej: conseguir trabajo en marketing digital / vender más"></div></div></div>`);
+    app.append(pf);
+    const go=$(`<button class="btn btn-primary" style="margin-top:8px">Guardar y empezar ${I('arrow','ic ic-s')}</button>`);
+    const skip=$(`<button class="btn btn-ghost" style="margin-top:2px">Lo defino después</button>`);
+    const done=async(save)=>{
+      if(save){
+        const b={project_name:pf.querySelector('#pname').value.trim(),
+                 project_desc:pf.querySelector('#pdesc').value.trim(),
+                 goal:pf.querySelector('#pgoal').value.trim()};
+        if(b.project_name||b.project_desc||b.goal){
+          await api('/profile',{method:'POST',body:JSON.stringify(b)});
+          Object.assign(STATE.me||{},b);
+        }
+      }
+      localStorage.setItem('aprende_onboarded','1');nav('#/hoy');
+    };
+    go.onclick=()=>done(true); skip.onclick=()=>done(false);
+    app.append(go); app.append(skip);
+    app.append($(`<div class="microlabel" style="margin-top:22px">Y así funciona el día a día</div>`));
+  }
+  renderHow(app);
+}
+
+/* ---------- Mi objetivo: the route as the learner's spine (docs/09) ---------- */
+async function viewObjetivo(){
+  const jt=await api('/job-target'); if(jt.__unauth)return renderLogin();
+  app.innerHTML='';
+  const back=$(`<div class="back">‹ Hoy</div>`); back.onclick=()=>nav('#/hoy'); app.append(back);
+  if(!jt.exists){
+    app.append($(`<div style="margin-top:14px"><div class="eyebrow">Tu objetivo</div>
+      <h1 style="margin-top:10px">Aún no tienes un objetivo activo.</h1>
+      <p class="muted" style="margin-top:8px">Pega la oferta del trabajo que quieres y armamos tu ruta de estudio y el documento para la entrevista.</p></div>`));
+    const go=$(`<button class="btn btn-primary" style="margin-top:14px">Pega tu oferta ${I('arrow','ic ic-s')}</button>`);
+    go.onclick=()=>nav('#/oferta'); app.append(go); return;
+  }
+  app.append($(`<div style="margin-top:6px"><div class="eyebrow">Tu objetivo</div>
+    <h1 style="margin-top:10px">${esc(jt.role_title||'Tu próximo trabajo')}</h1>
+    ${jt.company?`<p class="muted t-sm" style="margin-top:6px">${esc(jt.company)}</p>`:''}</div>`));
+  if(jt.next_lesson){
+    const nx=$(`<div class="card-hero" style="margin-top:12px">
+      <div class="eyebrow">Siguiente paso de tu ruta</div>
+      <p class="muted t-sm" style="margin:8px 0 4px">${esc(jt.next_lesson.course_title)}</p>
+      <h3 style="margin-bottom:12px">${esc(jt.next_lesson.title)}</h3>
+      <button class="btn btn-primary">${I('play','ic ic-s')} Continuar mi ruta</button></div>`);
+    nx.querySelector('button').onclick=()=>nav('#/leccion/'+jt.next_lesson.node_id);
+    app.append(nx);
+  }
+  /* THE SPINE. This used to render one card per COURSE with a module range —
+     a bill of materials. docs/09 settled that the module is the unit and the
+     matcher has reasoned in modules since; only the screen still sold courses.
+     Now it is an ordered path of steps, each labelled by what you will be able
+     to DO, with the course demoted to provenance. */
+  const steps=jt.steps||[];
+  const firstPending=steps.findIndex(s=>s.done<s.lessons);
+  const phases=[['nucleo','Empieza por aquí'],['despues','Después, para completar el perfil']];
+  let stepNo=0;
+  phases.forEach(([ph,label])=>{
+    const rows=steps.filter(s=>s.phase===ph);
+    if(!rows.length)return;
+    app.append($(`<div class="microlabel" style="margin-top:16px">${label}</div>`));
+    rows.forEach(st=>{
+      const idx=steps.indexOf(st); stepNo++;
+      const complete=st.done>=st.lessons;
+      const current=idx===firstPending;
+      const pct=st.lessons?Math.round(100*st.done/st.lessons):0;
+      const mark=complete?I('check','ic ic-s'):current?I('play','ic ic-s'):I('lock','ic ic-s');
+      const card=$(`<div class="card ${st.next_lesson_id?'clickable':''}"
+          style="${current?'border-color:var(--amber)':''}">
+        <div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px">
+          <div class="row" style="gap:8px;align-items:center">
+            <span style="color:${complete?'var(--amber)':'var(--faint)'}">${mark}</span>
+            <span class="microlabel">Paso ${stepNo} de ${steps.length}</span></div>
+          <span class="muted t-sm">${st.done}/${st.lessons}</span></div>
+        <p class="t-base" style="font-weight:600;margin:8px 0 4px">${esc(st.outcome||st.module_title||'')}</p>
+        <p class="faint" style="font-size:var(--fs-xs);margin:0 0 8px">${esc(st.course_title)} · módulo ${st.module_no}</p>
+        <div class="prog"><i style="width:${pct}%"></i></div></div>`);
+      if(st.next_lesson_id)card.onclick=()=>nav('#/leccion/'+st.next_lesson_id);
+      else if(complete)card.onclick=()=>nav('#/curso/'+st.course_slug);
+      app.append(card);
+    });
+  });
+  if(jt.gaps&&jt.gaps.length){
+    app.append($(`<div class="microlabel" style="margin-top:16px">Esto lo pide el puesto y no lo cubrimos</div>`));
+    const g=$(`<div class="card"></div>`);
+    jt.gaps.forEach(x=>g.append($(`<div class="gaprow"><span class="gx">${I('alert','ic ic-s')}</span><span>${esc(x.name)}</span></div>`)));
+    app.append(g);
+  }
+  // The goal document: compiles the learner's best work across the WHOLE route,
+  // aimed at this posting. Eligible from the first submission — it grows.
+  const gd=await api('/goal-doc');
+  app.append($(`<div class="microlabel" style="margin-top:16px">Tu documento para la entrevista</div>`));
+  const dcard=$(`<div class="card card-paper">
+    <div class="row" style="gap:8px">${I('doc','ic ic-s')}<b class="t-md">${esc(jt.doc_type||'Documento profesional')}</b></div>
+    <p class="t-sm" style="margin-top:8px;opacity:.85">${gd.exists
+      ?'Compilado con tu trabajo real. Se actualiza cada vez que lo regeneres.'
+      :gd.eligible
+        ?'Ya tienes trabajo suficiente: compila tu primera versión.'
+        :`Se arma con tu trabajo real: llevas <b>${gd.submissions||0} de ${gd.needed||3}</b> entregas de los cursos de tu ruta. Con menos tendría que inventar, y este documento lo vas a mostrar. No es un CV — es el trabajo que hiciste, con tus decisiones y tus números.`}</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+      ${gd.eligible?`<button class="btn btn-paper" id="gdo">${gd.exists?'Actualizar mi documento':'Compilar mi documento'}</button>`:''}
+      ${gd.exists?`<button class="btn btn-ghost" id="gview">Ver y compartir</button>`:''}</div>
+    <div id="gmsg" class="center muted t-sm" style="margin-top:8px"></div></div>`);
+  app.append(dcard);
+  const gdo=dcard.querySelector('#gdo');
+  if(gdo)gdo.onclick=async()=>{
+    gdo.disabled=true; const zone=dcard.querySelector('#gmsg');
+    const rc=readingCard('Tu tutora está compilando tu documento…'); dcard.append(rc);
+    const res=await api('/goal-doc',{method:'POST'});
+    rc.remove(); gdo.disabled=false;
+    if(res&&res.share_url){window.open(res.share_url,'_blank'); viewObjetivo();}
+    else zone.textContent=(res&&res.detail)||'No pudimos compilarlo, intenta de nuevo.';
+  };
+  const gv=dcard.querySelector('#gview');
+  if(gv)gv.onclick=()=>window.open(gd.share_url,'_blank');
+
+  // Changing goal is normal, not an edge case: people find new offers. It is
+  // also non-destructive — completed lessons carry over and the old goal keeps
+  // its document — so the entry point can be plainly visible.
+  app.append($(`<div class="microlabel" style="margin-top:18px">¿Encontraste otra oferta?</div>`));
+  const other=$(`<button class="btn btn-ghost">Analizar otra oferta ${I('arrow','ic ic-s')}</button>`);
+  other.onclick=()=>nav('#/oferta'); app.append(other);
+  app.append($(`<p class="faint t-sm" style="margin:8px 2px 0">Tu avance no se pierde: las lecciones que ya hiciste cuentan para cualquier ruta que las incluya, y este objetivo queda guardado con su documento.</p>`));
+
+  const hist=await api('/job-targets');
+  const others=((hist&&hist.targets)||[]).filter(t=>!t.active);
+  if(others.length){
+    app.append($(`<div class="microlabel" style="margin-top:16px">Tus otros objetivos</div>`));
+    others.forEach(t=>{
+      const row=$(`<div class="lrow clickable"><div class="num">${I('target','ic ic-s')}</div>
+        <div class="lt">${esc(t.role_title||'Objetivo')}
+          <div style="font-size:var(--fs-xs);color:var(--faint);font-weight:600;margin-top:2px">${t.done}/${t.total} lecciones · ${t.coverage}% cubierto${t.has_doc?' · tiene documento':''}</div></div>
+        <div class="st">Retomar</div></div>`);
+      row.onclick=async()=>{
+        const r=await api('/job-target/claim',{method:'POST',body:JSON.stringify({token:t.token})});
+        if(r&&r.ok)viewObjetivo();
+      };
+      app.append(row);
+    });
+  }
+}
+
+/* ---------- shell / tabs ---------- */
+const TAB_ICONS={hoy:'sun',cursos:'book',portafolio:'doc',perfil:'user'};
+function showTabs(){
+  tabbar.classList.remove('hide'); tabbar.innerHTML='';
+  [['hoy','Hoy'],['cursos','Cursos'],['portafolio','Portafolio'],['perfil','Perfil']].forEach(([k,label])=>{
+    const b=$(`<button class="${STATE.tab===k?'on':''}">${I(TAB_ICONS[k])}${label}</button>`);
+    b.onclick=()=>nav('#/'+k); tabbar.append(b);
+  });
+}
+
+/* ---------- Hoy: the zero-decision daily entry ---------- */
+async function viewToday(){
+  const [d,jt]=await Promise.all([api('/today'),api('/job-target')]);
+  STATE.objetivo=jt;   // the continue-card measures the route, not the course
+  if(d.__unauth)return renderLogin();
+  app.innerHTML='';
+  app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Aprende IA<small>Hola, ${esc(d.name)}</small></div></div>${flameChip(d.streak)}</div>`));
+  // The goal is the spine of the experience (docs/09): if there is an active
+  // job target, the day starts from it, not from a loose course.
+  if(jt&&jt.exists){
+    const pct=jt.total?Math.round(100*jt.done/jt.total):0;
+    const card=$(`<div class="card card-spot" style="margin-top:6px">
+      <div class="eyebrow">Tu objetivo</div>
+      <h2 style="margin-top:6px">${esc(jt.role_title||'Tu próximo trabajo')}</h2>
+      <div class="row" style="justify-content:space-between;margin:10px 0 6px">
+        <span class="muted t-sm">${jt.done} de ${jt.total} lecciones de tu ruta</span>
+        <span class="muted t-sm">${pct}%</span></div>
+      <div class="prog"><i style="width:${pct}%"></i></div>
+      <button class="btn btn-ghost" style="margin-top:12px">Ver mi ruta y mi documento ${I('arrow','ic ic-s')}</button></div>`);
+    card.querySelector('button').onclick=()=>nav('#/objetivo');
+    app.append(card);
+  }else if(STATE.me&&!STATE.me.project_name){
+    /* Aplicación is 40 of the 100 points and is judged against this. Skipped by
+       every learner so far, because the old nudge sounded like a nicety. Say
+       what it actually costs. */
+    const nud=$(`<div class="lrow clickable" style="margin-top:6px"><div class="num">${I('target','ic ic-s')}</div>
+      <div class="lt">Elige tu proyecto real<div style="font-size:var(--fs-xs);color:var(--faint);font-weight:600;margin-top:2px">Sin él tu tutora evalúa a ciegas: 40 de los 100 puntos miden qué tan anclado está tu trabajo en un proyecto tuyo</div></div>
+      <div class="st">Definir</div></div>`);
+    nud.onclick=()=>nav('#/perfil'); app.append(nud);
+  }
+  if(d.continue&&!d.continue.finished){
+    const c=d.continue;
+    /* With a goal set, the headline is the GOAL and the measure is the route —
+       "Paso 4 de 24 hacia Growth Marketer". Saying "Lección 4 de 30 de Marketing
+       con IA" frames the work as consuming a course, which is exactly the
+       shop-shaped reading the route exists to replace. Without a goal we fall
+       back to the course framing, because then the course really is the unit. */
+    /* "Paso" means a MODULE step (#/objetivo counts 13 of them). Here we are
+       pointing at one lesson, so it counts lessons within the route — using the
+       same word for both units with different denominators reads as a bug. */
+    const goal=STATE.objetivo;
+    const onRoute=goal&&goal.exists&&goal.total>0;
+    const step=onRoute?Math.min(goal.done+1,goal.total):null;
+    const card=$(`<div class="card-hero" style="margin-top:6px">
+      <div class="eyebrow">${onRoute?'Tu ruta hacia '+esc(goal.role_title||'tu objetivo'):'Continúa donde quedaste'}</div>
+      <h2 style="margin-top:8px">${esc(c.lesson_title)}</h2>
+      <p class="muted t-sm" style="margin:6px 0 14px">${onRoute
+        ? `Lección ${step} de ${goal.total} de tu ruta · ${esc(c.course_title)}`
+        : `Lección ${c.position} de ${c.total} · ${esc(c.course_title)}`}</p>
+      ${onRoute?`<div class="prog" style="margin-bottom:12px"><i style="width:${Math.round(100*goal.done/goal.total)}%"></i></div>`:''}
+      <button class="btn btn-primary">${I('play','ic ic-s')} ${d.done_today>0?'Sigue con tu clase':'Empieza tu clase de hoy'}</button></div>`);
+    card.querySelector('button').onclick=()=>nav('#/leccion/'+c.lesson_id);
+    app.append(card);
+  }else if(d.continue&&d.continue.finished){
+    const card=$(`<div class="card-hero" style="margin-top:6px">
+      <div class="eyebrow">Curso completado</div>
+      <h2 style="margin-top:8px">${esc(d.continue.course_title)}</h2>
+      <p class="muted t-sm" style="margin:6px 0 14px">Compila tu documento final y elige tu próximo curso.</p>
+      <button class="btn btn-primary">Elegir mi próximo curso ${I('arrow','ic ic-s')}</button></div>`);
+    card.querySelector('button').onclick=()=>nav('#/cursos');
+    app.append(card);
+  }else{
+    /* A learner with no goal used to land on "elige tu primer curso" — the
+       opposite of what the landing promised them ("dinos qué quieres ser,
+       nosotros armamos el plan"). Choosing blind from 14 courses is exactly what
+       the route exists to prevent, and the one real learner did lesson 1 of two
+       unrelated courses and stopped. Lead with the goal; keep browsing as the
+       secondary door for people who already know what they want. */
+    const card=$(`<div class="card-hero" style="margin-top:6px">
+      <div class="eyebrow">Empieza por aquí</div>
+      <h2 style="margin-top:8px">Dinos qué quieres ser</h2>
+      <p class="muted t-sm" style="margin:6px 0 14px">Pega una oferta de trabajo real, o solo el puesto que quieres. Te armamos la ruta: qué cursos, qué módulos y en qué orden — y qué no cubrimos.</p>
+      <button class="btn btn-primary">${I('target','ic ic-s')} Armar mi ruta</button></div>`);
+    card.querySelector('button').onclick=()=>nav('#/oferta');
+    app.append(card);
+    const alt=$(`<div class="lrow clickable" style="margin-top:6px"><div class="num">${I('book','ic ic-s')}</div>
+      <div class="lt">Ya sé qué quiero estudiar<div style="font-size:var(--fs-xs);color:var(--faint);font-weight:600;margin-top:2px">Ver los 14 cursos y sus temarios</div></div>
+      <div class="st">Cursos</div></div>`);
+    alt.onclick=()=>nav('#/cursos'); app.append(alt);
+  }
+  if(d.reviews&&d.reviews.length){
+    app.append($(`<div class="microlabel" style="margin-top:10px">Repasos de hoy · fijan lo aprendido</div>`));
+    d.reviews.forEach(r=>{
+      const row=$(`<div class="lrow clickable"><div class="num">${I('redo','ic ic-s')}</div>
+        <div class="lt">${esc(r.lesson_title)}<div style="font-size:var(--fs-xs);color:var(--faint);font-weight:600;margin-top:2px">${esc(r.course_title)}</div></div>
+        <div class="st">Repasar</div></div>`);
+      row.onclick=()=>nav('#/leccion/'+r.lesson_id); app.append(row);
+    });
+  }
+  if(d.defenses&&d.defenses.length){
+    app.append($(`<div class="microlabel" style="margin-top:10px">Tu tutora te hizo una pregunta · suma hasta 10 pts</div>`));
+    d.defenses.forEach(f=>{
+      const row=$(`<div class="lrow clickable caprow"><div class="num">${I('mic','ic ic-s')}</div>
+        <div class="lt">${esc(f.lesson_title)}</div><div class="st">Responder</div></div>`);
+      row.onclick=()=>nav(f.kind==='capstone'
+        ? '#/reto/'+f.capstone_id
+        : '#/leccion/'+f.lesson_id+'/'+f.step);
+      app.append(row);
+    });
+  }
+  if(d.done_today>0)app.append($(`<p class="faint t-sm center" style="margin-top:14px">Hoy: ${d.done_today} ${d.done_today===1?'lección completada':'lecciones completadas'} ✓</p>`));
+}
+
+/* ---------- catalog ---------- */
+async function viewCatalog(){
+  const d=await api('/courses'); if(d.__unauth)return renderLogin();
+  app.innerHTML='';
+  app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Aprende IA<small>Tus cursos</small></div></div>${flameChip(d.streak)}</div>`));
+  app.append($(`<h2 style="margin-top:6px">Cursos</h2>`));
+  const courseCard=(c)=>{
+    const pct=c.total?Math.round(c.done/c.total*100):0;
+    if(c.available){
+      const card=$(`<div class="card course-card">
+        <div class="pill go" style="position:absolute;top:14px;right:14px">${c.done>0?pct+'%':'Empezar'}</div>
+        <h3>${esc(c.title)}</h3>
+        ${c.description?`<p class="desc">${esc(c.description)}</p>`:''}
+        ${c.doc_type?`<p class="delivers">${I('doc','ic ic-s')} Termina con: ${esc(c.doc_type)}</p>`:''}
+        <div class="prog"><i style="width:${pct}%"></i></div>
+        <div class="meta"><span>${c.done} de ${c.total} lecciones · ${c.modules} módulos</span>${I('arrow','ic ic-s')}</div></div>`);
+      card.onclick=()=>nav('#/curso/'+c.slug); return card;
+    }
+    return $(`<div class="card course-card soon">
+      <div class="pill soon" style="position:absolute;top:14px;right:14px">Próximamente</div>
+      <h3>${esc(c.title)}</h3>
+      ${c.description?`<p class="desc">${esc(c.description)}</p>`:''}
+      ${c.doc_type?`<p class="delivers">${I('doc','ic ic-s')} Termina con: ${esc(c.doc_type)}</p>`:''}
+      <div class="meta"><span>${c.total} lecciones · ${c.modules} módulos · en producción</span></div></div>`);
+  };
+  const cats=clusterize(d.courses);
+  // Open the cluster where the learner is working; otherwise the first one.
+  const active=d.courses.find(c=>c.done>0);
+  const openCat=active?(active.category||'Más cursos'):(cats[0]?cats[0][0]:null);
+  renderClusters(cats, openCat, courseCard);
+  renderConcierge();
+}
+
+/* ---------- course concierge ---------- */
+async function renderConcierge(){
+  const d=await api('/requests'); if(d.__unauth)return renderLogin();
+  app.append($(`<div style="margin-top:14px"><div class="eyebrow">¿No está lo que buscas?</div>
+    <h2 style="margin-top:8px">Pide tu curso</h2>
+    <p class="muted t-sm" style="margin-top:6px">Cuéntanos qué quieres aprender y lo construimos para ti: video, guía y quiz por lección. Te avisamos aquí cuando esté listo.</p></div>`));
+  const form=$(`<div class="card" style="display:flex;flex-direction:column;gap:12px">
+    <div><label>¿Qué quieres aprender?</label><input id="reqtopic" maxlength="200" placeholder="Ej: Ventas por WhatsApp con IA"></div>
+    <div><label>¿Para qué lo necesitas? (opcional)</label><textarea id="reqdetail" maxlength="1000" placeholder="Tu meta, tu nivel, tu contexto — nos ayuda a armar mejor el curso"></textarea></div>
+    <button class="btn btn-primary" id="reqsend">Enviar solicitud</button>
+    <div id="reqmsg" class="center muted t-sm"></div></div>`);
+  app.append(form);
+  form.querySelector('#reqsend').onclick=async()=>{
+    const topic=form.querySelector('#reqtopic').value.trim(), detail=form.querySelector('#reqdetail').value.trim();
+    const msg=form.querySelector('#reqmsg');
+    if(topic.length<5){msg.textContent='Cuéntanos el tema con un poco más de detalle.';return;}
+    msg.textContent='Enviando…';
+    const res=await fetch('/api/learn/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic,detail})});
+    const r=await res.json();
+    if(!res.ok){msg.textContent=r.detail||'No pudimos enviar tu solicitud.';return;}
+    viewCatalog();
+  };
+  if(d.requests&&d.requests.length){
+    app.append($(`<div class="microlabel" style="margin-top:10px">Tus solicitudes</div>`));
+    d.requests.forEach(r=>{
+      const ready=r.status==='published'&&r.course_slug;
+      const row=$(`<div class="req-row ${ready?'ready':''}">
+        <div style="flex:1"><div class="rt">${esc(r.topic)}</div><div class="rd">${r.created_at}${ready?' · toca para empezar':''}</div></div>
+        <span class="pill st-${r.status}">${esc(r.status_label)}</span></div>`);
+      if(ready)row.onclick=()=>nav('#/curso/'+r.course_slug);
+      app.append(row);
+    });
+  }
+}
+
+/* ---------- outline (temario) ---------- */
+async function viewOutline(slug){
+  const d=await api('/course/'+slug); if(d.__unauth)return renderLogin();
+  STATE.course=slug; app.innerHTML='';
+  const back=$(`<div class="back">‹ Cursos</div>`); back.onclick=()=>nav('#/cursos'); app.append(back);
+  const pct=d.total?Math.round(d.done/d.total*100):0;
+  app.append($(`<div><h2>${esc(d.title)}</h2>
+    ${d.description?`<p class="muted t-sm" style="margin-top:8px">${esc(d.description)}</p>`:''}
+    <div class="row" style="justify-content:space-between;margin:12px 0 8px"><span class="microlabel">Tu avance</span><span class="microlabel">${d.done}/${d.total} · ${pct}%</span></div>
+    <div class="prog"><i style="width:${pct}%"></i></div>
+    <p class="faint" style="font-size:var(--fs-xs);margin-top:8px">Toca cualquier lección bloqueada para ver qué aprenderás en ella.</p></div>`));
+  d.modules.forEach(m=>{
+    app.append($(`<div class="modhead">Módulo ${m.module_no} · ${esc(m.module_title)}</div>`));
+    if(m.module_description)app.append($(`<p class="muted t-sm" style="margin:-2px 0 10px">${esc(m.module_description)}</p>`));
+    m.lessons.forEach(l=>{
+      const clickable=l.status==='done'||l.status==='current';
+      const stLabel={done:'Completada',current:'Disponible',coming:'En producción',locked:'Bloqueada'}[l.status];
+      const mark=l.status==='done'?I('check','ic ic-s'):l.status==='locked'?I('lock','ic ic-s'):l.status==='coming'?I('clock','ic ic-s'):l.position;
+      const row=$(`<div class="lrow ${l.status} ${clickable?'clickable':''}" ${l.objectives?`style="flex-wrap:wrap"`:''}>
+        <div class="num">${mark}</div><div class="lt">${esc(l.title)}</div><div class="st">${stLabel}</div>
+        ${l.objectives?`<div class="obj hide">Al terminar podrás: ${esc(l.objectives)}</div>`:''}</div>`);
+      if(clickable)row.onclick=()=>nav('#/leccion/'+l.id);
+      else if(l.objectives)row.onclick=()=>row.querySelector('.obj').classList.toggle('hide');
+      app.append(row);
+    });
+    if(m.capstone){
+      const c=m.capstone;
+      const stLabel=c.status==='done'?(c.score!=null?c.score+'/100':'Completado'):c.status==='available'?'Disponible':'Bloqueado';
+      const capTitle=(c.title||'').replace(/^reto:?\s*/i,'');
+      const row=$(`<div class="lrow caprow ${c.status==='locked'?'locked':'clickable'}">
+        <div class="num">${I('flag','ic ic-s')}</div><div class="lt">Reto: ${esc(capTitle)}</div><div class="st">${stLabel}</div></div>`);
+      if(c.status!=='locked')row.onclick=()=>nav('#/reto/'+c.id);
+      app.append(row);
+    }
+  });
+  renderCaseStudyCard(slug);
+}
+
+/* ---------- portfolio: project document (primary) + case study (companion) ---------- */
+async function renderCaseStudyCard(slug){
+  const [doc,cs]=await Promise.all([api('/project-doc/'+slug),api('/case-study/'+slug)]);
+  if(doc.__unauth||doc.detail)return;
+  const card=$(`<div class="card-paper" style="margin-top:14px">
+    <div class="ai-tag"><span class="dot"></span> Tu portafolio</div>
+    <h3 style="margin-top:8px">${esc(doc.doc_type)}</h3>
+    <p class="muted t-sm" style="margin-top:6px">Tus ejercicios y retos, compilados en el documento que un cliente pagaría por recibir: tuyo, descargable en PDF, listo para tu portafolio o para enviar.</p>
+    <div id="pdz" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div></div>`);
+  app.append(card);
+  const zone=card.querySelector('#pdz');
+  if(doc.exists){
+    const v=$(`<button class="btn btn-paper">${I('doc','ic ic-s')} Ver mi documento</button>`);
+    v.onclick=()=>nav('#/documento/'+slug); zone.append(v);
+  }else if(doc.eligible){
+    const g=$(`<button class="btn btn-paper">${I('doc','ic ic-s')} Compilar mi documento</button>`);
+    g.onclick=async()=>{
+      g.disabled=true;g.textContent='Compilando tu documento… (unos segundos)';
+      const res=await fetch('/api/learn/project-doc/'+slug,{method:'POST'});
+      const r=await res.json();
+      if(!res.ok){g.disabled=false;g.textContent='Compilar mi documento';alert(r.detail||'No se pudo compilar.');return;}
+      nav('#/documento/'+slug);
+    };
+    zone.append(g);
+  }else{
+    /* The gate is deliberate, not a tease. Fed one or two pieces the compiler
+       does not produce a short document — it fills the vacuum by inventing
+       (it once wrote a skills inventory for a learner whose only submission was
+       the starter prompt). So say what it needs and why, and show the progress
+       so it reads as a countdown rather than a locked door. */
+    const have=doc.submissions||0, need=doc.needed||3;
+    const pips=Array.from({length:need},(_,i)=>
+      `<span style="width:22px;height:4px;border-radius:2px;background:${i<have?'var(--amber)':'rgba(255,255,255,.14)'}"></span>`).join('');
+    zone.append($(`<div>
+      <div class="row" style="gap:6px;align-items:center;margin-bottom:8px">${pips}
+        <span class="faint" style="font-size:var(--fs-xs);margin-left:6px">${have} de ${need} trabajos</span></div>
+      <p class="faint t-sm" style="margin:0">Con ${need} entregas tuyas ya hay material real para compilar.
+      Con menos, el documento tendría que inventar — y este lo vas a mostrar.
+      ${have===0?'Envía el ejercicio de cualquier lección para empezar.':`Te ${need-have===1?'falta 1':'faltan '+(need-have)}.`}</p></div>`));
+  }
+  // Companion narrative: the STAR case study about how the work was done.
+  if(cs&&!cs.detail&&(cs.exists||cs.eligible)){
+    const row=$(`<button class="btn btn-ghost btn-sm" style="width:100%">${cs.exists?'Ver mi caso de estudio (STAR) ›':'Generar caso de estudio (STAR)'}</button>`);
+    row.onclick=async()=>{
+      if(cs.exists)return nav('#/caso-view/'+slug);
+      row.disabled=true;row.textContent='Redactando tu caso…';
+      const res=await fetch('/api/learn/case-study/'+slug,{method:'POST'});
+      if(res.ok)nav('#/caso-view/'+slug); else {row.disabled=false;row.textContent='Generar caso de estudio (STAR)';}
+    };
+    zone.append(row);
+  }
+}
+async function viewProjectDoc(slug){
+  const d=await api('/project-doc/'+slug); if(d.__unauth)return renderLogin();
+  app.innerHTML='';
+  const back=$(`<div class="back">‹ Volver</div>`); back.onclick=()=>history.back(); app.append(back);
+  app.append($(`<div style="margin-top:4px"><div class="ai-tag"><span class="dot"></span> ${esc(d.doc_type)}</div></div>`));
+  const doc=$(`<div class="card-paper"><div class="written" id="pddoc"></div></div>`);
+  app.append(doc);
+  const body=doc.querySelector('#pddoc');
+  renderMD(body, d.content_md);
+  const open=$(`<button class="btn btn-paper">${I('down','ic ic-s')} Abrir para descargar en PDF</button>`);
+  open.onclick=()=>window.open(d.share_url,'_blank'); app.append(open);
+  const share=$(`<button class="btn btn-ghost">${I('copy','ic ic-s')} Copiar enlace del documento</button>`);
+  share.onclick=()=>{navigator.clipboard.writeText(location.origin+d.share_url);share.textContent='✓ Enlace copiado';};
+  app.append(share);
+  const md=$(`<button class="btn btn-ghost">${I('copy','ic ic-s')} Copiar Markdown (para Notion)</button>`);
+  md.onclick=()=>{navigator.clipboard.writeText(d.content_md);md.textContent='✓ Copiado';};
+  app.append(md);
+  const re=$(`<button class="btn btn-ghost">Recompilar con mi trabajo más reciente</button>`);
+  re.onclick=async()=>{re.disabled=true;re.textContent='Compilando de nuevo…';
+    const res=await fetch('/api/learn/project-doc/'+slug,{method:'POST'});
+    if(res.ok)viewProjectDoc(slug); else {re.disabled=false;re.textContent='Recompilar con mi trabajo más reciente';}};
+  app.append(re);
+}
+async function viewCaseStudy(slug){
+  const d=await api('/case-study/'+slug); if(d.__unauth)return renderLogin();
+  app.innerHTML='';
+  const back=$(`<div class="back">‹ Volver</div>`); back.onclick=()=>history.back(); app.append(back);
+  app.append($(`<div style="margin-top:4px"><div class="ai-tag"><span class="dot"></span> Caso de estudio · metodología STAR</div></div>`));
+  const doc=$(`<div class="card-paper"><div class="written" id="csdoc"></div></div>`);
+  app.append(doc);
+  const body=doc.querySelector('#csdoc');
+  renderMD(body, d.content_md);
+  const share=$(`<button class="btn btn-paper">${I('copy','ic ic-s')} Copiar enlace para compartir</button>`);
+  share.onclick=()=>{navigator.clipboard.writeText(location.origin+d.share_url);share.textContent='✓ Enlace copiado';};
+  app.append(share);
+  const md=$(`<button class="btn btn-ghost">${I('copy','ic ic-s')} Copiar texto (Markdown)</button>`);
+  md.onclick=()=>{navigator.clipboard.writeText(d.content_md);md.textContent='✓ Copiado';};
+  app.append(md);
+  const re=$(`<button class="btn btn-ghost">Regenerar con mi trabajo más reciente</button>`);
+  re.onclick=async()=>{re.disabled=true;re.textContent='Redactando de nuevo…';
+    const res=await fetch('/api/learn/case-study/'+slug,{method:'POST'});
+    if(res.ok)viewCaseStudy(slug); else {re.disabled=false;re.textContent='Regenerar con mi trabajo más reciente';}};
+  app.append(re);
+}
+
+/* ---------- module capstone (reto) ---------- */
+async function openCapstone(id){
+  const d=await api('/capstone/'+id); if(d.__unauth)return renderLogin();
+  if(d.detail){alert(d.detail);return;}
+  app.innerHTML='';
+  const back=$(`<div class="back">‹ Temario</div>`); back.onclick=()=>nav('#/curso/'+d.course_slug); app.append(back);
+  app.append($(`<div><div class="eyebrow">Reto del módulo ${d.module_no}</div>
+    <h2 style="margin-top:8px">${esc((d.title||'').replace(/^reto:?\s*/i,''))}</h2>
+    <p class="muted t-sm" style="margin-top:6px">Un caso nuevo. Nada de teoría: demuestra que puedes aplicarlo.</p></div>`));
+  app.append($(`<div class="card"><div class="microlabel" style="color:var(--amber)">El caso</div>
+    <p class="t-base" style="margin-top:8px;white-space:pre-wrap">${esc(d.scenario)}</p></div>`));
+  app.append($(`<div class="card ai-card"><div class="ai-tag"><span class="dot"></span> Tu entregable</div>
+    <p class="t-base" style="margin-top:8px">${esc(d.deliverable)}</p></div>`));
+  if(d.last){
+    app.append($(`<div class="microlabel">Tu último intento</div>`));
+    app.append(evalCard(d.last));
+    const dz=defenseCard(d.last); if(dz)app.append(dz);
+  }
+  const form=$(`<div style="display:flex;flex-direction:column;gap:12px">
+    <div><label>Tu solución</label><textarea id="cap" maxlength="8000" style="min-height:120px" placeholder="Escribe o pega tu solución completa"></textarea></div>
+    <button class="btn btn-primary" id="send">${d.last?'Intentarlo de nuevo':'Enviar mi solución'}</button>
+    <div id="cmsg" class="center muted t-sm"></div>
+    <div id="cres" style="display:flex;flex-direction:column;gap:12px"></div></div>`);
+  app.append(form);
+  if(d.last_content)form.querySelector('#cap').value=d.last_content;
+  attachDraft(form.querySelector('#cap'),'capstone',id);
+  const doSubmitCap=async(predicted)=>{
+    const content=form.querySelector('#cap').value.trim();
+    const msg=form.querySelector('#cmsg'), btn=form.querySelector('#send');
+    const zone=form.querySelector('#cres');
+    zone.innerHTML=''; const rc=readingCard('Tu tutora está leyendo tu solución…'); zone.append(rc);
+    const {res,data:r}=await postWithTimeout('/api/learn/submit-capstone',{capstone_id:id,content,predicted:predicted??null});
+    if(!res||!res.ok){rc.remove();btn.classList.remove('hide');btn.disabled=false;msg.textContent=r.detail||'No pudimos evaluar, intenta de nuevo.';return;}
+    const ta=form.querySelector('#cap'); ta.disabled=true;
+    clearDraft('capstone',id);
+    evalResult(zone, r.evaluation,
+      ()=>{ta.disabled=false;ta.focus();zone.innerHTML='';
+        msg.textContent='Mejora tu solución con el feedback y envíala de nuevo.';
+        btn.classList.remove('hide');btn.disabled=false;btn.textContent='Enviar de nuevo';},
+      ()=>nav('#/curso/'+d.course_slug),'Volver al temario ›');
+  };
+  // Same prediction beat as the exercise: a reto is a work product too, and the
+  // two should not disagree about how self-assessment is asked for.
+  form.querySelector('#send').onclick=()=>{
+    const content=form.querySelector('#cap').value.trim();
+    const msg=form.querySelector('#cmsg'), btn=form.querySelector('#send');
+    if(content.length<50){msg.textContent='Desarrolla tu solución un poco más (mínimo 50 caracteres).';return;}
+    msg.textContent=''; btn.classList.add('hide');
+    const zone=form.querySelector('#cres'); zone.innerHTML='';
+    zone.append(predictionBeat(doSubmitCap));
+  };
+}
+
+/* ---------- lesson ---------- */
+async function openLesson(id,step){
+  const l=await api('/lesson/'+id); if(l.__unauth)return renderLogin();
+  // is_review comes ONLY from the server (completed = review). Forcing it
+  // client-side made completions via prev/next navigation silently not count.
+  STATE.lesson=l; STATE.answers={};
+  // Deep links land on the exact step — a pending conversation is one tap away.
+  if(step==='explica')renderExplain();
+  else if(step==='quiz')renderQuiz();
+  else if(step==='ejercicio')renderExercise();
+  else renderVideo();
+}
+function lessonShell(inner,showNav){
+  app.innerHTML=''; const l=STATE.lesson;
+  const head=$(`<div class="lesson-head"><div class="back">‹ Temario</div><span class="microlabel">Lección ${l.position} de ${l.total}</span></div>`);
+  head.querySelector('.back').onclick=()=>nav('#/curso/'+l.course_slug);
+  app.append(head); app.append(inner);
+  // Prev/next only on the lesson's entry screen: mid-flow (explain/quiz/
+  // exercise) they invited wandering off and losing progress.
+  if(showNav){
+    const bar=$(`<div class="navbtns"><button id="np">‹ Anterior</button><button id="nn">Siguiente ›</button></div>`);
+    const p=bar.querySelector('#np'), n=bar.querySelector('#nn');
+    p.disabled=!l.prev_id; n.disabled=!l.next_id;
+    p.onclick=()=>l.prev_id&&nav('#/leccion/'+l.prev_id);
+    n.onclick=()=>l.next_id&&nav('#/leccion/'+l.next_id);
+    app.append(bar);
+  }
+}
+function renderVideo(){
+  const l=STATE.lesson, pts=(l.key_points||[]).map(p=>`<li style="margin-bottom:7px">${esc(p)}</li>`).join('');
+  const wrap=$(`<div style="display:flex;flex-direction:column;gap:14px">
+    <div><div class="eyebrow">${l.is_review?'Repaso':'Módulo '+l.module_no} · Día ${l.position}</div><h2 style="margin-top:8px">${esc(l.title)}</h2>
+    ${l.objectives?`<p class="muted t-sm" style="margin-top:8px">Al terminar podrás: ${esc(l.objectives)}</p>`:''}</div>
+    ${l.video_url?`<video id="vid" src="${l.video_url}" controls playsinline preload="metadata"
+       poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 720 1280'%3E%3Crect width='720' height='1280' fill='%23161310'/%3E%3Ccircle cx='360' cy='640' r='54' fill='none' stroke='%23c98a2b' stroke-width='4'/%3E%3Cpath d='M342 610l46 30-46 30z' fill='%23c98a2b'/%3E%3C/svg%3E"></video>`:`<div class="card muted">Video en producción — por ahora usa Resumen y Guía.</div>`}
+    <div id="readpane" class="hide" style="display:flex;flex-direction:column;gap:12px">
+      ${pts?`<div class="card"><div class="microlabel" style="color:var(--amber)">Puntos clave</div><ul style="margin:10px 0 0 18px;font-size:var(--fs-base)">${pts}</ul></div>`:''}
+      <div class="card"><div class="microlabel">Lección completa</div><p class="t-base" style="margin-top:10px;white-space:pre-wrap">${esc(l.transcript||'—')}</p></div></div>
+    <div id="guidepane" class="hide"><div class="written" id="writtenbody"></div><div id="diagrams"></div></div>
+    <button class="btn btn-primary" id="toquiz">Continuar ${I('arrow','ic ic-s')}</button></div>`);
+  const hasGuide=(l.written&&l.written.trim())||(l.diagrams&&l.diagrams.length);
+  const tabs=$(`<div class="seg">
+    <button id="tv">${I('play','ic ic-s')} Ver</button>
+    <button id="tr">${I('book','ic ic-s')} Resumen</button>
+    ${hasGuide?`<button id="tg">${I('tool','ic ic-s')} Guía</button>`:''}</div>`);
+  (wrap.querySelector('#vid')||wrap.firstChild).after(tabs);
+  lessonShell(wrap,true);
+  const vid=wrap.querySelector('#vid'), read=wrap.querySelector('#readpane'), guide=wrap.querySelector('#guidepane');
+  const tv=tabs.querySelector('#tv'),tr=tabs.querySelector('#tr'),tg=tabs.querySelector('#tg'); let built=false;
+  const set=(m)=>{if(vid)vid.classList.toggle('hide',m!=='ver');read.classList.toggle('hide',m!=='leer');guide.classList.toggle('hide',m!=='guia');
+    tv.classList.toggle('on',m==='ver');tr.classList.toggle('on',m==='leer');if(tg)tg.classList.toggle('on',m==='guia');
+    if(m==='guia'&&!built){buildGuide(wrap,l);built=true;}};
+  set(l.video_url?'ver':'leer');
+  tv.onclick=()=>set('ver');tr.onclick=()=>set('leer');if(tg)tg.onclick=()=>set('guia');
+  // Reviews go through explain too: it's retrieval practice, it keeps a pending
+  // conversation reachable after completion, and it has a skip straight to the quiz.
+  wrap.querySelector('#toquiz').onclick=()=>renderExplain();
+}
+
+/* ---------- evaluation helpers ---------- */
+/* Predicting your own grade IS the metacognition this product claims to teach
+   (docs/02: "the meta-skill of judging your own work"). It used to be a bare
+   number box beside the send button and was used in 2 of 16 real submissions.
+   So it is a beat instead: one tap between deciding to submit and the work
+   leaving your hands, phrased as a judgement rather than a number. Shared by
+   the exercise and the reto — two work products must not ask differently.
+   Always skippable: the platform gates on doing, never on ceremony. */
+const PREDICTIONS=[
+  ['Le falta',            50, 'Sé que está incompleto'],
+  ['Va bien',             70, 'Cumple, con huecos'],
+  ['Está sólido',         85, 'Lo entregaría a un cliente'],
+  ['Es mi mejor trabajo', 95, 'No sabría cómo mejorarlo'],
+];
+function predictionBeat(onPick){
+  const beat=$(`<div class="card-spot">
+    <div class="eyebrow">${I('target','ic ic-s')} Antes de verla, ¿cómo la ves tú?</div>
+    <p class="faint t-sm" style="margin:6px 0 12px">Acertar no suma puntos. Saber juzgar tu propio trabajo sí es parte del oficio.</p>
+    <div id="predopts" style="display:flex;flex-direction:column;gap:8px"></div>
+    <button class="btn btn-ghost btn-sm" id="predskip" style="width:100%;margin-top:8px">Prefiero no adivinar</button></div>`);
+  const opts=beat.querySelector('#predopts');
+  PREDICTIONS.forEach(([label,value,hint])=>{
+    const b=$(`<button class="btn btn-ghost" style="width:100%;text-align:left">
+      <b>${label}</b><span class="faint" style="font-size:var(--fs-xs);display:block;font-weight:500">${hint}</span></button>`);
+    b.onclick=()=>onPick(value); opts.append(b);
+  });
+  beat.querySelector('#predskip').onclick=()=>onPick(null);
+  return beat;
+}
+
+const VERDICT={lo_tienes:'Lo tienes', casi:'Casi', todavia_no:'Todavía no'};
+/* A comprehension check reports a state of understanding, not a grade: the
+   explain step is diagnostic, and scoring it punished correct-but-generic
+   explanations (a concept is generic by nature). Work products keep numbers. */
+function verdictCard(ev){
+  // Legacy explains (scored under the old numeric rubric) render here too, with
+  // no badge — we never show that number again rather than invent a verdict.
+  const v=ev.verdict, label=VERDICT[v];
+  const missing=(ev.missing&&ev.missing.length)
+    ?`<div class="note note-goal"><b>${I('target','ic ic-s')} ${v==='lo_tienes'?'Para redondearlo:':'Para que quede claro te falta:'}</b>
+       <ul style="margin:6px 0 0 18px">${ev.missing.map(m=>`<li style="margin-bottom:4px">${esc(m)}</li>`).join('')}</ul></div>`:'';
+  const card=$(`<div class="card" style="margin-top:4px">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="microlabel" style="color:var(--amber)">¿Quedó claro?${ev.attempt&&ev.attempt>1?` · intento ${ev.attempt}`:''}</div>
+      ${label?`<div class="verdict ${v}">${label}</div>`:''}</div>
+    <p class="t-base">${esc(ev.feedback||'')}</p>
+    ${ev.misconception?`<div class="note note-warn">${I('alert','ic ic-s')} ${esc(ev.misconception)}</div>`:''}
+    ${missing}
+    <div id="rtz"></div></div>`);
+  /* The third move. "casi"/"todavía no" used to leave exactly two options —
+     retry with the same understanding, or skip — which is no choice at all for
+     someone who did not follow the video. Asking for help is free: never
+     evaluated, never counted, and it cannot lower anything. */
+  if(v==='casi'||v==='todavia_no'){
+    const zone=card.querySelector('#rtz');
+    const btn=$(`<button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px">${I('spark','ic ic-s')} Explícamelo de otra forma</button>`);
+    btn.onclick=async()=>{
+      btn.disabled=true; zone.querySelectorAll('.card-spot,.faint').forEach(e=>e.remove());
+      const rc=readingCard('Tu tutora está buscando otra manera de explicártelo…');
+      zone.append(rc);
+      const {res,data:r}=await postWithTimeout('/api/learn/reteach',{node_id:STATE.lesson.id});
+      rc.remove(); btn.disabled=false;
+      if(!res||!res.ok){
+        zone.append($(`<p class="faint t-sm" style="margin-top:8px">${esc((r&&r.detail)||'No pudimos prepararla, intenta de nuevo.')}</p>`));
+        return;
+      }
+      const box=$(`<div class="card-spot" style="margin-top:10px">
+        <div class="eyebrow">${I('spark','ic ic-s')} Otra forma de verlo</div>
+        <div class="written" id="rtbody" style="margin-top:8px"></div>
+        ${r.check?`<div class="note note-goal" style="margin-top:10px"><b>Para comprobar:</b> ${esc(r.check)}</div>`:''}</div>`);
+      zone.append(box);
+      renderMD(box.querySelector('#rtbody'), r.explanation);
+      btn.textContent='Explícamelo otra vez, distinto';
+    };
+    zone.append(btn);
+  }
+  return card;
+}
+function evalCard(ev,animate){
+  if(ev.verdict||ev.kind==='explain')return verdictCard(ev);
+  /* THE NUMBER ON SCREEN IS THEIR NOTA — the best they have earned — never the
+     attempt they happen to have just sent. A learner watched 79 become 50 become
+     30 on the same work and stopped; the score was safe in the database the
+     whole time, which helped nobody. A weaker attempt is now DIAGNOSTIC: we say
+     what it would have scored and why, and the nota does not move. Retrying can
+     only teach you something, never cost you something. */
+  const mine=ev.final_score??ev.score;                 // this attempt
+  const best=(ev.best_score!=null)?ev.best_score:mine; // what they keep
+  const shown=(mine!=null&&best!=null)?Math.max(mine,best):(mine??best);
+  const lower=(mine!=null&&best!=null&&mine<best);
+  const cls=shown>=80?'hi':shown>=60?'mid':'lo';
+  const D=ev.dimensions;
+  const dimRow=(label,v,max)=>`<div class="dimrow">
+    <span>${label}</span>
+    <div class="prog"><i data-w="${Math.max(2,Math.round(v/max*100))}" style="width:${animate?0:Math.max(2,Math.round(v/max*100))}%"></i></div>
+    <span>${v}/${max}</span></div>`;
+  const dims=D?`<div style="margin:2px 0 10px">${dimRow('Aplicación',D.aplicacion,40)}${dimRow('Criterio',D.criterio,30)}${dimRow('Ejecución',D.ejecucion,30)}</div>`:'';
+  const missing=(ev.missing&&ev.missing.length)
+    ?`<div class="note note-goal"><b>${I('target','ic ic-s')} ${lower?'Lo que le falta a esta versión:':'Para llegar a 100 te falta:'}</b>
+       <ul style="margin:6px 0 0 18px">${ev.missing.map(m=>`<li style="margin-bottom:4px">${esc(m)}</li>`).join('')}</ul></div>`:'';
+  // A weaker attempt is framed as what it IS — a version that would have scored
+  // less — instead of as a new, lower grade. The nota above it does not move.
+  const diag=lower
+    ?`<div class="note note-warn" style="margin-bottom:8px">${I('alert','ic ic-s')}
+       <span><b>Tu nota sigue siendo ${best}.</b> Esta versión habría sacado ${mine};
+       abajo te explico por qué, para que la siguiente suba y no para restarte.</span></div>`:'';
+  const unchanged=ev.unchanged
+    ?`<div class="note note-warn" style="margin-bottom:8px">${I('alert','ic ic-s')} Es la misma entrega de antes, así que mantiene su nota.
+       Cambia lo que te señalé abajo y vuelve a enviarla.</div>`:'';
+  const dimsLabel=lower
+    ?`<div class="microlabel" style="margin:6px 0 2px">Cómo puntuaría esta versión</div>`:'';
+  const gap=(ev.predicted!=null&&ev.score!=null)?ev.predicted-ev.score:null;
+  const pred=gap!=null?`<p class="faint" style="font-size:var(--fs-xs);margin-top:8px">Tu predicción: ${ev.predicted} · Nota: ${ev.score}${Math.abs(gap)>=15?(gap>0?' — esta vez fuiste optimista; saber autoevaluarse también se entrena.':' — te subestimaste; tu trabajo vale más de lo que crees.'):' — bien calibrada.'}</p>`:'';
+  // The defensa has its own card (retryable) — never duplicated here.
+  const defended='';
+  const card=$(`<div class="card" style="margin-top:4px">
+    <div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+      <div class="microlabel" style="color:var(--amber);padding-top:10px">${lower?'Tu nota':'Tu evaluación'}${ev.attempt&&ev.attempt>1?` · intento ${ev.attempt}`:''}</div>
+      <div class="scorebig ${cls}" data-n="${shown??0}">${animate?0:(shown??'—')}</div></div>
+    ${unchanged}${diag}
+    ${dimsLabel}${dims}
+    <p class="t-base">${esc(ev.feedback||'')}</p>
+    ${ev.misconception?`<div class="note note-warn">${I('alert','ic ic-s')} ${esc(ev.misconception)}</div>`:''}
+    ${missing}
+    ${ev.improve&&!(ev.missing&&ev.missing.length)?`<div class="note note-goal">→ ${esc(ev.improve)}</div>`:''}
+    ${defended}${pred}</div>`);
+  if(animate)requestAnimationFrame(()=>animateEval(card));
+  return card;
+}
+/* the reveal: bars fill in sequence, then the serif number counts up */
+function animateEval(card){
+  card.querySelectorAll('.prog i[data-w]').forEach((bar,i)=>{
+    setTimeout(()=>{bar.style.width=bar.dataset.w+'%';},150+i*180);
+  });
+  const num=card.querySelector('.scorebig');
+  if(!num)return;
+  const target=parseInt(num.dataset.n,10)||0, t0=performance.now(), dur=850;
+  const tick=(t)=>{const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3);
+    num.textContent=Math.round(target*e);
+    if(p<1)requestAnimationFrame(tick);};
+  requestAnimationFrame(tick);
+}
+/* The ownership probe: one question only the decision-maker can answer.
+   Optional, rewarded (+10 max), and RETRYABLE without limit — every evaluation
+   names what a +10 answer would add, and the best attempt is the one that
+   counts, so defending again can only help. We reward appropriation; we never
+   police AI use. */
+function defenseCard(ev, onDone){
+  if(!ev.defense_question)return null;
+  const dz=$(`<div class="card-spot"></div>`);
+
+  const askForm=(intro)=>{
+    dz.innerHTML=`<div class="eyebrow">${I('mic','ic ic-s')} Conversa con tu tutora · suma hasta 10 pts</div>
+      <p class="t-base" style="font-weight:600;margin-top:8px">${esc(ev.defense_question)}</p>
+      <p class="faint" style="font-size:var(--fs-xs);margin-top:4px">${intro}</p>
+      <textarea id="defans" maxlength="2000" style="margin-top:10px" placeholder="Porque..."></textarea>
+      <button class="btn btn-primary btn-sm" id="defsend" style="margin-top:8px;width:100%">${I('send','ic ic-s')} Enviar mi respuesta</button>
+      <div id="defmsg" class="faint t-sm" style="margin-top:6px"></div>`;
+    // Read the latest answer at render time — a retry must never start blank.
+    dz.querySelector('#defans').value=(ev.defense&&ev.defense.answer)||'';
+    dz.querySelector('#defsend').onclick=send;
+  };
+
+  const showResult=(d,best,finalScore)=>{
+    const cls=d.bonus>=7?'hi':d.bonus>=4?'mid':'lo';
+    const missing=(d.missing&&d.missing.length)
+      ? `<div class="note note-goal"><b>${I('target','ic ic-s')} Para llegar a los 10 puntos:</b>
+          <ul style="margin:6px 0 0 18px">${d.missing.map(m=>`<li style="margin-bottom:4px">${esc(m)}</li>`).join('')}</ul></div>` : '';
+    const kept=(best>d.bonus)
+      ? `<div class="note note-goal">Se mantiene tu mejor respuesta: <b>+${best}</b> — nunca pierdes puntos por volver a intentarlo.</div>` : '';
+    dz.innerHTML=`<div class="eyebrow">${I('mic','ic ic-s')} ${best>=10?'¡Llegaste a los 10 puntos!':'Tu tutora te respondió'}</div>
+      <div class="row" style="justify-content:space-between;align-items:flex-start;margin-top:8px">
+        <p class="t-base" style="flex:1">${esc(d.comment||'')}</p>
+        <div class="scorepill ${cls}" style="margin-left:10px">+${d.bonus}</div></div>
+      ${missing}${kept}
+      <p class="microlabel" style="margin-top:10px">Nota final: ${finalScore}</p>`;
+    if(best<10){
+      const again=$(`<button class="btn btn-primary btn-sm" style="width:100%;margin-top:12px">${I('send','ic ic-s')} Responder de nuevo</button>`);
+      again.onclick=()=>askForm('Suma lo que te faltó y respóndele otra vez. Puedes conversar las veces que quieras hasta llegar a los 10.');
+      dz.append(again);
+      dz.append($(`<p class="faint center" style="font-size:var(--fs-xs);margin-top:6px">Intentos ilimitados · siempre se queda tu mejor respuesta</p>`));
+    }
+  };
+
+  async function send(){
+    const answer=dz.querySelector('#defans').value.trim();
+    const btn=dz.querySelector('#defsend'), msg=dz.querySelector('#defmsg');
+    if(answer.length<10){msg.textContent='Desarrolla tu respuesta un poco más.';return;}
+    btn.disabled=true;btn.textContent='Evaluando tu defensa…';
+    const res=await fetch('/api/learn/defend',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({submission_id:ev.id,answer})});
+    const r=await res.json();
+    if(!res.ok){btn.disabled=false;btn.innerHTML=`${I('send','ic ic-s')} Enviar mi respuesta`;msg.textContent=r.detail||'No se pudo evaluar, intenta de nuevo.';return;}
+    ev.defense=r.defense; ev.defense_best=r.best; ev.final_score=r.final_score;
+    showResult(r.defense, r.best, r.final_score);
+    // The headline score must reflect the bonus the learner just earned.
+    // Same rule as evalCard: the headline is their nota, so it can rise from a
+    // conversation bonus but never fall because they defended an older attempt.
+    const big=dz.parentElement&&dz.parentElement.querySelector('.scorebig');
+    if(big){
+      const cur=parseInt(big.textContent,10);
+      const n=Math.max(r.final_score??0, r.best_score??0, isNaN(cur)?0:cur);
+      big.textContent=n;
+      big.className='scorebig '+(n>=80?'hi':n>=60?'mid':'lo');}
+    if(onDone)onDone(r);
+  }
+
+  if(ev.defense)showResult(ev.defense, ev.defense_best??ev.defense.bonus, ev.final_score??'—');
+  else askForm('Responde con tus palabras: solo quien tomó las decisiones contesta bien esto. Si usaste IA, contar qué le cambiaste y por qué también suma. Puedes responder las veces que quieras — se queda tu mejor respuesta.');
+  return dz;
+}
+/* Feedback is an invitation, not a verdict: below 90 the primary action is to
+   improve the answer; the path forward is always available but never pushy. */
+function evalResult(zone, ev, retryFn, nextFn, nextLabel){
+  zone.innerHTML=''; zone.append(evalCard(ev,true));
+  const dz=defenseCard(ev); if(dz)zone.append(dz);
+  const good=ev.verdict?ev.verdict==='lo_tienes':(ev.score??0)>=90;
+  const retry=$(`<button class="btn ${good?'btn-ghost':'btn-primary'}">${I('pen','ic ic-s')} ${ev.verdict?'Explicarlo de nuevo':'Mejorar mi respuesta'}</button>`);
+  retry.onclick=retryFn;
+  const next=$(`<button class="btn ${good?'btn-primary':'btn-ghost'}">${nextLabel}</button>`);
+  next.onclick=nextFn;
+  if(good){zone.append(next);zone.append(retry);}else{zone.append(retry);zone.append(next);}
+}
+
+/* ---------- explain it back (Feynman) ---------- */
+function renderExplain(){
+  const l=STATE.lesson;
+  const wrap=$(`<div style="display:flex;flex-direction:column;gap:14px">
+    <div><div class="eyebrow">Antes del quiz</div>
+    <h2 style="margin-top:8px">Explícalo en tus palabras</h2>
+    ${l.explain_prompt
+      ?`<div class="card" style="margin-top:10px;border-color:rgba(240,164,60,.35)"><p class="t-md" style="font-weight:600">${esc(l.explain_prompt)}</p></div>
+        <p class="muted t-sm" style="margin-top:8px">Respóndelo como se lo contarías a un amigo, con tus palabras y tu ejemplo.</p>`
+      :`<p class="muted t-sm" style="margin-top:6px">Como si se lo contaras a un amigo que no vio el video. Si puedes explicarlo, lo entendiste de verdad.</p>`}</div>
+    <textarea id="expl" maxlength="5000" placeholder="Lo que entendí es que..."></textarea>
+    <p class="faint" style="font-size:var(--fs-xs)">Esto no lleva nota: es para ver si el concepto te quedó claro. Explícalo en abstracto o con un ejemplo, como prefieras.</p>
+    <button class="btn btn-primary" id="send">Enviar mi explicación</button>
+    <button class="btn btn-ghost" id="skip">Ir directo al quiz ›</button>
+    <div id="emsg" class="center muted t-sm"></div>
+    <div id="eres" style="display:flex;flex-direction:column;gap:12px"></div></div>`);
+  lessonShell(wrap);
+  attachDraft(wrap.querySelector('#expl'),'explain',l.id);
+  wrap.querySelector('#skip').onclick=renderQuiz;
+  if(l.last_explain){
+    wrap.querySelector('#expl').value=l.last_explain.content;
+    wrap.querySelector('#send').textContent='Enviar de nuevo';
+    const zone=wrap.querySelector('#eres');
+    zone.append($(`<div class="microlabel">Tu entrega anterior</div>`));
+    zone.append(evalCard(l.last_explain.evaluation));
+    const dz=defenseCard(l.last_explain.evaluation); if(dz)zone.append(dz);
+  }
+  wrap.querySelector('#send').onclick=async()=>{
+    const content=wrap.querySelector('#expl').value.trim();
+    const msg=wrap.querySelector('#emsg'), btn=wrap.querySelector('#send');
+    if(content.length<20){msg.textContent='Escribe al menos un par de frases.';return;}
+    msg.textContent='';
+    const zone=wrap.querySelector('#eres');
+    btn.classList.add('hide');wrap.querySelector('#skip').classList.add('hide');
+    zone.innerHTML=''; const rc=readingCard('Tu tutora está leyendo tu explicación…'); zone.append(rc);
+    const {res,data:r}=await postWithTimeout('/api/learn/submit',{node_id:l.id,kind:'explain',content});
+    if(!res||!res.ok){rc.remove();btn.classList.remove('hide');wrap.querySelector('#skip').classList.remove('hide');btn.disabled=false;msg.textContent=r.detail||'No pudimos evaluar, intenta de nuevo.';return;}
+    const ta=wrap.querySelector('#expl'); ta.disabled=true;
+    clearDraft('explain',l.id);
+    evalResult(zone, r.evaluation,
+      ()=>{ta.disabled=false;ta.focus();zone.innerHTML='';
+        msg.textContent='Ajusta tu respuesta con el feedback en mente y envíala de nuevo.';
+        btn.classList.remove('hide');btn.disabled=false;btn.textContent='Enviar de nuevo';},
+      renderQuiz,'Continuar al quiz ›');
+  };
+}
+function buildGuide(wrap,l){
+  const body=wrap.querySelector('#writtenbody');
+  if(l.written) renderMD(body, l.written);
+  const dc=wrap.querySelector('#diagrams');
+  (l.diagrams||[]).forEach(d=>{const box=$(`<div><div class="diagram-title">${esc(d.title||'')}</div><div class="diagram"><pre class="mermaid">${esc(d.mermaid||'')}</pre></div></div>`);
+    dc.append(box); if(window.renderMermaid)window.renderMermaid(box.querySelector('.mermaid'));});
+}
+function renderQuiz(){
+  const l=STATE.lesson;
+  const wrap=$(`<div style="display:flex;flex-direction:column;gap:16px"><div class="eyebrow">Quiz · ${l.quiz.length} preguntas</div></div>`);
+  l.quiz.forEach((q,qi)=>{
+    const block=$(`<div class="qblock"><h4>${qi+1}. ${esc(q.q)}</h4></div>`);
+    q.options.forEach((opt,oi)=>{
+      const b=$(`<button class="opt"><span class="key">${String.fromCharCode(65+oi)}</span><span>${esc(opt)}</span></button>`);
+      b.onclick=()=>{if(block.dataset.done)return; STATE.answers[qi]=oi; block.dataset.done='1';
+        [...block.querySelectorAll('.opt')].forEach((o,k)=>{if(k===q.answer)o.classList.add('correct');else if(k===oi)o.classList.add('wrong');});
+        block.append($(`<div class="explain">${esc(q.explain||'')}</div>`));
+        if(Object.keys(STATE.answers).length===l.quiz.length)wrap.querySelector('#toex').classList.remove('hide');};
+      block.append(b);
+    });
+    wrap.append(block);
+  });
+  const next=$(`<button class="btn btn-primary hide" id="toex">Ir al ejercicio ${I('arrow','ic ic-s')}</button>`); next.onclick=renderExercise; wrap.append(next);
+  lessonShell(wrap);
+}
+function renderExercise(){
+  const l=STATE.lesson, ex=l.exercise||{};
+  const wrap=$(`<div style="display:flex;flex-direction:column;gap:14px">
+    <div class="ai-tag"><span class="dot"></span> Tu ejercicio de hoy</div><h2>${esc(l.title)}</h2>
+    <div class="card"><p class="t-base">${esc(ex.instruction||'')}</p></div>
+    ${ex.starting_point?`<div class="card ai-card"><div class="ai-tag"><span class="dot"></span> Pega esto en ChatGPT o Claude</div><div class="prompt">${esc(ex.starting_point)}</div><button class="copybtn" id="cp">${I('copy','ic ic-s')} Copiar prompt</button></div>`:''}
+    ${STATE.me&&STATE.me.project_name
+      ?`<div class="note note-goal">${I('target','ic ic-s')} <span>Tu proyecto: <b>${esc(STATE.me.project_name)}</b> — tu tutora evalúa contra este contexto. Haz el ejercicio sobre él.</span></div>`
+      /* Without a declared project the exercise text still says "elige tu
+         proyecto real", which is per-course wording from before the project
+         moved to the learner (docs/09). Point them at the one place it lives. */
+      :`<div class="note note-warn">${I('target','ic ic-s')} <span>Aún no definiste tu proyecto. <b>Aplicación vale 40 de 100 puntos</b> y mide qué tan anclado está esto en un proyecto tuyo — <u id="godef">defínelo en un minuto</u>.</span></div>`}
+    <div><label>Pega aquí lo que hiciste</label>
+    <p class="faint" style="font-size:var(--fs-xs);margin:-2px 0 8px">Usar IA está perfecto — es parte del oficio. Suma puntos contar qué le cambiaste a su respuesta y por qué.</p>
+    <textarea id="work" maxlength="5000" placeholder="Tu brief, tus copys, tu plan... lo que produjo el ejercicio. Recibirás feedback al instante."></textarea></div>
+    <button class="btn btn-primary" id="send">Enviar mi trabajo</button>
+    <button class="btn btn-ghost" id="later">Terminar sin enviar</button>
+    <div id="xmsg" class="center muted t-sm"></div>
+    <div id="xres" style="display:flex;flex-direction:column;gap:12px"></div></div>`);
+  lessonShell(wrap);
+  attachDraft(wrap.querySelector('#work'),'exercise',l.id);
+  const gd=wrap.querySelector('#godef');
+  if(gd){gd.style.cursor='pointer'; gd.onclick=()=>nav('#/perfil');}
+  const cp=wrap.querySelector('#cp'); if(cp)cp.onclick=()=>{navigator.clipboard.writeText(ex.starting_point);cp.textContent='✓ Copiado';};
+  wrap.querySelector('#later').onclick=finish;
+  if(l.last_exercise){
+    wrap.querySelector('#work').value=l.last_exercise.content;
+    wrap.querySelector('#send').textContent='Enviar de nuevo';
+    const zone=wrap.querySelector('#xres');
+    zone.append($(`<div class="microlabel">Tu entrega anterior</div>`));
+    zone.append(evalCard(l.last_exercise.evaluation));
+    const dz=defenseCard(l.last_exercise.evaluation); if(dz)zone.append(dz);
+  }
+  const doSubmit=async(predicted)=>{
+    const content=wrap.querySelector('#work').value.trim();
+    const msg=wrap.querySelector('#xmsg'), btn=wrap.querySelector('#send');
+    const zone=wrap.querySelector('#xres');
+    zone.innerHTML=''; const rc=readingCard('Tu tutora está leyendo tu trabajo…'); zone.append(rc);
+    const {res,data:r}=await postWithTimeout('/api/learn/submit',
+      {node_id:l.id,kind:'exercise',content,predicted:predicted??null});
+    if(!res||!res.ok){rc.remove();btn.classList.remove('hide');wrap.querySelector('#later').classList.remove('hide');btn.disabled=false;msg.textContent=r.detail||'No pudimos evaluar, intenta de nuevo.';return;}
+    const ta=wrap.querySelector('#work'); ta.disabled=true;
+    clearDraft('exercise',l.id);   // it is stored server-side now
+    evalResult(zone, r.evaluation,
+      ()=>{ta.disabled=false;ta.focus();zone.innerHTML='';
+        msg.textContent='Mejora tu entrega con el feedback y envíala de nuevo.';
+        btn.classList.remove('hide');btn.disabled=false;btn.textContent='Enviar de nuevo';},
+      finish,'Completar lección ✓');
+  };
+  wrap.querySelector('#send').onclick=()=>{
+    const content=wrap.querySelector('#work').value.trim();
+    const msg=wrap.querySelector('#xmsg'), btn=wrap.querySelector('#send');
+    if(content.length<20){msg.textContent='Pega tu trabajo completo, no solo una línea.';return;}
+    msg.textContent='';
+    btn.classList.add('hide'); wrap.querySelector('#later').classList.add('hide');
+    const zone=wrap.querySelector('#xres'); zone.innerHTML='';
+    zone.append(predictionBeat(doSubmit));
+  };
+}
+async function finish(){
+  const l=STATE.lesson, correct=l.quiz.reduce((n,q,i)=>n+(STATE.answers[i]===q.answer?1:0),0);
+  const score=l.quiz.length?correct/l.quiz.length:1;
+  // Deep-linked past the quiz (e.g. from a pending conversation in Hoy): there
+  // is no quiz result from this session, so never record a phantom 0 — either
+  // nothing to add (already completed) or send them through the quiz first.
+  if(l.quiz.length && !Object.keys(STATE.answers).length){
+    if(l.is_review){ nav('#/curso/'+l.course_slug); return; }
+    return renderQuiz();
+  }
+  let r;
+  try{
+    r=await api('/complete',{method:'POST',body:JSON.stringify({node_id:l.id,quiz_score:score,is_review:!!l.is_review})});
+    if(!r||r.ok!==true)throw 0;
+  }catch(e){
+    // A dropped request must never swallow a completion silently.
+    app.innerHTML='';
+    app.append($(`<div class="celebrate"><h2 style="margin-top:30px">No pudimos guardar tu avance</h2>
+      <p class="muted t-sm">Revisa tu conexión — tu lección no se pierde, solo falta registrarla.</p></div>`));
+    const retry=$(`<button class="btn btn-primary" style="margin-top:18px">Reintentar</button>`);
+    retry.onclick=finish; app.append(retry);
+    return;
+  }
+  app.innerHTML='';
+  app.append($(`<div class="celebrate"><div class="medal">${I(l.is_review?'redo':'spark','ic')}</div>
+    <h2 style="font-size:30px;margin-top:18px">${l.is_review?'Repaso listo':'Lección '+l.position+' completada'}</h2>
+    <p class="muted">${correct} de ${l.quiz.length} en el quiz.</p>
+    <div class="bigstreak">${r.streak}</div><div class="microlabel">días seguidos</div></div>`));
+  const c=$(`<button class="btn btn-primary" style="margin-top:24px">${l.next_id?'Siguiente lección ›':'Volver al temario'}</button>`);
+  c.onclick=()=>l.next_id?nav('#/leccion/'+l.next_id):nav('#/curso/'+l.course_slug); app.append(c);
+  const o=$(`<button class="btn btn-ghost" style="margin-top:10px">Ver el temario</button>`); o.onclick=()=>nav('#/curso/'+l.course_slug); app.append(o);
+}
+
+/* ---------- portafolio: the product's endgame, promoted to the nav ---------- */
+async function viewPortfolio(){
+  const pf=await api('/portfolio'); if(pf.__unauth)return renderLogin();
+  app.innerHTML='';
+  app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Portafolio<small>Tu trabajo, tu evidencia</small></div></div></div>`));
+  const items=pf.items||[];
+  if(!items.length){
+    app.append($(`<div class="card-paper" style="margin-top:6px"><h3>Todavía no hay piezas aquí</h3>
+      <p class="muted t-sm" style="margin-top:8px">Cada ejercicio que envías se vuelve una sección de tu documento profesional. Empieza una lección y tu portafolio se construye solo.</p></div>`));
+    const b=$(`<button class="btn btn-primary" style="margin-top:8px">Ir a mis cursos ${I('arrow','ic ic-s')}</button>`);
+    b.onclick=()=>nav('#/cursos'); app.append(b);
+    return;
+  }
+  // Group by course; the deliverables lead, the raw work follows.
+  const byCourse={};
+  items.forEach(it=>{const k=it.course_slug||'otros';(byCourse[k]=byCourse[k]||{title:it.course_title||'Otros',items:[]}).items.push(it);});
+  const slugs=Object.keys(byCourse);
+  const statuses=await Promise.all(slugs.map(s=>s==='otros'?null:api('/project-doc/'+s)));
+  slugs.forEach((slug,i)=>{
+    const g=byCourse[slug], st=statuses[i];
+    app.append($(`<div class="modhead" style="margin-top:18px">${esc(g.title)}</div>`));
+    if(st&&!st.detail){
+      const zone=$(`<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>`);
+      if(st.exists){
+        const v=$(`<button class="btn btn-paper">${I('doc','ic ic-s')} ${esc(st.doc_type)}</button>`);
+        v.onclick=()=>nav('#/documento/'+slug); zone.append(v);
+      }else if(st.eligible){
+        const gbtn=$(`<button class="btn btn-paper">${I('doc','ic ic-s')} Compilar mi ${esc(st.doc_type)}</button>`);
+        gbtn.onclick=async()=>{gbtn.disabled=true;gbtn.textContent='Compilando… (unos segundos)';
+          const res=await fetch('/api/learn/project-doc/'+slug,{method:'POST'});
+          if(res.ok)nav('#/documento/'+slug); else {gbtn.disabled=false;gbtn.textContent='Compilar mi documento';}};
+        zone.append(gbtn);
+      }else{
+        zone.append($(`<p class="faint t-sm">${esc(st.doc_type)}: se desbloquea con ${st.needed} trabajos · llevas ${st.submissions}.</p>`));
+      }
+      app.append(zone);
+    }
+    g.items.forEach(it=>{
+      const cls=it.score>=80?'hi':it.score>=60?'mid':'lo';
+      const KIND={explain:'Explicación',exercise:'Ejercicio',capstone:'Reto de módulo'};
+      const mark=it.verdict?`<div class="vchip ${it.verdict}">${VERDICT[it.verdict]||''}</div>`
+        :(it.score!=null?`<div class="scorepill ${cls}">${it.score}</div>`:'');
+      const row=$(`<div class="pf-row">
+        <div class="row" style="justify-content:space-between;gap:10px">
+          <div style="flex:1;min-width:0"><div style="font-size:var(--fs-sm);font-weight:700;line-height:1.3">${esc(it.title||'')}</div>
+          <div style="font-size:var(--fs-xs);color:var(--faint);margin-top:2px">${KIND[it.kind]||it.kind} · ${it.created_at}</div></div>
+          ${mark}</div>
+        <div class="fb">${esc(it.feedback||'')}</div></div>`);
+      row.onclick=()=>row.classList.toggle('open');
+      app.append(row);
+    });
+  });
+}
+
+/* ---------- profile ---------- */
+async function viewProfile(){
+  const d=await api('/profile'); if(d.__unauth)return renderLogin();
+  app.innerHTML='';
+  app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Perfil</div></div>${flameChip(d.streak)}</div>`));
+  app.append($(`<div class="card" style="text-align:center;padding:24px">
+    <div style="width:64px;height:64px;border-radius:99px;margin:0 auto 12px;background:linear-gradient(150deg,var(--amber-hi),var(--amber-deep));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:26px;font-weight:700;color:var(--amber-ink)">${esc((d.name||'?')[0].toUpperCase())}</div>
+    <h2 style="font-size:var(--fs-xl)">${esc(d.name)}</h2><p class="muted t-sm">${esc(d.email)}</p></div>`));
+  app.append($(`<div class="row" style="gap:12px">
+    <div class="card" style="flex:1;text-align:center"><div class="bigstreak" style="font-size:34px;margin:0">${d.streak}</div><div class="microlabel">días seguidos</div></div>
+    <div class="card" style="flex:1;text-align:center"><div class="bigstreak" style="font-size:34px;margin:0">${d.lessons_done}</div><div class="microlabel">lecciones hechas</div></div></div>`));
+  // The transversal project: learner-level, editable here (docs/09).
+  const pc=$(`<div class="card" style="margin-top:6px">
+    <div class="row" style="gap:10px;color:var(--amber)">${I('target')}<b class="t-md" style="color:var(--text)">Tu proyecto</b></div>
+    <p class="muted t-sm" style="margin:8px 0 12px">El proyecto real sobre el que trabajan todos tus ejercicios. Tu tutora evalúa contra este contexto.</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+    <div><label>Proyecto o marca</label><input id="ppn" maxlength="120" value="${esc(d.project_name)}" placeholder="Tu negocio, o una marca donde quieres trabajar"></div>
+    <div><label>De qué se trata</label><input id="ppd" maxlength="500" value="${esc(d.project_desc)}" placeholder="Una línea de contexto"></div>
+    <div><label>Tu meta</label><input id="ppg" maxlength="200" value="${esc(d.goal)}" placeholder="Conseguir trabajo, vender más..."></div>
+    <button class="btn btn-ghost" id="psave">Guardar</button>
+    <div id="pmsg" class="center muted t-sm"></div></div></div>`);
+  pc.querySelector('#psave').onclick=async(e)=>{
+    const b={project_name:pc.querySelector('#ppn').value.trim(),
+             project_desc:pc.querySelector('#ppd').value.trim(),
+             goal:pc.querySelector('#ppg').value.trim()};
+    const r=await api('/profile',{method:'POST',body:JSON.stringify(b)});
+    pc.querySelector('#pmsg').textContent=r&&r.ok?'Guardado ✓':'No se pudo guardar, intenta de nuevo.';
+    if(r&&r.ok)Object.assign(STATE.me||{},b);
+  };
+  app.append(pc);
+  if(d.courses.length){
+    app.append($(`<div class="microlabel" style="margin-top:6px">Tu progreso</div>`));
+    d.courses.forEach(c=>{const pct=Math.round(c.done/c.total*100);
+      app.append($(`<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><span style="font-weight:700;font-size:var(--fs-base)">${esc(c.title)}</span><span class="muted t-sm">${c.done}/${c.total}</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>`));});
+  }
+  const how=$(`<button class="btn btn-ghost" style="margin-top:8px">¿Cómo funciona Aprende IA?</button>`);
+  how.onclick=()=>nav('#/como-funciona'); app.append(how);
+  const out=$(`<button class="btn btn-ghost" style="margin-top:2px">Salir</button>`);
+  out.onclick=async()=>{await api('/logout',{method:'POST'});location.href='/aprende';}; app.append(out);
+}
+
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+Ingeniero/a de Datos Senior — Plataforma de Datos
+
+Sobre el rol:
+Buscamos un/a Ingeniero/a de Datos Senior para diseñar, construir y mantener la
+plataforma de datos que alimenta los modelos de riesgo crediticio de la compañía.
+Reportarás al Head of Data Platform y trabajarás con un equipo de 6 ingenieros.
+
+Requisitos técnicos:
+- Mínimo 5 años de experiencia construyendo pipelines de datos en producción.
+- Dominio avanzado de Python y SQL. Se evaluará con una prueba técnica en vivo.
+- Experiencia sólida con Apache Spark y procesamiento distribuido sobre
+  volúmenes de más de 10 TB.
+- Orquestación con Apache Airflow: DAGs idempotentes, backfills, SLAs y alertas.
+- Modelado dimensional en un data warehouse en la nube (Snowflake o BigQuery),
+  incluyendo diseño de tablas de hechos y dimensiones lentamente cambiantes.
+- Streaming en tiempo real con Kafka: particionamiento, consumer groups y
+  garantías de entrega exactly-once.
+- Infraestructura como código con Terraform sobre AWS (S3, EMR, Glue, IAM).
+- CI/CD para pipelines de datos y pruebas automatizadas con dbt y Great Expectations.
+- Gobierno de datos: linaje, catálogo, control de acceso a nivel de columna y
+  cumplimiento de normativa de datos personales del sector financiero.
+
+Deseable:
+- Experiencia con feature stores y despliegue de modelos de machine learning.
+- Kubernetes y observabilidad (Prometheus, Grafana).
+- Haber trabajado en entornos regulados (banca, seguros o fintech).
+
+Ofrecemos:
+Modalidad híbrida en Santiago, tres días presenciales. Stock options, seguro
+complementario y presupuesto anual de capacitación técnica.

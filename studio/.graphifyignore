@@ -1,0 +1,4 @@
+output/
+queue/
+__pycache__/
+*.mp4

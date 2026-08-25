@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dashboard",
+      "runtimeExecutable": "C:\\Users\\joset\\Projects\\MoneyPrinterTurbo\\MoneyPrinterTurbo\\.venv\\Scripts\\python.exe",
+      "runtimeArgs": ["studio/dashboard/app.py"],
+      "port": 8765
+    },
+    {
+      "name": "learner-app",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File",
+        "studio/dashboard/run_local.ps1"
+      ],
+      "port": 8799,
+      "autoPort": true
+    }
+  ]
+}

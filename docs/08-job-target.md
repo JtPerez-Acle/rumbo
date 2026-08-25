@@ -23,7 +23,7 @@ the deliverable — the portfolio document — is already built.
 This is **not an extra feature**. It is intended to become the front door and
 the organizing metaphor, with the course catalog demoted to the browse surface
 beneath it. It also settles the positioning ambiguity flagged in doc 06: not
-"Aprende IA", but *el plan y el portafolio para el trabajo que quieres*.
+"Rumbo", but *el plan y el portafolio para el trabajo que quieres*.
 
 ## The decision that defines the design: two clocks
 

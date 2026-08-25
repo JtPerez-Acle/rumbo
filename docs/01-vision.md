@@ -1,4 +1,4 @@
-# 01 — Vision: why Aprende IA exists
+# 01 — Vision: why Rumbo exists
 
 ## The problem, stated honestly
 
@@ -18,7 +18,7 @@ plan, an audit of a real brand.
 > Generating courses is a commodity. **Verifying that someone learned — and turning
 > their verified work into proof they can show — is the defensible half.**
 
-Aprende IA is built around that asymmetry. The course is the delivery mechanism;
+Rumbo is built around that asymmetry. The course is the delivery mechanism;
 the product is a loop:
 
 ```

@@ -1,4 +1,4 @@
-# Aprende IA
+# Rumbo
 
 **Tell it what you want to be. It compiles the route, verifies you learned it, and
 hands you the work document that proves it.**
@@ -13,9 +13,17 @@ into a client-grade document under your byline.
 
 Not a certificate. The work.
 
-https://estudio-production-1b8c.up.railway.app/aprende
+**Live:** https://estudio-production-1b8c.up.railway.app/aprende
 
-https://github.com/user-attachments/assets/brag.mp4
+[![Rumbo — 20-second launch video](brag-output/brag.jpg)](brag-output/brag.mp4)
+
+*20-second launch video ([brag-output/brag.mp4](brag-output/brag.mp4)) — click the still to play.*
+
+> **On the name:** the product was built as *Aprende IA* and the running
+> application, its URL, and the launch video still carry that name. *Rumbo* is
+> the name it is taking — the rebrand of the live UI is a deliberate, separate
+> change, not something to slip into a portfolio commit while five people are
+> using it.
 
 ---
 

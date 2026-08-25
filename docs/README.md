@@ -1,13 +1,13 @@
-# Aprende IA — Documentation
+# Rumbo — Documentation
 
-**Aprende IA** is a Spanish-language learning platform for Latin America that
+**Rumbo** is a Spanish-language learning platform for Latin America that
 turns deep research into complete video courses — and turns each learner's
 coursework into a **real, client-grade portfolio document** they can put in
 front of an employer.
 
 One AI content engine powers two products:
 
-1. **Aprende IA** (live) — the learning platform. **14 courses, 420 lessons.**
+1. **Rumbo** (live) — the learning platform. **14 courses, 420 lessons.**
    A learner names the job they want and gets a route through the module library;
    each lesson is a short vertical video + written guide + a comprehension check +
    a hands-on exercise evaluated by an AI tutor. Every course ends in a

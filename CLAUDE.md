@@ -1,4 +1,4 @@
-# CLAUDE.md — Estudio IA / Aprende IA
+# CLAUDE.md — Estudio IA / Rumbo
 
 System map for a fresh session. Read this first; it points to deeper docs and a
 queryable code graph so you don't have to grep the whole tree.
@@ -13,7 +13,7 @@ ritual, tooling traps and the bug patterns this codebase has already produced.
 
 **One AI engine, two products**, both in Spanish for LatAm:
 
-1. **Aprende IA — the learning platform.** **LIVE and the whole focus.**
+1. **Rumbo — the learning platform.** **LIVE and the whole focus.**
    **14 courses · 420 lessons · 420 videos.** Deep docs: `docs/`.
 2. **Social content factory** (`studio/channels/*.toml`, 4 channels) — short-form video
    + auto-publishing. **Built, DORMANT since July** (scheduler off, no Upload-Post

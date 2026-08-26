@@ -1,0 +1,548 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-26T00:00:00Z",
+  "title": "Design System: Rumbo",
+  "extensions": {
+    "colorMeta": {
+      "lamp-amber": {
+        "role": "primary",
+        "displayName": "Lamp Amber",
+        "canonical": "#F0A43C",
+        "purpose": "The light in the room: primary action, current step, active tab, eyebrow.",
+        "tonalRamp": [
+          "#472B05",
+          "#7D4C0A",
+          "#B36D0E",
+          "#E98E12",
+          "#F1A845",
+          "#F5C17B",
+          "#F9DBB1",
+          "#FDF4E7"
+        ]
+      },
+      "lamp-amber-high": {
+        "role": "primary",
+        "displayName": "Lamp Amber High",
+        "canonical": "#FFC670",
+        "purpose": "The hot centre of the light: gradient tops, the roaring streak.",
+        "tonalRamp": [
+          "#4C2E00",
+          "#875100",
+          "#C17400",
+          "#FB9700",
+          "#FFAF37",
+          "#FFC671",
+          "#FFDEAB",
+          "#FFF5E5"
+        ]
+      },
+      "lamp-amber-deep": {
+        "role": "primary",
+        "displayName": "Lamp Amber Deep",
+        "canonical": "#AD7423",
+        "purpose": "The falloff: gradient bases and progress starts.",
+        "tonalRamp": [
+          "#402B0D",
+          "#704B17",
+          "#A16C20",
+          "#D18C2A",
+          "#DDA658",
+          "#E7C089",
+          "#F1DAB9",
+          "#FBF4EA"
+        ]
+      },
+      "amber-ink": {
+        "role": "primary",
+        "displayName": "Amber Ink",
+        "canonical": "#241603",
+        "purpose": "Text sitting on amber. Never a background.",
+        "tonalRamp": [
+          "#472B06",
+          "#7C4C0A",
+          "#B26D0F",
+          "#E88E13",
+          "#F0A846",
+          "#F4C17C",
+          "#F9DAB2",
+          "#FDF4E7"
+        ]
+      },
+      "paper": {
+        "role": "secondary",
+        "displayName": "The Paper",
+        "canonical": "#F1E6CE",
+        "purpose": "Reserved for the learner's own work: documents, prompts, the portfolio surface.",
+        "tonalRamp": [
+          "#3B2E11",
+          "#69511E",
+          "#96742B",
+          "#C39838",
+          "#D2AF63",
+          "#DFC790",
+          "#ECDEBE",
+          "#F9F5EB"
+        ]
+      },
+      "paper-dim": {
+        "role": "secondary",
+        "displayName": "Paper Dim",
+        "canonical": "#CFC3A8",
+        "purpose": "Paper at rest, or secondary text within a paper surface.",
+        "tonalRamp": [
+          "#312A1B",
+          "#574B30",
+          "#7C6B45",
+          "#A28C59",
+          "#B8A67E",
+          "#CCC0A3",
+          "#E1DAC9",
+          "#F6F4EF"
+        ]
+      },
+      "paper-ink": {
+        "role": "secondary",
+        "displayName": "Paper Ink",
+        "canonical": "#26200F",
+        "purpose": "Text on paper.",
+        "tonalRamp": [
+          "#372E16",
+          "#615126",
+          "#8A7537",
+          "#B49847",
+          "#C6B06F",
+          "#D7C799",
+          "#E7DEC3",
+          "#F8F5ED"
+        ]
+      },
+      "sage": {
+        "role": "tertiary",
+        "displayName": "Sage",
+        "canonical": "#A9C48F",
+        "purpose": "Correct, completed, 'lo tienes'. A dried herb, never a success green.",
+        "tonalRamp": [
+          "#26321A",
+          "#43582F",
+          "#607E43",
+          "#7DA557",
+          "#9ABA7C",
+          "#B8CEA2",
+          "#D5E2C8",
+          "#F2F6EE"
+        ]
+      },
+      "sage-ink": {
+        "role": "tertiary",
+        "displayName": "Sage Ink",
+        "canonical": "#1C2A12",
+        "purpose": "Text on sage.",
+        "tonalRamp": [
+          "#243617",
+          "#3F5E28",
+          "#5A873A",
+          "#75B04B",
+          "#94C373",
+          "#B3D49C",
+          "#D2E6C4",
+          "#F1F7ED"
+        ]
+      },
+      "terracotta": {
+        "role": "tertiary",
+        "displayName": "Terracotta",
+        "canonical": "#E5825E",
+        "purpose": "Wrong, missing, 'todavia no', honest gaps. Clay, never an error red.",
+        "tonalRamp": [
+          "#42190B",
+          "#742D13",
+          "#A6401B",
+          "#D85323",
+          "#E37952",
+          "#EBA085",
+          "#F3C7B7",
+          "#FBEEE9"
+        ]
+      },
+      "terracotta-ink": {
+        "role": "tertiary",
+        "displayName": "Terracotta Ink",
+        "canonical": "#33170C",
+        "purpose": "Text on terracotta.",
+        "tonalRamp": [
+          "#3E1C0F",
+          "#6D311A",
+          "#9C4625",
+          "#CB5C30",
+          "#D9805D",
+          "#E4A58C",
+          "#EFCABB",
+          "#FAEFEA"
+        ]
+      },
+      "workshop-night": {
+        "role": "neutral",
+        "displayName": "Workshop Night",
+        "canonical": "#100D17",
+        "purpose": "The room. Page ground.",
+        "tonalRamp": [
+          "#221C31",
+          "#3C3156",
+          "#56467B",
+          "#705BA1",
+          "#907FB7",
+          "#B0A4CC",
+          "#D0C9E1",
+          "#F1EFF6"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel",
+        "canonical": "#191521",
+        "purpose": "The bench. Default card and row surface.",
+        "tonalRamp": [
+          "#231E2F",
+          "#3E3452",
+          "#594B76",
+          "#74629A",
+          "#9385B1",
+          "#B3A8C8",
+          "#D2CCDE",
+          "#F1EFF5"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised",
+        "canonical": "#221D2E",
+        "purpose": "Objects on the bench: inputs, troughs, table headers.",
+        "tonalRamp": [
+          "#231E2F",
+          "#3D3453",
+          "#584B76",
+          "#72619A",
+          "#9184B2",
+          "#B1A8C8",
+          "#D1CCDF",
+          "#F1EFF5"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "#2F2839",
+        "purpose": "Hairline separation between surface tiers.",
+        "tonalRamp": [
+          "#25202D",
+          "#41384F",
+          "#5E5071",
+          "#7A6894",
+          "#9889AC",
+          "#B6ACC4",
+          "#D4CEDC",
+          "#F2F0F4"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Line Strong",
+        "canonical": "#453B54",
+        "purpose": "Emphasised hairline, and ghost-button hover.",
+        "tonalRamp": [
+          "#25202D",
+          "#41384F",
+          "#5D5071",
+          "#796894",
+          "#9789AC",
+          "#B5ACC4",
+          "#D4CEDC",
+          "#F2F0F4"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Text",
+        "canonical": "#F2EFE9",
+        "purpose": "Primary reading colour, warm white.",
+        "tonalRamp": [
+          "#302A1C",
+          "#554932",
+          "#796948",
+          "#9E885D",
+          "#B5A381",
+          "#CABEA6",
+          "#E0D9CA",
+          "#F6F3EF"
+        ]
+      },
+      "dim": {
+        "role": "neutral",
+        "displayName": "Dim",
+        "canonical": "#B2AABB",
+        "purpose": "Secondary prose and supporting copy.",
+        "tonalRamp": [
+          "#26222A",
+          "#433C4B",
+          "#60566B",
+          "#7D708C",
+          "#9A90A6",
+          "#B8B0C0",
+          "#D5D0DA",
+          "#F2F1F4"
+        ]
+      },
+      "faint": {
+        "role": "neutral",
+        "displayName": "Faint",
+        "canonical": "#8B8296",
+        "purpose": "Micro-labels and de-emphasised meta. Tuned to clear WCAG AA at 11px.",
+        "tonalRamp": [
+          "#26232A",
+          "#433E49",
+          "#605869",
+          "#7D7389",
+          "#9A92A4",
+          "#B7B2BE",
+          "#D5D1D9",
+          "#F2F1F3"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The one headline per view. Never two on a screen."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section-level headline in the same serif voice."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles, course names, question stems."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All reading copy."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Eyebrow (amber, 0.16em) names context; microlabel (faint, 0.13em) names a group."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "The evaluation score, and the score alone."
+      }
+    },
+    "shadows": [
+      {
+        "name": "glow-amber",
+        "value": "0 12px 34px -12px rgba(240,164,60,.5)",
+        "purpose": "The lamp falling on the thing you should touch. Primary action, hero and spotlight cards."
+      },
+      {
+        "name": "glow-paper",
+        "value": "0 10px 32px -14px rgba(241,230,206,.28)",
+        "purpose": "The learner's work catching the light. Paper surfaces and the paper button."
+      },
+      {
+        "name": "glow-medal",
+        "value": "0 0 54px rgba(240,164,60,.55)",
+        "purpose": "Lesson completion only. The single celebratory moment the system allows."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-workshop",
+        "value": "cubic-bezier(.22,.9,.3,1)",
+        "purpose": "Default easing everywhere. Decisive out, soft landing."
+      },
+      {
+        "name": "dur-standard",
+        "value": "380ms",
+        "purpose": "Page-enter rise and opacity changes."
+      },
+      {
+        "name": "dur-state",
+        "value": "150-200ms",
+        "purpose": "Border, colour and press feedback."
+      },
+      {
+        "name": "stagger-enter",
+        "value": "40ms",
+        "purpose": "Delay between direct children on page enter, capped at the 8th child."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "all animation and transition disabled",
+        "purpose": "prefers-reduced-motion is honoured globally; new motion must stay inside that rule."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "column",
+        "value": "560px",
+        "purpose": "The only layout constant. The app has NO media-query breakpoints; the column centres at every width."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one action on a view. Amber gradient with the lamp glow.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Continuar mi ruta</button>",
+      "css": ".ds-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:15.5px;border:none;border-radius:999px;padding:14px 22px;cursor:pointer;transition:transform .15s cubic-bezier(.22,.9,.3,1),box-shadow .2s}.ds-btn-primary{background:linear-gradient(140deg,#FFC670,#F0A43C);color:#241603;box-shadow:0 12px 34px -12px rgba(240,164,60,.5)}.ds-btn-primary:hover{box-shadow:0 14px 40px -10px rgba(240,164,60,.62)}.ds-btn-primary:focus-visible{outline:2px solid #FFC670;outline-offset:3px}.ds-btn-primary:active{transform:scale(.98)}"
+    },
+    {
+      "name": "Paper Button",
+      "kind": "button",
+      "refersTo": "button-paper",
+      "description": "Acting on the learner's own document. The only button that wears paper.",
+      "html": "<button class=\"ds-btn ds-btn-paper\">Compilar mi documento</button>",
+      "css": ".ds-btn-paper{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:15.5px;border:none;border-radius:999px;padding:14px 22px;cursor:pointer;background:linear-gradient(150deg,#FBF3E1,#F1E6CE);color:#26200F;box-shadow:0 10px 32px -14px rgba(241,230,206,.28);transition:transform .15s,box-shadow .2s}.ds-btn-paper:hover{box-shadow:0 12px 38px -12px rgba(241,230,206,.4)}.ds-btn-paper:focus-visible{outline:2px solid #F1E6CE;outline-offset:3px}.ds-btn-paper:active{transform:scale(.98)}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "The secondary path. Never competes with the lamp.",
+      "html": "<button class=\"ds-btn ds-btn-ghost\">Prefiero verlo igual</button>",
+      "css": ".ds-btn-ghost{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:15.5px;border-radius:999px;padding:14px 22px;cursor:pointer;background:rgba(255,255,255,.04);color:#F2EFE9;border:1px solid #2F2839;transition:border-color .2s}.ds-btn-ghost:hover{border-color:#453B54}.ds-btn-ghost:focus-visible{outline:2px solid #FFC670;outline-offset:3px}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Raised ground, hairline border, amber on focus.",
+      "html": "<label class=\"ds-label\" for=\"ds-i\">Tu proyecto o marca</label><input class=\"ds-input\" id=\"ds-i\" placeholder=\"Cafe Luna, Santiago\">",
+      "css": ".ds-label{font-family:Archivo,system-ui,sans-serif;font-size:12.5px;color:#B2AABB;font-weight:600;display:block;margin-bottom:4px}.ds-input{width:100%;font-family:Archivo,system-ui,sans-serif;font-size:15.5px;color:#F2EFE9;background:#221D2E;border:1px solid #2F2839;border-radius:14px;padding:14px;outline:none;transition:border-color .2s}.ds-input::placeholder{color:#8B8296}.ds-input:focus{border-color:#F0A43C}.ds-input:focus-visible{outline:2px solid rgba(240,164,60,.45);outline-offset:2px}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The bench surface. Tone and a hairline, never a shadow.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-microlabel\">Modulo 2 de 5</div><p class=\"ds-cardtitle\">Sabras segmentar publicos que si escalan.</p></div>",
+      "css": ".ds-card{background:#191521;border:1px solid #2F2839;border-radius:20px;padding:16px;font-family:Archivo,system-ui,sans-serif;color:#F2EFE9}.ds-microlabel{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#8B8296;font-weight:700}.ds-cardtitle{font-size:15.5px;font-weight:600;margin:8px 0 0;line-height:1.35}"
+    },
+    {
+      "name": "Hero Card",
+      "kind": "card",
+      "refersTo": "card-hero",
+      "description": "The single 'do this next' card on a view. Lit by the lamp.",
+      "html": "<div class=\"ds-hero\"><div class=\"ds-eyebrow\">Siguiente paso de tu ruta</div><h3 class=\"ds-herotitle\">Publicos similares: cuando y como</h3></div>",
+      "css": ".ds-hero{background:linear-gradient(165deg,#221D2E,#191521);border:1px solid rgba(240,164,60,.35);border-radius:20px;padding:24px 16px;box-shadow:0 12px 34px -12px rgba(240,164,60,.5);font-family:Archivo,system-ui,sans-serif;color:#F2EFE9}.ds-eyebrow{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#F0A43C}.ds-herotitle{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:26px;line-height:1.08;letter-spacing:-.01em;margin:8px 0 0}"
+    },
+    {
+      "name": "Lesson Row",
+      "kind": "custom",
+      "refersTo": "lesson-row",
+      "description": "The temario's atom. State lives in the border tint and the number chip, never in the box size.",
+      "html": "<div class=\"ds-lrow ds-current\"><div class=\"ds-num\">7</div><div class=\"ds-lt\">Como segmenta Meta en 2026</div><div class=\"ds-st\">Disponible</div></div>",
+      "css": ".ds-lrow{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid #2F2839;border-radius:14px;background:#191521;font-family:Archivo,system-ui,sans-serif;color:#F2EFE9;cursor:pointer;transition:border-color .2s}.ds-lrow.ds-current{border-color:rgba(240,164,60,.5)}.ds-lrow:focus-visible{outline:2px solid #FFC670;outline-offset:2px}.ds-num{width:28px;height:28px;flex:none;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;background:#F0A43C;color:#241603;border:1px solid #F0A43C}.ds-lt{flex:1;font-size:14px;font-weight:600;line-height:1.25}.ds-st{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#8B8296}"
+    },
+    {
+      "name": "Verdict Chip",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "A comprehension check reports a word, never a number.",
+      "html": "<span class=\"ds-vchip\">Lo tienes</span> <span class=\"ds-vchip ds-casi\">Casi</span> <span class=\"ds-vchip ds-no\">Todavia no</span>",
+      "css": ".ds-vchip{display:inline-block;font-family:Archivo,system-ui,sans-serif;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:rgba(169,196,143,.16);color:#A9C48F;border:1px solid rgba(169,196,143,.4)}.ds-vchip.ds-casi{background:rgba(240,164,60,.15);color:#F0A43C;border-color:rgba(240,164,60,.4)}.ds-vchip.ds-no{background:rgba(229,130,94,.14);color:#E5825E;border-color:rgba(229,130,94,.35)}"
+    },
+    {
+      "name": "Reading State",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Shown while a real model call is in flight (25-35s). A dead spinner on a wait that long reads as a hang.",
+      "html": "<div class=\"ds-reading\"><div class=\"ds-readtext\">Tu tutora esta leyendo tu entrega</div><div class=\"ds-readline\"><i></i></div></div>",
+      "css": ".ds-reading{display:flex;flex-direction:column;gap:12px;font-family:Archivo,system-ui,sans-serif}.ds-readtext{font-size:14px;color:#B2AABB}.ds-readline{height:3px;border-radius:99px;background:#221D2E;overflow:hidden}.ds-readline i{display:block;height:100%;width:40%;border-radius:99px;background:linear-gradient(90deg,transparent,#F0A43C,transparent);animation:ds-sweep 1.4s cubic-bezier(.22,.9,.3,1) infinite}@keyframes ds-sweep{from{transform:translateX(-100%)}to{transform:translateX(350%)}}@media(prefers-reduced-motion:reduce){.ds-readline i{animation:none;width:100%;background:#F0A43C;opacity:.5}}"
+    },
+    {
+      "name": "Document Mock",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The learner's work, literally glowing. The only rotated element and the only near-square corner in the product.",
+      "html": "<div class=\"ds-doc\"><div class=\"ds-dm-eyebrow\">Documento de trabajo</div><div class=\"ds-dm-title\">Plan de campana en Meta Ads</div><div class=\"ds-dm-line ds-w9\"></div><div class=\"ds-dm-line ds-w7\"></div><div class=\"ds-dm-line ds-w8\"></div><div class=\"ds-dm-sig\">por Liv P.</div></div>",
+      "css": ".ds-doc{background:linear-gradient(160deg,#FBF4E3,#F1E6CE);color:#26200F;border-radius:6px;padding:22px 20px;transform:rotate(-1.6deg);box-shadow:0 18px 44px -14px rgba(241,230,206,.3),0 4px 14px rgba(0,0,0,.4);max-width:320px;font-family:Archivo,system-ui,sans-serif}.ds-dm-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:#8a6d3a}.ds-dm-title{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:17px;line-height:1.2;margin:6px 0 12px}.ds-dm-line{height:5px;border-radius:3px;background:rgba(38,32,15,.16);margin-bottom:7px}.ds-w9{width:92%}.ds-w7{width:70%}.ds-w8{width:82%}.ds-dm-sig{font-family:Fraunces,Georgia,serif;font-style:italic;font-size:12px;margin-top:12px;color:#6b5327;text-align:right}"
+    }
+  ],
+  "narrative": {
+    "northStar": "El Taller Nocturno (The Night Workshop)",
+    "overview": "This is a workshop after hours. The room is warm and dark, there is exactly one lamp above the bench, and the only thing that truly glows is the work on the table. That is not decoration - it is the product argument rendered as light. The platform's whole thesis is that the learner's output, not the platform's credential, is what has value; so the interface deliberately recedes into warm darkness and the learner's own work is rendered as paper, lit, slightly warm, the brightest thing on any screen.\n\nThe atmosphere is calm and adult. Learners are working people studying in stolen time around a job, on a phone, often tired. Nothing shouts, nothing celebrates prematurely, nothing infantilises. Where other learning products reach for confetti, badges and progress dopamine, this one reaches for the feeling of a quiet bench and good light.\n\nThe palette is earth, never neon. The two accents mean two different things and never trade places: amber is the room's light (where to act, where you are), paper is the work (what you made, what you will show someone).",
+    "keyCharacteristics": [
+      "Warm near-black ground (#100D17) with a single radial amber wash from above",
+      "One amber accent used sparingly as light, not as brand paint",
+      "Paper tones reserved exclusively for learner-authored output",
+      "Grotesk interface, serif work: Archivo for the app, Fraunces for documents and numbers",
+      "Six type sizes, three surface tiers, three radii - a deliberately small vocabulary",
+      "No shadow scale; the only two shadows are glows that mean 'lit'",
+      "Drawn single-stroke SVG icons, never emoji, in the chrome",
+      "Film grain at 3.5% opacity over the whole page"
+    ],
+    "rules": [
+      {
+        "name": "The One Lamp Rule",
+        "body": "There is exactly one light source. Amber marks where to act and where you are, and appears on well under 10% of any screen. The moment a second amber element competes with the primary action on a view, one of them is wrong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Paper Is The Work Rule",
+        "body": "Paper tones are reserved for things the learner authored or will show someone. Chrome never wears paper, and learner output is never amber. This is the palette carrying the product thesis.",
+        "section": "colors"
+      },
+      {
+        "name": "The Earth Rule",
+        "body": "Semantic colour is pigment, never signal-light. Sage and terracotta only. No neon of any kind.",
+        "section": "colors"
+      },
+      {
+        "name": "The Six Sizes Rule",
+        "body": "Six interface sizes exist (11 / 12.5 / 14 / 15.5 / 18 / 22px) plus three display sizes (26 / 31 / 42px). Adding a seventh is a design failure, not a design decision.",
+        "section": "typography"
+      },
+      {
+        "name": "The Grotesk/Serif Split",
+        "body": "The interface is grotesk; the work is serif. If a piece of text is about the product it is Archivo. If it is the thing the learner made - or the number naming its quality - it is Fraunces.",
+        "section": "typography"
+      },
+      {
+        "name": "The Verdict Is Not A Grade Rule",
+        "body": "Comprehension checks render a serif word (Lo tienes / Casi / Todavia no) and never a number. Only work products get numerals.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Column Rule",
+        "body": "Everything lives in one 560px column. No sidebar, no two-up grid, no desktop-specific layout inside the app. A screen that needs two columns to work has too much on it.",
+        "section": "layout"
+      },
+      {
+        "name": "The No-Shadow Rule",
+        "body": "Surfaces are flat and separated by tone and a hairline. If something needs to feel closer it gets light (a glow), not lift. There is no box-shadow that is not one of the two named glows.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put every visual change in the :root token block. A colour or size written inline is a bug in this codebase, not a shortcut.",
+      "Do reserve paper tones for the learner's own output and amber for light and action, in every new surface.",
+      "Do use tone and a hairline border for depth, and a glow only to mean 'lit'.",
+      "Do state state on the border colour at 30-55% alpha, never by changing border width or the element's box size.",
+      "Do render comprehension as a serif word and work quality as a serif numeral.",
+      "Do keep one display headline and one primary action per view.",
+      "Do name a real wait honestly and show what is happening during it.",
+      "Do honour prefers-reduced-motion - the system already disables all animation and transition under it."
+    ],
+    "donts": [
+      "Don't introduce a seventh interface type size or a fourth radius.",
+      "Don't add a generic box-shadow scale; the only shadows are the two glows.",
+      "Don't use emoji in the chrome. Icons are the drawn single-stroke SVG set at 1.7 stroke width and currentColor.",
+      "Don't use neon or signal-light semantics. Sage and terracotta only.",
+      "Don't add badges, XP, levels, or confetti. The daily streak is the only gamification the product permits.",
+      "Don't put a number on a comprehension check.",
+      "Don't let an interface element wear paper, or a learner's document wear amber.",
+      "Don't scatter animation. One orchestrated entrance per view."
+    ]
+  }
+}

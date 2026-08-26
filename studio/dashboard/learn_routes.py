@@ -284,7 +284,8 @@ def _node_with_course(conn, node_id: int):
 
 
 def _accessible_ids(nodes: list[dict], completed: set[int],
-                    route_modules: set[int] | None = None) -> set[int]:
+                    route_modules: set[int] | None = None,
+                    exempt_modules: set[int] | None = None) -> set[int]:
     """Completed lessons + the first uncompleted (progress gate) are open.
 
     Route-aware widening (docs/09): when the learner's active route selects
@@ -293,6 +294,14 @@ def _accessible_ids(nodes: list[dict], completed: set[int],
     because the matcher's module sets are prereq-closed server-side. The rule
     only ever WIDENS access: a learner without a route, or on a course outside
     their route, gets exactly the original behavior.
+
+    Exemption-aware widening (docs/10): a module the learner has skipped — said
+    they already know it, or credited it by passing its reto — should not be
+    where the course tries to start them, so the first uncompleted lesson in a
+    NON-exempt module is opened too. This also only ever adds: every lesson of a
+    skipped module stays exactly as reachable as it was, because removing
+    content from someone who wants it is the failure mode, and hiding is not
+    locking.
     """
     acc = set(completed)
     for n in nodes:  # ordered by position
@@ -304,7 +313,32 @@ def _accessible_ids(nodes: list[dict], completed: set[int],
             if n["module_no"] in route_modules and n["id"] not in completed:
                 acc.add(n["id"])
                 break
+    if exempt_modules:
+        pool = [n for n in nodes if n["module_no"] not in exempt_modules]
+        if route_modules:
+            pool = [n for n in pool if n["module_no"] in route_modules]
+        nxt = next((n for n in pool if n["id"] not in completed), None)
+        if nxt:
+            acc.add(nxt["id"])
     return acc
+
+
+def _accessible_for(conn, learner_id: int, course: dict, nodes: list[dict],
+                    completed: set[int]) -> set[int]:
+    """THE place access is computed. One function, one rule.
+
+    Every widening source (route module sets, CV exemptions) has to be applied
+    at every gate — lesson, video, submit, reteach, complete, temario — and this
+    codebase's recurring failure shape is a new rule added to some call sites and
+    not others (docs/07: "security by allowlist"). Both sources here only ever
+    ADD, so a missed call site costs a learner a shortcut rather than opening a
+    hole; consolidating still beats relying on that.
+    """
+    return _accessible_ids(
+        nodes, completed,
+        _route_modules_for(conn, learner_id, course["slug"]),
+        db.exempt_modules_for(conn, learner_id, course["id"]),
+    )
 
 
 def _route_modules_for(conn, learner_id: int, course_slug: str) -> set[int] | None:
@@ -386,7 +420,10 @@ def today(learner_session: str | None = Cookie(default=None)):
             c = conn.execute("SELECT * FROM courses WHERE id = %s",
                              (latest["course_id"],)).fetchone()
             nodes = db.course_nodes(conn, c["id"])
-            nxt = next((n for n in nodes if n["id"] not in completed), None)
+            # docs/10: never point the continue-card at a module they skipped.
+            skipped = db.exempt_modules_for(conn, learner["id"], c["id"])
+            nxt = next((n for n in nodes
+                        if n["id"] not in completed and n["module_no"] not in skipped), None)
             if nxt:
                 cont = {"course_slug": c["slug"], "course_title": c["title"],
                         "lesson_id": nxt["id"], "lesson_title": nxt["title"],
@@ -679,7 +716,13 @@ def my_job_target(learner_session: str | None = Cookie(default=None)):
         analysis = target["analysis"] or {}
         prog = db.progress_map(conn, learner["id"])
         completed = {nid for nid, p in prog.items() if p["completed_at"]}
+        # docs/10: modules the learner skipped. They stay IN the route (the route
+        # is the honest answer to "what does this job need"), but they are marked,
+        # they are not where we start anyone, and they come out of what is left
+        # to do — which is the number the learner actually feels.
+        exempt_state = _exemption_view(conn, learner["id"])
         route, steps, next_lesson = [], [], None
+        exempt_lessons = exempt_modules = 0
         for r in (analysis.get("ruta") or []):
             c = conn.execute("SELECT * FROM courses WHERE slug = %s",
                              (r["course_slug"],)).fetchone()
@@ -691,11 +734,20 @@ def my_job_target(learner_session: str | None = Cookie(default=None)):
             selected = ({int(x) for x in mods} if isinstance(mods, list) and mods
                         else set(range(1, int(r.get("through_module", 1)) + 1)))
             in_route = [n for n in nodes if n["module_no"] in selected]
+            skipped = {m for m in selected
+                       if f"{r['course_slug']}:{m}" in exempt_state}
             done = sum(1 for n in in_route if n["id"] in completed)
+            for m in skipped:
+                exempt_modules += 1
+                exempt_lessons += sum(1 for n in in_route
+                                      if n["module_no"] == m and n["id"] not in completed)
             if next_lesson is None:
-                # First uncompleted lesson INSIDE the route's module set — by the
-                # widened access rule it is always reachable.
-                pending = next((n for n in in_route if n["id"] not in completed), None)
+                # First uncompleted lesson INSIDE the route's module set and NOT
+                # in a skipped module — by the widened access rule it is always
+                # reachable.
+                pending = next((n for n in in_route
+                                if n["id"] not in completed
+                                and n["module_no"] not in skipped), None)
                 if pending:
                     next_lesson = {"node_id": pending["id"], "title": pending["title"],
                                    "course_title": c["title"]}
@@ -714,6 +766,7 @@ def my_job_target(learner_session: str | None = Cookie(default=None)):
                     continue
                 m_done = sum(1 for n in in_mod if n["id"] in completed)
                 pending = next((n for n in in_mod if n["id"] not in completed), None)
+                ex = exempt_state.get(f"{r['course_slug']}:{m}")
                 steps.append({
                     "course_slug": r["course_slug"], "course_title": c["title"],
                     "module_no": m, "module_title": in_mod[0].get("module_title") or "",
@@ -721,11 +774,20 @@ def my_job_target(learner_session: str | None = Cookie(default=None)):
                     "phase": r.get("phase", "nucleo"),
                     "lessons": len(in_mod), "done": m_done,
                     "next_lesson_id": pending["id"] if pending else None,
+                    # None | "declarado" | "acreditado" (docs/10). The step stays
+                    # visible either way: the job still needs it, and the lessons
+                    # are still open if they want them.
+                    "exempt": ex["status"] if ex else None,
+                    "exempt_score": ex["score"] if ex else None,
                 })
         gd = db.get_goal_doc(conn, learner["id"], target["id"])
     total = sum(r["lessons"] for r in route)
     done = sum(r["done"] for r in route)
     return {"exists": True, "target_id": target["id"],
+            # What is actually left after the skips — the number that turns an
+            # honest-but-unstartable 84-lesson route into one someone opens.
+            "exempt_lessons": exempt_lessons, "exempt_modules": exempt_modules,
+            "remaining": max(0, total - done - exempt_lessons),
             "role_title": target["role_title"], "company": target["company"],
             "coverage": analysis.get("coverage", 0), "gaps": analysis.get("gaps") or [],
             "doc_type": analysis.get("doc_type", ""), "route": route,
@@ -758,6 +820,180 @@ def my_job_targets(learner_session: str | None = Cookie(default=None)):
                 "done": p["done"], "total": p["total"],
             })
     return {"targets": out}
+
+
+# ---- CV intake (docs/10): the CV proposes, the reto disposes ---------------
+# A CV is a CLAIM about what someone already knows, and this product exists
+# because claims are not trusted — work is. So none of these endpoints can widen
+# access. `POST /cv` returns PROPOSALS; accepting one shortens the route and
+# opens that module's reto early; only PASSING the reto (a novel case,
+# deliberately not covered in the lessons) credits the module. That is the whole
+# security argument: an injected CV reaches "declarado" and stops there.
+
+class CvBody(BaseModel):
+    cv: str = ""
+    company: str = ""     # honeypot, same as the other public-ish text intakes
+
+
+def _exemption_view(conn, learner_id: int) -> dict:
+    """Every exemption keyed "<slug>:<module_no>", for merging into any surface."""
+    out = {}
+    for e in db.learner_exemptions(conn, learner_id):
+        out[f"{e['course_slug']}:{e['module_no']}"] = {
+            "status": e["status"], "source": e["source"], "score": e["score"],
+            "course_title": e["course_title"], "module_no": e["module_no"],
+            "course_slug": e["course_slug"], "claim": e["claim"] or "",
+        }
+    return out
+
+
+def _cv_payload(conn, learner_id: int, profile: dict | None) -> dict:
+    """The CV reading plus what the learner has since DONE with each proposal.
+
+    The analysis is a snapshot of what the model read; the exemptions are the
+    live state. Keeping them separate means re-reading the CV never silently
+    revokes a credited module.
+    """
+    if not profile:
+        return {"exists": False, "pass_score": writer.EXEMPTION_PASS_SCORE,
+                "exemptions": list(_exemption_view(conn, learner_id).values())}
+    analysis = profile["analysis"] or {}
+    state = _exemption_view(conn, learner_id)
+    claims = []
+    for c in (analysis.get("claims") or []):
+        st = state.get(f"{c['course_slug']}:{c['module_no']}")
+        claims.append({**c, "state": st["status"] if st else "pendiente",
+                       "exempt_score": st["score"] if st else None})
+    return {
+        "exists": True,
+        # The bar the reto has to clear, straight from the server: the screen
+        # must never promise a threshold the backend does not enforce.
+        "pass_score": writer.EXEMPTION_PASS_SCORE,
+        "created_at": profile["created_at"].date().isoformat(),
+        "headline": analysis.get("headline", ""),
+        "years_experience": analysis.get("years_experience", 0),
+        "claims": claims,
+        "fuera_del_catalogo": analysis.get("fuera_del_catalogo") or [],
+        "proposed_modules": analysis.get("proposed_modules", 0),
+        "proposed_lessons": analysis.get("proposed_lessons", 0),
+        "exemptions": list(state.values()),
+    }
+
+
+@router.post("/cv")
+def submit_cv(body: CvBody, learner_session: str | None = Cookie(default=None)):
+    """Read a CV and propose module exemptions. Requires a session on purpose.
+
+    Unlike the job analyser — which is deliberately public because it is the
+    acquisition surface — a CV is personal data with no acquisition value to us
+    and every reason to stay attached to one account. Contact details are
+    stripped BEFORE the text is stored or sent to the model.
+    """
+    if body.company.strip():                  # honeypot tripped — silently no-op
+        raise HTTPException(400, "no pudimos leer ese CV")
+    learner = _require(learner_session)
+    cv = writer.strip_contacts(body.cv.strip())
+    if len(cv) < 200:
+        raise HTTPException(400, "pega tu CV completo: con la experiencia y lo que "
+                                 "hiciste en cada puesto, no solo los títulos")
+    if len(cv) > 20000:
+        raise HTTPException(400, "ese CV es muy largo, pega la parte de experiencia")
+    if not _eval_rate_ok(learner["id"]):
+        raise HTTPException(429, "alcanzaste el límite por ahora, intenta más tarde")
+    if not _JOB_SLOTS.acquire(blocking=False):
+        raise HTTPException(503, "estamos analizando varios CV ahora mismo. "
+                                 "Intenta de nuevo en un par de minutos.")
+    try:
+        with db.connect() as conn:
+            catalog = db.job_catalog(conn)
+        if not catalog:
+            raise HTTPException(503, "catálogo no disponible")
+        try:
+            analysis = writer.analyze_cv(cv, catalog)
+        except Exception as exc:
+            print(f"cv analysis failed: {exc}", file=sys.stderr)
+            raise HTTPException(503, "no pudimos terminar de leer tu CV. Vuelve a "
+                                     "intentarlo en unos minutos.")
+        with db.connect() as conn:
+            profile = db.save_cv_profile(conn, learner["id"], cv, analysis)
+            conn.commit()
+            payload = _cv_payload(conn, learner["id"], profile)
+    finally:
+        _JOB_SLOTS.release()
+    return {"ok": True, **payload}
+
+
+@router.get("/cv")
+def my_cv(learner_session: str | None = Cookie(default=None)):
+    learner = _require(learner_session)
+    with db.connect() as conn:
+        return _cv_payload(conn, learner["id"],
+                           db.active_cv_profile(conn, learner["id"]))
+
+
+@router.delete("/cv")
+def forget_cv(learner_session: str | None = Cookie(default=None)):
+    """Forget the CV and every skip it proposed.
+
+    CREDITED modules survive deliberately: those were earned by passing a reto,
+    and nothing a learner earned may ever go down (docs/07). Deleting the CV
+    removes what we were told, never what they proved.
+    """
+    learner = _require(learner_session)
+    with db.connect() as conn:
+        dropped = db.clear_declared_exemptions(conn, learner["id"])
+        removed = db.delete_cv_profiles(conn, learner["id"])
+        conn.commit()
+    return {"ok": True, "profiles_deleted": removed, "exemptions_cleared": dropped}
+
+
+class ExemptionBody(BaseModel):
+    course_slug: str
+    module_no: int
+    action: str = "skip"          # skip | teach
+    claim: str = ""
+
+
+@router.post("/exemption")
+def set_exemption(body: ExemptionBody, learner_session: str | None = Cookie(default=None)):
+    """Accept a proposed skip, or undo one ("enséñamelo igual").
+
+    `skip` is cosmetic by design: it shortens the route, opens that module's reto
+    early, and changes NO access — every lesson stays exactly as reachable as it
+    was. `teach` can only undo a DECLARED skip; a credited module is a passed
+    reto, not a preference.
+    """
+    learner = _require(learner_session)
+    if body.action not in ("skip", "teach"):
+        raise HTTPException(400, "acción no válida")
+    with db.connect() as conn:
+        course = conn.execute("SELECT * FROM courses WHERE slug = %s",
+                              (body.course_slug,)).fetchone()
+        if not course:
+            raise HTTPException(404, "curso no encontrado")
+        modules = {n["module_no"] for n in db.course_nodes(conn, course["id"])}
+        if body.module_no not in modules:
+            raise HTTPException(404, "módulo no encontrado")
+        if body.action == "skip":
+            db.set_module_exemption(conn, learner["id"], course["id"],
+                                    body.module_no, claim=body.claim[:400], source="cv")
+            conn.commit()
+            return {"ok": True, "status": "declarado",
+                    "exemptions": list(_exemption_view(conn, learner["id"]).values())}
+        cleared = db.clear_module_exemption(conn, learner["id"], course["id"],
+                                            body.module_no)
+        conn.commit()
+        if not cleared:
+            # Either there was nothing to clear, or it is credited — say which,
+            # because "nothing happened" reads as a bug.
+            state = _exemption_view(conn, learner["id"]).get(
+                f"{body.course_slug}:{body.module_no}")
+            if state and state["status"] == "acreditado":
+                raise HTTPException(
+                    409, "Ese módulo lo acreditaste con su reto. Puedes ver sus "
+                         "lecciones cuando quieras: no lo quitamos de tu historial.")
+        return {"ok": True, "status": "pendiente",
+                "exemptions": list(_exemption_view(conn, learner["id"]).values())}
 
 
 @router.get("/goal-doc")
@@ -874,9 +1110,10 @@ def course_outline(slug: str, learner_session: str | None = Cookie(default=None)
         nodes = db.course_nodes(conn, c["id"])
         prog = db.progress_map(conn, learner["id"])
         capstones = _capstone_states(conn, c["id"], learner["id"])
-        route_modules = _route_modules_for(conn, learner["id"], slug)
-    completed = {nid for nid, p in prog.items() if p["completed_at"]}
-    accessible = _accessible_ids(nodes, completed, route_modules)
+        completed = {nid for nid, p in prog.items() if p["completed_at"]}
+        accessible = _accessible_for(conn, learner["id"], c, nodes, completed)
+        exempt = {e["module_no"]: e for e in db.learner_exemptions(conn, learner["id"])
+                  if e["course_slug"] == slug}
     modules: dict[int, dict] = {}
     for n in nodes:
         has_video = bool(n["video_file"])
@@ -888,11 +1125,16 @@ def course_outline(slug: str, learner_session: str | None = Cookie(default=None)
             status = "coming"      # it's your next lesson but not rendered yet
         else:
             status = "locked"
+        ex = exempt.get(n["module_no"])
         m = modules.setdefault(n["module_no"], {"module_no": n["module_no"],
                                                 "module_title": n["module_title"],
                                                 "module_description": n.get("module_description") or "",
                                                 "lessons": [],
-                                                "capstone": capstones.get(n["module_no"])})
+                                                "capstone": capstones.get(n["module_no"]),
+                                                # docs/10: skipped, not locked —
+                                                # every lesson below is still open.
+                                                "exempt": ex["status"] if ex else None,
+                                                "exempt_score": ex["score"] if ex else None})
         m["lessons"].append({
             "id": n["id"], "position": n["position"], "title": n["title"],
             "objectives": n.get("objectives") or "",
@@ -943,8 +1185,7 @@ def lesson(node_id: int, learner_session: str | None = Cookie(default=None)):
             raise HTTPException(404, "lección no encontrada")
         prog = db.progress_map(conn, learner["id"])
         completed = {nid for nid, p in prog.items() if p["completed_at"]}
-        accessible = _accessible_ids(nodes, completed,
-                                     _route_modules_for(conn, learner["id"], course["slug"]))
+        accessible = _accessible_for(conn, learner["id"], course, nodes, completed)
         if node["id"] not in accessible:
             raise HTTPException(403, "esta lección aún no está disponible")
         # The learner's own history belongs in the lesson, not hidden in Perfil:
@@ -993,9 +1234,8 @@ def video(node_id: int, learner_session: str | None = Cookie(default=None)):
             # Same lock model as the lesson endpoint: completed + the next one.
             prog = db.progress_map(conn, learner["id"])
             completed = {nid for nid, p in prog.items() if p["completed_at"]}
-            if node["id"] not in _accessible_ids(
-                    nodes, completed,
-                    _route_modules_for(conn, learner["id"], course["slug"])):
+            if node["id"] not in _accessible_for(
+                    conn, learner["id"], course, nodes, completed):
                 raise HTTPException(403, "esta lección aún no está disponible")
     if not node or not node["video_file"]:
         raise HTTPException(404, "video no disponible")
@@ -1121,9 +1361,8 @@ def submit(body: SubmitBody, learner_session: str | None = Cookie(default=None))
             raise HTTPException(404, "lección no encontrada")
         prog = db.progress_map(conn, learner["id"])
         completed = {nid for nid, p in prog.items() if p["completed_at"]}
-        if node["id"] not in _accessible_ids(
-                nodes, completed,
-                _route_modules_for(conn, learner["id"], course["slug"])):
+        if node["id"] not in _accessible_for(
+                conn, learner["id"], course, nodes, completed):
             raise HTTPException(403, "esta lección aún no está disponible")
         previous, prior_attempts = _previous_submission(
             conn, learner["id"], body.kind, node_id=node["id"])
@@ -1198,9 +1437,8 @@ def reteach(body: ReteachBody, learner_session: str | None = Cookie(default=None
             raise HTTPException(404, "lección no encontrada")
         prog = db.progress_map(conn, learner["id"])
         completed = {nid for nid, p in prog.items() if p["completed_at"]}
-        if node["id"] not in _accessible_ids(
-                nodes, completed,
-                _route_modules_for(conn, learner["id"], course["slug"])):
+        if node["id"] not in _accessible_for(
+                conn, learner["id"], course, nodes, completed):
             raise HTTPException(403, "esta lección aún no está disponible")
         # Aim at the specific misunderstanding the evaluator already diagnosed,
         # if there is one. Without it this still works, just less pointedly.
@@ -1299,19 +1537,28 @@ def _capstone_states(conn, course_id: int, learner_id: int) -> dict[int, dict]:
     nodes = db.course_nodes(conn, course_id)
     prog = db.progress_map(conn, learner_id)
     completed = {nid for nid, p in prog.items() if p["completed_at"]}
+    # docs/10: a declared skip opens its reto immediately. That is the whole
+    # test-out path — the reto is a novel case the lessons never covered, so
+    # passing it is evidence of the module's outcome contract in a way no CV is.
+    exempt = db.exempt_modules_for(conn, learner_id, course_id)
     # Best attempt, never the latest: a weaker retry must not lower the score shown.
     latest = {s["capstone_id"]: s for s in db.best_submissions(conn, learner_id)
               if s["kind"] == "capstone" and s["capstone_id"]}
     out = {}
     for cap in caps:
         module_nodes = [n for n in nodes if n["module_no"] == cap["module_no"]]
-        unlocked = bool(module_nodes) and all(n["id"] in completed for n in module_nodes)
+        is_exempt = cap["module_no"] in exempt
+        unlocked = bool(module_nodes) and (
+            is_exempt or all(n["id"] in completed for n in module_nodes))
         sub = latest.get(cap["id"])
         ev = (sub or {}).get("evaluation") or {}
         out[cap["module_no"]] = {
             "id": cap["id"], "title": cap["title"],
             "status": "done" if sub else ("available" if unlocked else "locked"),
             "score": _final_score(ev),
+            # The UI offers this as "pruébalo" rather than "reto" when it is the
+            # test-out for a module they said they already know.
+            "test_out": is_exempt and not sub,
         }
     return out
 
@@ -1376,16 +1623,28 @@ def submit_capstone(body: CapstoneBody, learner_session: str | None = Cookie(def
         raise HTTPException(503, "no pudimos evaluar tu solución ahora, intenta de nuevo en un momento")
     if body.predicted is not None and 0 <= body.predicted <= 100:
         evaluation["predicted"] = body.predicted
+    credited = None
     with db.connect() as conn:
         sub = db.add_submission(conn, learner["id"], "capstone", content,
                                 evaluation, capstone_id=cap["id"],
                                 prompt=_prompt_snapshot("capstone", capstone=cap))
+        this_score = _final_score(sub.get("evaluation") or {})
+        # docs/10 — the only path that converts a CLAIM into something that
+        # counts. A reto is a novel case the lessons never covered, so passing it
+        # is evidence of the module's outcome contract; a CV is not. Only a module
+        # they had already declared can be credited: passing the reto after doing
+        # the lessons is just a good reto score.
+        if (this_score is not None and this_score >= writer.EXEMPTION_PASS_SCORE
+                and cap["module_no"] in db.exempt_modules_for(
+                    conn, learner["id"], cap["course_id"])):
+            row = db.credit_module_exemption(conn, learner["id"], cap["course_id"],
+                                             cap["module_no"], sub["id"], this_score)
+            credited = {"module_no": row["module_no"], "score": row["score"]}
         conn.commit()
     out = _evaluation_out(sub, attempt=prior_attempts + 1)
-    this_score = _final_score(sub.get("evaluation") or {})
     out["best_score"] = max([s for s in (best_before, this_score) if s is not None],
                             default=None)
-    return {"ok": True, "evaluation": out}
+    return {"ok": True, "evaluation": out, "credited": credited}
 
 
 # -------------------- portfolio case study (STAR) --------------------
@@ -1726,9 +1985,8 @@ def complete(body: CompleteBody, learner_session: str | None = Cookie(default=No
             raise HTTPException(404, "lección no encontrada")
         prog = db.progress_map(conn, learner["id"])
         completed = {nid for nid, p in prog.items() if p["completed_at"]}
-        if node["id"] not in _accessible_ids(
-                nodes, completed,
-                _route_modules_for(conn, learner["id"], course["slug"])):
+        if node["id"] not in _accessible_for(
+                conn, learner["id"], course, nodes, completed):
             raise HTTPException(403, "esta lección aún no está disponible")
         # A review is a lesson they have ALREADY completed — that is a fact in
         # the database, not a claim the client gets to make.

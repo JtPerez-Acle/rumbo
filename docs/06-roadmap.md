@@ -1,6 +1,6 @@
 # 06 — Status, roadmap and parked designs
 
-*Verified against the live database 2026-08-25.*
+*Verified against the live database 2026-08-26.*
 
 ## Where we actually are
 
@@ -11,12 +11,13 @@ every decision:
 |---|---|
 | Courses live | **14** (420 lessons, 420 videos, all with written guides) |
 | Route library | 70 module contracts with declared prerequisites |
-| Learners | **5** · 16 submissions · **1 lesson-2 completion, ever** |
-| Verdicts produced by real learners | 1 |
-| Conversations answered | 3 of 7 asked |
+| Learners | **5** · 16 submissions · **3 lesson completions, every one of them a lesson 1** |
+| Last completion of any kind | **2026-08-07** |
+| Verdicts produced by a real learner | 1 (and it was the operator's own account) |
+| Conversations answered | **1 of 4 asked**, and that one scored 0 |
 | Transversal projects declared | **0 of 5** |
-| Job analyses run | 3 (12 distinct gaps, **none recurring**) |
-| Modules never selected by any route | **43 of 70** |
+| Job analyses run | 3 (15 distinct gaps, **none recurring**) |
+| Modules never selected by any route | **42 of 70** |
 | Concierge requests / waitlist | 0 / 0 |
 
 **We build roughly seventy times faster than we learn.** The machinery is now
@@ -39,7 +40,7 @@ Module 1 (6 lessons) and produces an artifact she actually uses.
 
 ### What the data says NOT to do
 
-**Do not build course #15.** 43 of 70 modules have never been selected for
+**Do not build course #15.** 42 of 70 modules have never been selected for
 anyone's goal, and no gap in the demand ledger recurs. The catalog is ahead of
 demand, not behind it. `GET /api/demand` is the instrument that says so; check it
 before generating anything.
@@ -90,13 +91,36 @@ evaluation flagging · offsite DB backups · learner access links.
    human. Priority: module 1 of each, because at current traffic nobody reaches
    lesson 7. `check-narration` will also flag scripts written with page-only
    devices while you are in there.
-5. **The conversation is still nearly idle** (3 of 7 answered) and **no learner has
+5. **The conversation is still nearly idle** (1 of 4 answered) and **no learner has
    ever declared a transversal project** (0 of 5) despite the orientation fix.
    Both are worth watching in real usage before changing again — the project step
    has already been moved once on a hypothesis.
 6. **Social channels** — built, dormant since July, blocked only on Upload-Post
    credentials. The public landing and shareable routes exist with nothing
    pointing traffic at them.
+
+## Shipped 2026-08-26: CV intake (docs/10)
+
+**The first feature demand pulled rather than supply pushed** — a real learner
+asked for it. Given a project whose documented failure mode is building seventy
+times faster than it learns, that provenance is the most interesting thing about
+it and is worth protecting: it is the first entry on this page that answers a
+person rather than a hypothesis.
+
+A learner pastes their CV; the matcher proposes module skips, each with a quote
+from the CV that must literally appear in it. **The CV proposes, the reto
+disposes**: accepting a skip shortens the route and opens that module's reto but
+changes no access at all, and only passing the reto (≥70) credits the module.
+Skipped is never locked. Full contract, invariants and calibration in docs/10.
+
+What the first calibration run showed, on real CVs: three engineering CVs
+produced **zero** proposals against a marketing catalog (the refusal direction
+works), and the one real marketing document exposed the matcher **paraphrasing
+instead of quoting** — now dropped server-side. **Still uncalibrated: the
+positive direction.** Every real CV on hand is an engineering CV, so what is
+proven is that we refuse; that a genuine marketing CV gets the *right* skips
+rests on a synthetic CV, which docs/07 says does not count. One real marketing
+CV is the next thing this feature needs.
 
 ## Security hardening (shipped 2026-08-12)
 

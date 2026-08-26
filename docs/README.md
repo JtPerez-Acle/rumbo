@@ -29,9 +29,9 @@ One AI content engine powers two products:
 | Marginal cost per course | ≈ $0.35 of LLM + ~2 h of local render compute |
 | Marginal cost per learner | ≈ $0 (videos are canonical; personalization lives in each learner's path) |
 | Cost per AI evaluation | fractions of a cent (DeepSeek V4 Pro via OpenRouter) |
-| Stack | Python/FastAPI · Postgres (18 tables) · vanilla-JS single-file frontends · MoneyPrinterTurbo render engine · Railway |
+| Stack | Python/FastAPI · Postgres (20 tables) · vanilla-JS single-file frontends · MoneyPrinterTurbo render engine · Railway |
 | Access | Invite-gated alpha; public landing + waitlist for strangers |
-| **Real usage** | **5 learners · 16 submissions · 1 lesson-2 completion** — see doc 06 |
+| **Real usage** | **5 learners · 16 submissions · 3 completions, all of them a lesson 1** — see doc 06 |
 
 ## Reading map
 
@@ -46,6 +46,7 @@ One AI content engine powers two products:
 | [07 — Engineering notes](07-engineering-notes.md) | **Read before your first edit.** Verification ritual, tooling traps, bug patterns |
 | [08 — Job target](08-job-target.md) | The acquisition wedge: a pasted job posting → a study route + the interview document |
 | [09 — World of knowledge](09-world-of-knowledge.md) | **North star.** "Quiero ser X" → route → verified learning → proof. What has to become true, in order |
+| [10 — CV intake](10-cv-intake.md) | Paste a CV → proposed module skips, credited only by passing the reto. The first feature a real learner asked for |
 
 ## If you are a coding agent starting fresh
 

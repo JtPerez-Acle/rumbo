@@ -234,6 +234,42 @@ CREATE TABLE IF NOT EXISTS goal_docs (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (learner_id, job_target_id)
 );
+-- CV intake (docs/10). The CV is a CLAIM about what someone already knows, and
+-- this platform is built on not trusting claims. So it lives in its own table
+-- and produces PROPOSALS; it never writes progress.
+-- cv_text has already been through writer.strip_contacts(): no emails, no phone
+-- numbers. backup_db.py exports every table offsite, so that matters here.
+CREATE TABLE IF NOT EXISTS cv_profiles (
+    id SERIAL PRIMARY KEY,
+    learner_id INT NOT NULL REFERENCES learners(id),
+    cv_text TEXT NOT NULL,
+    analysis JSONB NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- One row per module the learner skips. DELIBERATELY NOT `progress`: completed_at
+-- has to keep meaning "they did the lesson", or the streak, the SM-2 ladder and
+-- the Module-1 completion gate all quietly become fiction (docs/06 already lists
+-- gates it cannot compute).
+--   declarado  — they said they know it. Cosmetic: shortens the route, opens the
+--                reto early, changes NO access. An injected CV can reach exactly
+--                this and no further.
+--   acreditado — they passed the module's reto (a novel case, deliberately not
+--                covered in the lessons). Counts as the module's outcome met.
+CREATE TABLE IF NOT EXISTS module_exemptions (
+    id SERIAL PRIMARY KEY,
+    learner_id INT NOT NULL REFERENCES learners(id),
+    course_id INT NOT NULL REFERENCES courses(id),
+    module_no INT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'declarado',   -- declarado | acreditado
+    source TEXT NOT NULL DEFAULT 'cv',          -- cv | manual | reto
+    claim TEXT NOT NULL DEFAULT '',
+    capstone_submission_id INT REFERENCES submissions(id),
+    score INT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (learner_id, course_id, module_no)
+);
 """
 
 # Spaced-repetition intervals (days) by review stage. SM-2-lite.
@@ -765,6 +801,122 @@ def active_job_target(conn: psycopg.Connection, learner_id: int) -> dict | None:
         "SELECT * FROM job_targets WHERE learner_id = %s AND active "
         "ORDER BY id DESC LIMIT 1", (learner_id,),
     ).fetchone()
+
+
+def save_cv_profile(conn: psycopg.Connection, learner_id: int, cv_text: str,
+                    analysis: dict) -> dict:
+    """Store a CV reading (docs/10). Only one profile is active at a time; older
+    ones stay for history, the same way a superseded job target does.
+
+    `cv_text` must ALREADY be through `writer.strip_contacts` — this is the last
+    place a phone number could enter the database, and backup_db.py exports every
+    table offsite.
+    """
+    import json as _json
+    conn.execute("UPDATE cv_profiles SET active = false WHERE learner_id = %s",
+                 (learner_id,))
+    return conn.execute(
+        "INSERT INTO cv_profiles (learner_id, cv_text, analysis, active) "
+        "VALUES (%s, %s, %s, true) RETURNING *",
+        # ensure_ascii=False like every other JSONB write here.
+        (learner_id, cv_text, _json.dumps(analysis, ensure_ascii=False)),
+    ).fetchone()
+
+
+def active_cv_profile(conn: psycopg.Connection, learner_id: int) -> dict | None:
+    return conn.execute(
+        "SELECT * FROM cv_profiles WHERE learner_id = %s AND active "
+        "ORDER BY id DESC LIMIT 1", (learner_id,)).fetchone()
+
+
+def delete_cv_profiles(conn: psycopg.Connection, learner_id: int) -> int:
+    """Forget the CV entirely, including history. The declared exemptions it
+    produced go with it (see `clear_declared_exemptions`); CREDITED ones do not —
+    those were earned by passing a reto and nothing a learner earned may ever go
+    down (docs/07)."""
+    return conn.execute(
+        "DELETE FROM cv_profiles WHERE learner_id = %s", (learner_id,)).rowcount
+
+
+def set_module_exemption(conn: psycopg.Connection, learner_id: int, course_id: int,
+                         module_no: int, claim: str = "", source: str = "cv") -> dict:
+    """Record that the learner says they already know this module.
+
+    Status starts at 'declarado' and NEVER regresses: re-declaring a module that
+    is already 'acreditado' leaves the credit alone.
+    """
+    return conn.execute(
+        "INSERT INTO module_exemptions (learner_id, course_id, module_no, claim, source) "
+        "VALUES (%s, %s, %s, %s, %s) "
+        "ON CONFLICT (learner_id, course_id, module_no) DO UPDATE "
+        "SET claim = EXCLUDED.claim, source = EXCLUDED.source, updated_at = now() "
+        "RETURNING *",
+        (learner_id, course_id, module_no, claim, source),
+    ).fetchone()
+
+
+def credit_module_exemption(conn: psycopg.Connection, learner_id: int, course_id: int,
+                            module_no: int, submission_id: int, score: int) -> dict:
+    """Promote an exemption to 'acreditado': they passed the module's reto.
+
+    `GREATEST` on the score for the same reason every other number in this schema
+    keeps its best value — a weaker later attempt must never lower what they
+    already proved.
+    """
+    return conn.execute(
+        "INSERT INTO module_exemptions "
+        "  (learner_id, course_id, module_no, status, source, capstone_submission_id, score) "
+        "VALUES (%s, %s, %s, 'acreditado', 'reto', %s, %s) "
+        "ON CONFLICT (learner_id, course_id, module_no) DO UPDATE "
+        "SET status = 'acreditado', "
+        "    capstone_submission_id = CASE WHEN EXCLUDED.score > COALESCE(module_exemptions.score, -1) "
+        "                                  THEN EXCLUDED.capstone_submission_id "
+        "                                  ELSE module_exemptions.capstone_submission_id END, "
+        "    score = GREATEST(COALESCE(module_exemptions.score, 0), EXCLUDED.score), "
+        "    updated_at = now() "
+        "RETURNING *",
+        (learner_id, course_id, module_no, submission_id, score),
+    ).fetchone()
+
+
+def clear_module_exemption(conn: psycopg.Connection, learner_id: int, course_id: int,
+                           module_no: int) -> bool:
+    """Undo a DECLARED skip — "enséñamelo igual". Returns whether a row went.
+
+    A credited exemption is deliberately untouchable here: it is not a preference,
+    it is a passed reto, and it stays on the record with its score.
+    """
+    return conn.execute(
+        "DELETE FROM module_exemptions WHERE learner_id = %s AND course_id = %s "
+        "AND module_no = %s AND status = 'declarado'",
+        (learner_id, course_id, module_no)).rowcount > 0
+
+
+def clear_declared_exemptions(conn: psycopg.Connection, learner_id: int) -> int:
+    """Drop every declared skip (used when the CV that proposed them is deleted).
+    Credited ones survive — see `delete_cv_profiles`."""
+    return conn.execute(
+        "DELETE FROM module_exemptions WHERE learner_id = %s AND status = 'declarado'",
+        (learner_id,)).rowcount
+
+
+def learner_exemptions(conn: psycopg.Connection, learner_id: int) -> list[dict]:
+    """Every exemption with its course slug, for the route and temario surfaces."""
+    return conn.execute(
+        "SELECT e.*, c.slug AS course_slug, c.title AS course_title "
+        "FROM module_exemptions e JOIN courses c ON c.id = e.course_id "
+        "WHERE e.learner_id = %s ORDER BY c.id, e.module_no",
+        (learner_id,)).fetchall()
+
+
+def exempt_modules_for(conn: psycopg.Connection, learner_id: int,
+                       course_id: int) -> set[int]:
+    """The module numbers this learner has skipped in one course, declared or
+    credited. Callers that need to tell them apart use `learner_exemptions`."""
+    rows = conn.execute(
+        "SELECT module_no FROM module_exemptions WHERE learner_id = %s AND course_id = %s",
+        (learner_id, course_id)).fetchall()
+    return {r["module_no"] for r in rows}
 
 
 def record_access_request(conn: psycopg.Connection, email: str,

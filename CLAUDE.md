@@ -62,8 +62,9 @@ roughly seventy times faster than it learns.
 |---|---|
 | Goal engine: posting *or* role → prereq-aware module route, honest gaps | `docs/08` |
 | Route-aware access, goal documents, the "quiero ser X" north star | `docs/09` |
+| CV intake: proposed module skips, credited only by a passed reto | `docs/10` |
 | Lesson loop, rubrics, verdicts vs scores, the prediction beat | `docs/02` |
-| Schema (18 tables), API surface, request flows, **security controls** | `docs/03` |
+| Schema (20 tables), API surface, request flows, **security controls** | `docs/03` |
 | Course factory pipeline + the authoring standard | `docs/04`, `.claude/skills/course-factory/` |
 | Runbooks (deploy, ship a course, **turn on email**, invites, backups) | `docs/05` |
 | **Bug patterns and the verification ritual — read before editing** | `docs/07` |
@@ -121,11 +122,13 @@ DASHBOARD_TOKEN=… PUBLIC_BASE_URL=… python studio/cloud/upload_videos.py <sl
 # Checks — run the relevant one BEFORE deploying a change to that area:
 python studio/cloud/check_job_matcher.py    # matcher, 5 fixtures, ~15 min (real LLM)
 python studio/cloud/check_tutor.py          # tutor, 6 properties, ~5 min (real LLM)
+python studio/cloud/check_cv_matcher.py     # CV matcher; reads REAL CVs from ./cvs (git-ignored)
 node studio/dashboard/check_job_render.js studio/dashboard/static/learn.html \
      studio/fixtures/job-postings/sample-analysis.json
 node studio/dashboard/check_how_section.js
+node studio/dashboard/check_cv_render.js studio/dashboard/static/learn.html
 
-# Offsite backup (all 18 tables) — before anything risky:
+# Offsite backup (all 20 tables) — before anything risky:
 DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
 ```
 
@@ -168,6 +171,14 @@ DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
 - **New renders default to 1080p ~4 Mbps (≈18 MB/lesson).** The catalog is 720p/CRF27
   (~5 MB). Always shrink before uploading — the 5 GB volume filled once already
   (`docs/05` → shrink flow).
+- **A CV is a claim, and claims do not grant access** (`docs/10`). CV intake
+  produces *proposals*; only passing a module's reto (≥`EXEMPTION_PASS_SCORE`)
+  credits it. Exemptions live in `module_exemptions`, never in `progress` —
+  writing fake completions would corrupt the streak, the SM-2 ladder and the
+  Module-1 gate. `_accessible_for` is the one place access is computed and every
+  widener there only ever ADDS: **skipped is not locked.**
+- **Real CVs never enter the repo.** `.gitignore` blocks `*.pdf` and `cvs/`;
+  this repo is public and those are other people's names and employment history.
 - **Admin routes are gated by an ALLOWLIST** in `app._is_admin_path`. A new `/api/*`
   route not added to it ships **public**. Add the prefix in the same edit as the
   route, and curl it tokenless before deploying. The gate now also **fails closed**

@@ -11,7 +11,8 @@ flowchart TB
         APP["FastAPI (dashboard/app.py)\nadmin dashboard + learner app + all APIs"]
         SCHED["APScheduler (in-process, OFF)\n06:00 produce · 12/19/21h publish"]
     end
-    PG[("Postgres — 18 tables\ncourses · syllabus_nodes · module_capstones\nlearners · progress · submissions\nproject_docs · goal_docs · case_studies\njob_targets · requests · waitlist")]
+    PG[("Postgres — 20 tables\ncourses · syllabus_nodes · module_capstones\nlearners · progress · submissions\nproject_docs · goal_docs · case_studies
+cv_profiles · module_exemptions\njob_targets · requests · waitlist")]
     VOL[/"Volume /app/studio/output\n420 course mp4s + channel videos"/]
     OR["OpenRouter → DeepSeek V4 Pro\ngeneration AND evaluation"]
     APP --- PG
@@ -65,7 +66,7 @@ docs/                       ← you are here
 
 ## Data model
 
-18 tables. Schema and additive migrations both run on every boot via
+20 tables. Schema and additive migrations both run on every boot via
 `db.init_db()` — there is no migration framework, and changes must be
 additive (`CREATE TABLE IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS`).
 
@@ -82,6 +83,8 @@ additive (`CREATE TABLE IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS`).
 | `project_docs` / `case_studies` | per-course portfolio deliverables | `content_md`, stable `share_token` |
 | `job_targets` | goal intake: analyzed job postings (docs/08) | `learner_id` **nullable** (anonymous public analyses are demand data), `analysis` JSONB, `active`, `share_token` |
 | `goal_docs` | the goal document (docs/09): one deliverable per (learner, job target), compiled across the route | `UNIQUE(learner_id, job_target_id)`, stable `share_token`; served by the same paper page as `project_docs` |
+| `cv_profiles` | CV intake (docs/10): one active reading per learner, history kept | `cv_text` is **already contact-stripped**; `analysis` JSONB holds the claims |
+| `module_exemptions` | modules the learner skips | `status` declarado→acreditado, `source`, `capstone_submission_id`, `score`. **Deliberately not `progress`** — `completed_at` must keep meaning "they did the lesson" |
 
 `learners` also carries the **transversal project** (`project_name`,
 `project_desc`, `goal`): learner-level, declared at orientation, injected into
@@ -147,7 +150,8 @@ Rules encoded here, all of them learned from production incidents:
 | Home | `GET /today` — continue-card, due reviews, pending conversations, streak |
 | Courses | `GET /courses` · `GET /course/{slug}` · `GET /lesson/{node_id}` · `GET /video/{node_id}` · `POST /complete` |
 | Evaluation | `POST /submit` (explain\|exercise; identical text is **never re-graded** and the response carries `best_score`) · `POST /defend` · `POST /reteach` (re-teach on a failed verdict; not stored, not scored) · `GET /capstone/{id}` · `POST /submit-capstone` |
-| **Goal** | `GET /job-target` (active target, per-course `route`, **and `steps` — the route as an ordered path of module-level capabilities**) · `GET /job-targets` (history) · `POST /job-target/claim` (claim **and** switch) |
+| **Goal** | `GET /job-target` (active target, per-course `route`, **and `steps` — the route as an ordered path of module-level capabilities**, each with its `exempt` state) · `GET /job-targets` (history) · `POST /job-target/claim` (claim **and** switch) |
+| **CV** (docs/10) | `POST /cv` (read a CV → proposed module exemptions) · `GET /cv` · `DELETE /cv` · `POST /exemption` (`skip`\|`teach`). Session-gated on purpose: unlike the job analyser, a CV has no acquisition value and every reason to stay attached to one account |
 | Portfolio | `GET/POST /goal-doc` · `GET/POST /project-doc/{slug}` · `GET/POST /case-study/{slug}` · `GET /portfolio` |
 | Concierge | `POST /request` · `GET /requests` |
 | Profile | `GET /profile` · `POST /profile` (declare the transversal project) |
@@ -206,6 +210,13 @@ completed lessons skipped the explain step and the conversation was unreachable.
 recomputed per request. Enforced on `GET /lesson`, `GET /video` and `POST /submit`.
 `is_review` comes **only** from the server.
 
+`_accessible_for` is the single place it is computed, and it applies two
+wideners — the active route's module set (docs/09) and the learner's module
+exemptions (docs/10). Both only ever ADD: a skipped module stays exactly as
+reachable as before, what moves is where we *start* them. Consolidating matters
+because this codebase's recurring shape is a rule that reached some gates and
+not others (docs/07, "security by allowlist").
+
 **Evaluation.** `POST /submit` → access check → per-learner rate limit
 (`EVAL_RATE_MAX`, default 60/h) → the previous attempt is fetched and passed to
 the evaluator (for progress recognition **only** — the prompt insists on grading
@@ -226,10 +237,14 @@ stable share token → public paper page.
 
 Two front doors: the admin surface behind a single `DASHBOARD_TOKEN`
 (middleware, `_is_admin_path`), and the learner surface behind a session cookie.
-Public surfaces: landing/catalog/temarios, login (rate-limited 8/5min per IP +
-honeypot), waitlist (same), and share pages where an unguessable token is the
-capability. Per-learner evaluation rate limiting. No payments, no PII beyond
-name + email, no third-party trackers.
+Public surfaces: landing/catalog/temarios, login (rate-limited 8/5min per IP + honeypot),
+waitlist (same), and share pages where an unguessable token is the capability.
+Per-learner evaluation rate limiting. No payments and no third-party trackers.
+
+**PII: name, email, and — since 2026-08-26 — an optional CV** (docs/10), stored
+with emails and phone numbers stripped at ingest, kept off every admin surface,
+and deletable by the learner from the screen that collects it. Real CVs used for
+calibration never enter the repo: `.gitignore` blocks `*.pdf` and `cvs/`.
 
 **Hardened 2026-08-12** after a full audit that exploited four of these in
 production. What now holds, and what each replaced:
@@ -240,6 +255,7 @@ production. What now holds, and what each replaced:
 | **Account entry** | an existing account is enterable only by proving inbox control. Without `RESEND_API_KEY`, self-service re-login returns **409** and the operator mints the link (docs/05 lockout runbook). Invite codes create accounts; they do not enter them. |
 | **Sessions** | expiry lives in `learner_sessions.expires_at`, checked server-side; `/logout` deletes the row; expired sessions and spent magic links are purged on boot. |
 | **LLM inputs** | all learner text is wrapped by `writer._fenced()` and every evaluator/compiler system prompt carries `UNTRUSTED_RULE`. Model output is still recomputed server-side (scores clamped, dimensions summed). |
+| **CV claims** | a CV is untrusted text whose literal purpose is to request privilege, so its ceiling is a *proposal*: only passing a module's reto changes anything. Unknown slugs/modules are dropped and **every quote is verified to be in the CV** — the model paraphrased on the first real document and a paraphrase shown as "esto que escribiste" is a fabricated credential (docs/10). |
 | **Untrusted Markdown** | `renderMD()` = marked → DOMPurify. Never `innerHTML = marked.parse(...)`. CDN libs pinned exactly + SRI. |
 | **Admin gate** | fails **closed** in production (503 if `DASHBOARD_TOKEN` is unset on Railway), constant-time compare, `Secure` cookies. Locally an empty token still means open — the documented dev loop. |
 | **Headers** | CSP, HSTS, `nosniff`, `frame-ancestors 'none'`, Referrer-Policy, Permissions-Policy on every response. CSP still needs `'unsafe-inline'` for scripts (single-file frontends), so **DOMPurify is the real XSS control**, not CSP. |

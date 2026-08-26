@@ -30,6 +30,16 @@ researches/
 *.docx
 resumen_carrera_influencer_marketing.pdf
 
+# CVs. Real ones, belonging to real people, used to calibrate the CV matcher
+# (docs/10) the way docs/07 demands — against real documents, never ones we
+# wrote ourselves. This repo is PUBLIC, so they must never be committed: they
+# carry names, phone numbers and employment history that are not ours to
+# publish. Keep them local; the fixture set that IS committed lives in
+# studio/fixtures/cvs/ and is redacted.
+*.pdf
+!brag-output/**/*.pdf
+cvs/
+
 # Video composition working files. The finished cut is committed; the 114 MB
 # Chrome cache and node_modules behind it are not.
 brag-output/composition/node_modules/

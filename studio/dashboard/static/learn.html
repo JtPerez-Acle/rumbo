@@ -32,7 +32,7 @@
     --terra:#E5825E; --terra-ink:#33170C;
     /* type scale — six sizes, no more */
     --fs-xs:11px; --fs-sm:12.5px; --fs-base:14px; --fs-md:15.5px; --fs-lg:18px; --fs-xl:22px;
-    --fd-md:26px; --fd-lg:31px; --fd-num:42px;
+    --fd-md:26px; --fd-lg:31px; --fd-num:42px; --fd-streak:56px;
     /* space scale */
     --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
     /* radii */
@@ -46,6 +46,27 @@
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--ink);color:var(--text);font-family:var(--sans);line-height:1.5;
     font-size:var(--fs-base);-webkit-font-smoothing:antialiased}
+
+  /* ---- the parts we did not draw ----
+     Selection, caret, scrollbar and focus ring ship with browser defaults that
+     belong to no design system. In a room this dark, a stock blue selection is
+     the loudest thing on the page. */
+  ::selection{background:rgba(240,164,60,.28);color:var(--text)}
+  html{scrollbar-color:var(--line-strong) var(--ink);accent-color:var(--amber);
+    -webkit-tap-highlight-color:rgba(240,164,60,.18)}
+  input,textarea{caret-color:var(--amber)}
+  a{text-underline-offset:3px;text-decoration-thickness:1px}
+
+  /* THE focus ring. There was none: inputs set outline:none and signalled focus
+     only by tinting a 1px border, and every other control is a div. A keyboard
+     or switch user had no idea where they were on any screen in the product. */
+  :focus-visible{outline:2px solid var(--amber-hi);outline-offset:3px;border-radius:var(--r-sm)}
+  .btn:focus-visible,.tabbar button:focus-visible{outline-offset:3px}
+  input:focus-visible,textarea:focus-visible{outline:2px solid rgba(240,164,60,.5);outline-offset:2px}
+  /* Rows, cards and the paper mock are divs that behave like buttons; the
+     observer below makes them reachable, and this makes the reach visible. */
+  .clickable:focus-visible,.back:focus-visible,.cluster:focus-visible,
+  .opt:focus-visible,.docmock:focus-visible{outline:2px solid var(--amber-hi);outline-offset:2px}
   /* the lamp: one warm glow from above, plus a whisper of grain */
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
     background:radial-gradient(640px 420px at 50% -120px, rgba(240,164,60,.10), transparent 65%)}
@@ -84,6 +105,8 @@
     transition:transform .15s var(--ease),box-shadow .2s}
   .btn:active{transform:scale(.98)}
   .btn-primary{background:linear-gradient(140deg,var(--amber-hi),var(--amber));color:var(--amber-ink);box-shadow:var(--glow-amber)}
+  .btn-primary:hover{box-shadow:0 14px 40px -10px rgba(240,164,60,.62)}
+  .btn-paper:hover{box-shadow:0 12px 38px -12px rgba(241,230,206,.4)}
   .btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--line)}
   .btn-ghost:hover{border-color:var(--line-strong)}
   .btn-paper{background:linear-gradient(150deg,#FBF3E1,var(--paper));color:var(--paper-ink);box-shadow:var(--glow-paper)}
@@ -115,7 +138,8 @@
   .brandname{font-weight:800;font-size:var(--fs-md);letter-spacing:-.01em}
   .brandname small{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
   .topbar{display:flex;justify-content:space-between;align-items:center}
-  .back{color:var(--dim);font-size:var(--fs-sm);cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-weight:600}
+  .back{color:var(--dim);font-size:var(--fs-sm);cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-weight:600;
+    min-height:44px;margin-left:-2px}
   .back:hover{color:var(--text)}
 
   /* ---- streak flame: ember → lit → roaring ---- */
@@ -151,7 +175,7 @@
   .course-card .meta{display:flex;justify-content:space-between;align-items:center;margin-top:var(--s3);font-size:var(--fs-sm);color:var(--faint)}
 
   /* ---- pills ---- */
-  .pill{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+  .pill{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
   .pill.soon{background:var(--raised);color:var(--faint);border:1px solid var(--line)}
   .pill.go{background:rgba(240,164,60,.16);color:var(--amber)}
   .pill.st-new{background:var(--raised);color:var(--dim);border:1px solid var(--line)}
@@ -251,7 +275,7 @@
   .lrow.done .num{background:var(--sage);color:var(--sage-ink);border-color:var(--sage)}
   .lrow.current .num{background:var(--amber);color:var(--amber-ink);border-color:var(--amber)}
   .lrow .lt{flex:1;font-size:var(--fs-base);font-weight:600;line-height:1.25}
-  .lrow .st{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
+  .lrow .st{font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
   .lrow .obj{flex-basis:100%;font-size:var(--fs-sm);color:var(--dim);padding-top:var(--s1)}
 
   /* ---- lesson ---- */
@@ -276,7 +300,7 @@
   .qblock{display:flex;flex-direction:column;gap:9px} .qblock h4{font-size:var(--fs-md);font-weight:700;line-height:1.3}
 
   /* ---- taller tag (was ai-tag): the workshop label, paper-toned ---- */
-  .ai-tag{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:800;
+  .ai-tag{display:inline-flex;align-items:center;gap:7px;font-size:var(--fs-xs);font-weight:800;
     letter-spacing:.1em;text-transform:uppercase;color:var(--paper)}
   .ai-tag .dot{width:6px;height:6px;border-radius:99px;background:var(--paper);box-shadow:0 0 8px rgba(241,230,206,.8)}
   .ai-card{border-color:rgba(241,230,206,.28)}
@@ -304,9 +328,8 @@
     box-shadow:0 0 54px rgba(240,164,60,.55);color:var(--amber-ink);animation:pop .55s cubic-bezier(.2,1.4,.4,1)}
   .medal .ic{width:40px;height:40px;stroke-width:2}
   @keyframes pop{0%{transform:scale(0) rotate(-12deg)}100%{transform:scale(1) rotate(0)}}
-  .bigstreak{font-family:var(--serif);font-weight:700;font-size:56px;line-height:1;margin-top:var(--s2);
-    font-variant-numeric:tabular-nums;background:linear-gradient(120deg,var(--amber-hi),var(--amber-deep));
-    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .bigstreak{font-family:var(--serif);font-weight:700;font-size:var(--fd-streak);line-height:1;margin-top:var(--s2);
+    font-variant-numeric:tabular-nums;color:var(--amber-hi)}
 
   /* ---- the paper mock (landing hero): the work, literally glowing ---- */
   .docmock{background:linear-gradient(160deg,#FBF4E3,var(--paper));color:var(--paper-ink);border-radius:6px;
@@ -322,15 +345,21 @@
   .tabbar{position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(16,13,23,.9);backdrop-filter:blur(14px);
     border-top:1px solid var(--line);display:flex;justify-content:space-around;
     padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
-  .tabbar button{color:var(--faint);font-size:10px;font-weight:700;display:flex;flex-direction:column;
-    align-items:center;gap:3px;padding:4px 14px;letter-spacing:.02em}
+  .tabbar button{color:var(--faint);font-size:var(--fs-xs);font-weight:700;display:flex;flex-direction:column;
+    align-items:center;gap:3px;padding:6px 14px;min-height:44px;justify-content:center;letter-spacing:.02em;
+    transition:color .18s var(--ease)}
   .tabbar button .ic{width:21px;height:21px}
   .tabbar button.on{color:var(--amber)}
 
   .hide{display:none!important}
   a.textlink{color:var(--amber);font-weight:700;text-decoration:none}
   .center{text-align:center}
-  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    /* ...but a wait still has to read as a wait. */
+    .readline i{width:100%;background:var(--amber);opacity:.55}
+    .jstage{opacity:1}
+  }
 </style>
 <!-- Pinned to an exact version with SRI: a floating @12 tag plus no integrity
      attribute meant a CDN compromise (or a bad 12.x) executed on a page that
@@ -476,7 +505,7 @@ async function route(){
     else renderLanding();
     return;
   }
-  const tabOf={hoy:'hoy',objetivo:'hoy',cursos:'cursos',curso:'cursos',leccion:'cursos',reto:'cursos',
+  const tabOf={hoy:'hoy',objetivo:'hoy',cv:'hoy',cursos:'cursos',curso:'cursos',leccion:'cursos',reto:'cursos',
                portafolio:'portafolio',documento:'portafolio','caso-view':'portafolio',perfil:'perfil'};
   STATE.tab=tabOf[seg]||'hoy';
   showTabs();
@@ -485,6 +514,7 @@ async function route(){
   // must be able to analyse it. This branch was missing, so the "Pega tu oferta"
   // button inside #/objetivo silently dropped authed learners on Hoy.
   else if(seg==='oferta')renderJobBox();
+  else if(seg==='cv')viewCv();
   else if(seg==='cursos')viewCatalog();
   else if(seg==='curso'&&arg)viewOutline(arg);
   else if(seg==='leccion'&&arg)openLesson(parseInt(arg,10),step);
@@ -947,6 +977,199 @@ function renderOrientation(revisit){
   renderHow(app);
 }
 
+/* ---------- Tu experiencia: el CV propone, el reto acredita (docs/10) --------
+   A CV is a CLAIM, and this product exists because claims are not trusted —
+   work is. So nothing on this screen removes a lesson or locks anything: it
+   proposes skips the learner accepts, every skip stays reversible, and the only
+   thing that turns "ya lo sé" into something that counts is passing that
+   module's reto — a case the lessons never covered. */
+const CV_STAGES=[
+  [0,  'Leyendo tu experiencia','Lo que hiciste en cada puesto, no los títulos.'],
+  [20, 'Cruzando con los módulos','Uno por uno, contra lo que cada módulo promete que vas a saber hacer.'],
+  [45, 'Buscando la cita','Nada cuenta como sabido si no está escrito en tu CV.']];
+const CV_TIMEOUT_MS=180000;
+// Kept in sync from the server (writer.EXEMPTION_PASS_SCORE) so the copy can
+// never promise a bar the backend does not enforce.
+let CV_PASS=70;
+const _cvCourses={};
+
+async function viewCv(){
+  const data=await api('/cv'); if(data.__unauth)return renderLogin();
+  if(data.exists)renderCvResult(data); else renderCvBox();
+}
+
+function renderCvBox(warn){
+  app.innerHTML='';
+  const back=$(`<div class="back">‹ Mi objetivo</div>`); back.onclick=()=>nav('#/objetivo'); app.append(back);
+  const box=$(`<div style="margin-top:14px;display:flex;flex-direction:column;gap:15px">
+    <div><div class="eyebrow">Tu experiencia</div>
+    <h1 style="margin-top:10px">¿Ya sabes parte de esto?</h1>
+    <p class="muted" style="margin-top:8px">Pega tu CV y te decimos qué módulos de tu ruta ya hiciste en tu trabajo, con la frase de tu CV que lo dice. <b>Tú decides</b> cuáles saltarte, y puedes probarlos con su reto para dejarlos acreditados.</p></div>
+    <div><label>Tu CV</label>
+      <textarea id="cvtext" rows="12" maxlength="20000" placeholder="Pega aquí tu experiencia: cada puesto y qué hiciste en él…"></textarea>
+      <p class="faint t-sm" style="margin-top:6px">Lo que importa es <b>qué hiciste</b>, no los títulos: "instalé el píxel en 12 tiendas" dice mucho más que "Media Buyer".</p></div>
+    <input id="cvcompany" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
+    <div class="note">${I('lock','ic ic-s')} <span>Borramos tu correo y tu teléfono antes de guardar nada, tu CV no se muestra en ningún lado, y puedes borrarlo cuando quieras. No lo usamos en tu documento: ahí solo va trabajo tuyo evaluado.</span></div>
+    <div class="note note-warn">${I('clock','ic ic-s')} <span>Leerlo tarda <b>cerca de un minuto</b>. No cierres esta pestaña.</span></div>
+    <button class="btn btn-primary" id="cvgo">Leer mi CV ${I('arrow','ic ic-s')}</button>
+    <div id="cvmsg" class="center muted t-sm">${warn?esc(warn):''}</div></div>`);
+  app.append(box);
+  const ta=box.querySelector('#cvtext');
+  attachDraft(ta,'cv',0);          // docs/07: long text + a slow request = save it
+  box.querySelector('#cvgo').onclick=()=>{
+    const cv=ta.value.trim(), msg=box.querySelector('#cvmsg');
+    if(cv.length<200){msg.textContent='Pega tu CV completo: con lo que hiciste en cada puesto, no solo los cargos.';return;}
+    runCvAnalysis(cv, box.querySelector('#cvcompany').value);
+  };
+}
+
+async function runCvAnalysis(cv, honeypot){
+  app.innerHTML='';
+  app.append($(`<div style="margin-top:10px"><div class="eyebrow">Leyendo tu CV</div>
+    <h2 style="margin-top:10px">Tu tutora está leyendo tu experiencia.</h2>
+    <p class="muted t-sm" style="margin-top:8px">Busca en qué módulos ya hiciste el trabajo — y no da por sabido nada que tu CV no diga.</p></div>`));
+  const card=$(`<div class="card" style="margin-top:14px"></div>`);
+  CV_STAGES.forEach(([,t,sub],i)=>card.append($(`<div class="jstage" data-i="${i}">
+    <div class="jdot">${I('check','ic ic-s')}</div>
+    <div class="jtxt"><div>${esc(t)}</div><div class="jsub"><p class="faint t-sm" style="margin:0 0 8px">${esc(sub)}</p><div class="readline"><i></i></div></div></div></div>`)));
+  app.append(card);
+  const foot=$(`<div class="row" style="justify-content:space-between;margin-top:10px">
+    <span class="faint t-sm">No cierres esta pestaña</span><span class="jclock" id="cvclock">0:00</span></div>`);
+  app.append(foot);
+  const t0=Date.now(); let done=false;
+  const paint=()=>{
+    const el=Math.floor((Date.now()-t0)/1000);
+    const c=document.getElementById('cvclock');
+    if(c)c.textContent=Math.floor(el/60)+':'+String(el%60).padStart(2,'0');
+    let active=0; CV_STAGES.forEach(([at],i)=>{ if(el>=at)active=i; });
+    card.querySelectorAll('.jstage').forEach(s=>{ const i=+s.dataset.i;
+      s.classList.toggle('done', done||i<active); s.classList.toggle('now', !done&&i===active); });
+  };
+  paint(); const tick=setInterval(paint,1000);
+  const {res,data}=await postWithTimeout('/api/learn/cv',{cv,company:honeypot||''},CV_TIMEOUT_MS);
+  done=true; clearInterval(tick); paint();
+  if(!res||!res.ok){
+    // The CV is still in the draft, so "intentar de nuevo" reopens it filled in.
+    return renderCvBox((data&&data.detail)||'No pudimos leer tu CV. Vuelve a intentarlo en unos minutos.');
+  }
+  clearDraft('cv',0);
+  renderCvResult(data);
+}
+
+async function cvCourse(slug){
+  if(!_cvCourses[slug])_cvCourses[slug]=await api('/course/'+slug);
+  return _cvCourses[slug];
+}
+
+function renderCvResult(data){
+  if(data.pass_score)CV_PASS=data.pass_score;
+  app.innerHTML='';
+  const back=$(`<div class="back">‹ Mi objetivo</div>`); back.onclick=()=>nav('#/objetivo'); app.append(back);
+  const claims=data.claims||[];
+  const strong=claims.filter(c=>c.proposed);
+  const weak=claims.filter(c=>!c.proposed);
+  const taken=claims.filter(c=>c.state!=='pendiente');
+  app.append($(`<div style="margin-top:6px"><div class="eyebrow">Lo que ya traes</div>
+    <h1 style="margin-top:10px">${esc(data.headline||'Leímos tu CV')}</h1>
+    <p class="muted" style="margin-top:8px">${strong.length
+      ? `Encontramos <b>${strong.length} módulo${strong.length>1?'s':''}</b> de nuestro catálogo que tu CV muestra que ya hiciste — ${data.proposed_lessons} lecciones. Decide tú qué hacer con cada uno.`
+      : 'No encontramos módulos que tu CV demuestre haber hecho. Eso no dice nada malo de tu experiencia: solo significa que no podemos citarla, y sin cita no damos nada por sabido.'}</p></div>`));
+
+  if(strong.length){
+    app.append($(`<div class="microlabel" style="margin-top:18px">Tú decides</div>`));
+    strong.forEach(c=>app.append(cvClaimCard(c)));
+  }
+  if(weak.length){
+    app.append($(`<div class="microlabel" style="margin-top:18px">Lo leímos, pero no alcanza para saltártelo</div>`));
+    const w=$(`<div class="card"></div>`);
+    weak.forEach(c=>w.append($(`<div class="gaprow"><span class="gx">${I('alert','ic ic-s')}</span>
+      <span>${esc(c.course_title)} · módulo ${c.module_no} — <span class="faint">${esc(c.capability||'')}</span></span></div>`)));
+    w.append($(`<p class="faint t-sm" style="margin:10px 2px 0">Mencionar algo no es lo mismo que haberlo hecho. Si crees que sí lo dominas, entra al módulo y prueba su reto: se acredita solo.</p>`));
+    app.append(w);
+  }
+  if((data.fuera_del_catalogo||[]).length){
+    app.append($(`<div class="microlabel" style="margin-top:18px">Esto traes y no lo enseñamos</div>`));
+    const g=$(`<div class="card"></div>`);
+    data.fuera_del_catalogo.forEach(x=>g.append($(`<div class="gaprow"><span class="gx">${I('check','ic ic-s')}</span>
+      <span>${esc(x.name)}</span></div>`)));
+    g.append($(`<p class="faint t-sm" style="margin:10px 2px 0">Si tu objetivo pide algo de esta lista, ya lo tienes: cuéntalo en la entrevista.</p>`));
+    app.append(g);
+  }
+
+  const foot=$(`<div style="margin-top:22px">
+    <p class="faint t-sm">Leído el ${esc(data.created_at||'')}. Tu CV no aparece en tu documento ni en ninguna página pública — ahí solo va trabajo tuyo evaluado.</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+      <button class="btn btn-ghost" id="cvre">Pegar otro CV</button>
+      <button class="btn btn-ghost" id="cvdel">Borrar mi CV</button></div>
+    <div id="cvfmsg" class="center muted t-sm" style="margin-top:8px"></div></div>`);
+  app.append(foot);
+  foot.querySelector('#cvre').onclick=()=>renderCvBox();
+  foot.querySelector('#cvdel').onclick=async()=>{
+    const z=foot.querySelector('#cvfmsg'); z.textContent='Borrando…';
+    const r=await api('/cv',{method:'DELETE'});
+    if(r&&r.ok){
+      z.textContent='';
+      app.innerHTML='';
+      app.append($(`<div style="margin-top:14px"><div class="eyebrow">Tu experiencia</div>
+        <h1 style="margin-top:10px">Listo, lo borramos.</h1>
+        <p class="muted" style="margin-top:8px">${taken.filter(c=>c.state==='acreditado').length
+          ? 'Los módulos que acreditaste con su reto siguen acreditados: eso lo probaste tú, no lo dijo tu CV.'
+          : 'Los módulos que te habías saltado vuelven a tu ruta.'}</p></div>`));
+      const b=$(`<button class="btn btn-primary" style="margin-top:14px">Volver a mi objetivo</button>`);
+      b.onclick=()=>nav('#/objetivo'); app.append(b);
+    }else z.textContent='No pudimos borrarlo, intenta de nuevo.';
+  };
+}
+
+function cvClaimCard(c){
+  const done=c.state==='acreditado', skipped=c.state==='declarado';
+  const card=$(`<div class="card" style="${done?'border-color:var(--amber)':''}">
+    <div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px">
+      <span class="microlabel">${esc(c.course_title)} · módulo ${c.module_no}</span>
+      ${done?`<span class="pill go">Acreditado ${c.exempt_score||''}</span>`
+        :skipped?`<span class="pill soon">Te lo saltas</span>`:''}</div>
+    <p class="t-base" style="font-weight:600;margin:8px 0 4px">${esc(c.outcome||c.module_title||'')}</p>
+    <p class="faint t-sm" style="margin:0 0 8px">Lo decimos por esto que escribiste: “${esc(c.evidence||'')}”</p>
+    <div class="cvacts" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="cvmsg center muted t-sm" style="margin-top:6px"></div></div>`);
+  const acts=card.querySelector('.cvacts'), msg=card.querySelector('.cvmsg');
+  const act=async(action)=>{
+    acts.querySelectorAll('button').forEach(b=>b.disabled=true);
+    const r=await api('/exemption',{method:'POST',body:JSON.stringify(
+      {course_slug:c.course_slug,module_no:c.module_no,action,claim:c.capability||''})});
+    if(r&&r.ok){ c.state=action==='skip'?'declarado':'pendiente'; card.replaceWith(cvClaimCard(c)); }
+    else { msg.textContent=(r&&r.detail)||'No pudimos guardarlo.';
+           acts.querySelectorAll('button').forEach(b=>b.disabled=false); }
+  };
+  if(done){
+    acts.append($(`<p class="faint t-sm" style="margin:0">Pasaste su reto. El módulo sigue abierto si alguna vez quieres verlo.</p>`));
+    const see=$(`<button class="btn btn-ghost">Ver el módulo</button>`);
+    see.onclick=()=>nav('#/curso/'+c.course_slug); acts.append(see);
+    return card;
+  }
+  if(skipped){
+    const probar=$(`<button class="btn btn-primary">${I('target','ic ic-s')} Pruébalo con el reto</button>`);
+    probar.onclick=async()=>{
+      msg.textContent='Buscando su reto…';
+      const o=await cvCourse(c.course_slug);
+      const m=((o&&o.modules)||[]).find(x=>x.module_no===c.module_no);
+      if(m&&m.capstone&&m.capstone.id)nav('#/reto/'+m.capstone.id);
+      else msg.textContent='Ese módulo todavía no tiene reto. Puedes verlo desde el temario.';
+    };
+    const undo=$(`<button class="btn btn-ghost">Mejor enséñamelo</button>`);
+    undo.onclick=()=>act('teach');
+    acts.append(probar); acts.append(undo);
+    acts.append($(`<p class="faint t-sm" style="margin:2px 0 0">El reto es un caso nuevo que las lecciones no cubren. Si lo sacas ${CV_PASS}+ queda acreditado con tu trabajo, y ese trabajo cuenta para tu documento.</p>`));
+    return card;
+  }
+  const skip=$(`<button class="btn btn-primary">Ya lo sé, sáltalo</button>`);
+  skip.onclick=()=>act('skip');
+  const keep=$(`<button class="btn btn-ghost">Prefiero verlo igual</button>`);
+  keep.onclick=()=>{ card.querySelector('.cvmsg').textContent='Listo: se queda en tu ruta.'; };
+  acts.append(skip); acts.append(keep);
+  return card;
+}
+
 /* ---------- Mi objetivo: the route as the learner's spine (docs/09) ---------- */
 async function viewObjetivo(){
   const jt=await api('/job-target'); if(jt.__unauth)return renderLogin();
@@ -961,7 +1184,8 @@ async function viewObjetivo(){
   }
   app.append($(`<div style="margin-top:6px"><div class="eyebrow">Tu objetivo</div>
     <h1 style="margin-top:10px">${esc(jt.role_title||'Tu próximo trabajo')}</h1>
-    ${jt.company?`<p class="muted t-sm" style="margin-top:6px">${esc(jt.company)}</p>`:''}</div>`));
+    ${jt.company?`<p class="muted t-sm" style="margin-top:6px">${esc(jt.company)}</p>`:''}
+    ${jt.exempt_lessons?`<p class="muted t-sm" style="margin-top:8px">Te saltaste <b>${jt.exempt_modules} módulo${jt.exempt_modules>1?'s':''}</b> que ya sabías: te quedan <b>${jt.remaining} lecciones</b> en vez de ${jt.total-jt.done}.</p>`:''}</div>`));
   if(jt.next_lesson){
     const nx=$(`<div class="card-hero" style="margin-top:12px">
       <div class="eyebrow">Siguiente paso de tu ruta</div>
@@ -977,7 +1201,7 @@ async function viewObjetivo(){
      Now it is an ordered path of steps, each labelled by what you will be able
      to DO, with the course demoted to provenance. */
   const steps=jt.steps||[];
-  const firstPending=steps.findIndex(s=>s.done<s.lessons);
+  const firstPending=steps.findIndex(s=>s.done<s.lessons&&!s.exempt);
   const phases=[['nucleo','Empieza por aquí'],['despues','Después, para completar el perfil']];
   let stepNo=0;
   phases.forEach(([ph,label])=>{
@@ -989,14 +1213,18 @@ async function viewObjetivo(){
       const complete=st.done>=st.lessons;
       const current=idx===firstPending;
       const pct=st.lessons?Math.round(100*st.done/st.lessons):0;
-      const mark=complete?I('check','ic ic-s'):current?I('play','ic ic-s'):I('lock','ic ic-s');
+      /* docs/10: a skipped module stays in the route — the job still needs it —
+         and its lessons stay open. It just is not where we start anyone. */
+      const mark=complete||st.exempt?I('check','ic ic-s'):current?I('play','ic ic-s'):I('lock','ic ic-s');
       const card=$(`<div class="card ${st.next_lesson_id?'clickable':''}"
-          style="${current?'border-color:var(--amber)':''}">
+          style="${current?'border-color:var(--amber)':''}${st.exempt?';opacity:.72':''}">
         <div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px">
           <div class="row" style="gap:8px;align-items:center">
-            <span style="color:${complete?'var(--amber)':'var(--faint)'}">${mark}</span>
+            <span style="color:${complete||st.exempt?'var(--amber)':'var(--faint)'}">${mark}</span>
             <span class="microlabel">Paso ${stepNo} de ${steps.length}</span></div>
-          <span class="muted t-sm">${st.done}/${st.lessons}</span></div>
+          ${st.exempt==='acreditado'?`<span class="pill go">Acreditado ${st.exempt_score||''}</span>`
+            :st.exempt?`<span class="pill soon">Ya lo sabes</span>`
+            :`<span class="muted t-sm">${st.done}/${st.lessons}</span>`}</div>
         <p class="t-base" style="font-weight:600;margin:8px 0 4px">${esc(st.outcome||st.module_title||'')}</p>
         <p class="faint" style="font-size:var(--fs-xs);margin:0 0 8px">${esc(st.course_title)} · módulo ${st.module_no}</p>
         <div class="prog"><i style="width:${pct}%"></i></div></div>`);
@@ -1005,6 +1233,17 @@ async function viewObjetivo(){
       app.append(card);
     });
   });
+  /* docs/10. Offered AFTER the route, on purpose: the objection this answers
+     ("son muchísimas lecciones, la mitad ya la sé") only exists once they have
+     seen the length. Before the route it is a form; after it, it is a fix. */
+  const cvs=await api('/cv');
+  app.append($(`<div class="microlabel" style="margin-top:18px">Lo que ya sabes</div>`));
+  const cvcard=$(`<div class="card clickable">
+    <div class="row" style="gap:8px">${I('doc','ic ic-s')}<b class="t-md">${cvs.exists?'Tu CV, leído':'¿Ya sabes parte de esto?'}</b></div>
+    <p class="t-sm muted" style="margin-top:8px">${cvs.exists
+      ? `Encontramos ${cvs.proposed_modules} módulo${cvs.proposed_modules===1?'':'s'} que tu CV muestra que ya hiciste.${jt.exempt_modules?'':' Todavía no te saltaste ninguno.'}`
+      : 'Pega tu CV y te decimos qué módulos de esta ruta ya hiciste en tu trabajo. Tú decides cuáles saltarte — y puedes acreditarlos con su reto.'}</p></div>`);
+  cvcard.onclick=()=>nav('#/cv'); app.append(cvcard);
   if(jt.gaps&&jt.gaps.length){
     app.append($(`<div class="microlabel" style="margin-top:16px">Esto lo pide el puesto y no lo cubrimos</div>`));
     const g=$(`<div class="card"></div>`);
@@ -1258,8 +1497,25 @@ async function viewOutline(slug){
     <div class="prog"><i style="width:${pct}%"></i></div>
     <p class="faint" style="font-size:var(--fs-xs);margin-top:8px">Toca cualquier lección bloqueada para ver qué aprenderás en ella.</p></div>`));
   d.modules.forEach(m=>{
-    app.append($(`<div class="modhead">Módulo ${m.module_no} · ${esc(m.module_title)}</div>`));
+    /* docs/10: a skipped module is COLLAPSED, never removed and never locked.
+       The ask was "no me hagas ver de nuevo lo que ya sé", and a list of six
+       lessons they told us they already know is exactly that — but hiding it
+       for good would be the other failure, so it stays one tap away. */
+    app.append($(`<div class="modhead">Módulo ${m.module_no} · ${esc(m.module_title)}
+      ${m.exempt==='acreditado'?`<span class="pill go" style="margin-left:8px">Acreditado ${m.exempt_score||''}</span>`
+        :m.exempt?`<span class="pill soon" style="margin-left:8px">Ya lo sabes</span>`:''}</div>`));
     if(m.module_description)app.append($(`<p class="muted t-sm" style="margin:-2px 0 10px">${esc(m.module_description)}</p>`));
+    const holder=m.exempt?$(`<div class="modskip hide"></div>`):app;
+    if(m.exempt){
+      const toggle=$(`<div class="lrow clickable" style="opacity:.75">
+        <div class="num">${I('check','ic ic-s')}</div>
+        <div class="lt">${m.exempt==='acreditado'
+          ? 'Lo acreditaste con su reto'
+          : 'Te saltaste este módulo'}</div>
+        <div class="st">Ver igual</div></div>`);
+      toggle.onclick=()=>holder.classList.toggle('hide');
+      app.append(toggle); app.append(holder);
+    }
     m.lessons.forEach(l=>{
       const clickable=l.status==='done'||l.status==='current';
       const stLabel={done:'Completada',current:'Disponible',coming:'En producción',locked:'Bloqueada'}[l.status];
@@ -1269,14 +1525,18 @@ async function viewOutline(slug){
         ${l.objectives?`<div class="obj hide">Al terminar podrás: ${esc(l.objectives)}</div>`:''}</div>`);
       if(clickable)row.onclick=()=>nav('#/leccion/'+l.id);
       else if(l.objectives)row.onclick=()=>row.querySelector('.obj').classList.toggle('hide');
-      app.append(row);
+      holder.append(row);
     });
     if(m.capstone){
       const c=m.capstone;
-      const stLabel=c.status==='done'?(c.score!=null?c.score+'/100':'Completado'):c.status==='available'?'Disponible':'Bloqueado';
+      const stLabel=c.status==='done'?(c.score!=null?c.score+'/100':'Completado')
+        :c.test_out?'Pruébalo':c.status==='available'?'Disponible':'Bloqueado';
       const capTitle=(c.title||'').replace(/^reto:?\s*/i,'');
-      const row=$(`<div class="lrow caprow ${c.status==='locked'?'locked':'clickable'}">
-        <div class="num">${I('flag','ic ic-s')}</div><div class="lt">Reto: ${esc(capTitle)}</div><div class="st">${stLabel}</div></div>`);
+      const row=$(`<div class="lrow caprow ${c.status==='locked'?'locked':'clickable'}"
+          ${c.test_out?'style="border-color:var(--amber)"':''}>
+        <div class="num">${I('flag','ic ic-s')}</div>
+        <div class="lt">${c.test_out?'Acredita este módulo: ':'Reto: '}${esc(capTitle)}</div>
+        <div class="st">${stLabel}</div></div>`);
       if(c.status!=='locked')row.onclick=()=>nav('#/reto/'+c.id);
       app.append(row);
     }
@@ -1973,6 +2233,62 @@ async function viewProfile(){
   how.onclick=()=>nav('#/como-funciona'); app.append(how);
   const out=$(`<button class="btn btn-ghost" style="margin-top:2px">Salir</button>`);
   out.onclick=async()=>{await api('/logout',{method:'POST'});location.href='/aprende';}; app.append(out);
+}
+
+/* ---------- keyboard: divs that behave like buttons must act like them -------
+   This SPA builds rows, cards, clusters and the paper mock as <div> + onclick.
+   That is fine for a thumb and invisible to a keyboard or a switch: no tab stop,
+   no Enter, and a screen reader announcing nothing at all. It affects the temario
+   row, the catalog card, the cluster header, every quiz option and the document
+   mock on the landing — which is to say most of the product.
+
+   One observer stamps the contract on anything interactive as it enters the DOM,
+   so the ~40 construction sites stay untouched and every screen written after
+   this one inherits it for free. The click handler is read at press time, not at
+   stamp time, because rows get their onclick assigned after they are appended. */
+const KEYABLE='.clickable,.back,.cluster,.opt,.docmock,.pf-row,.req-row.ready,.course-card';
+function stamp(el){
+  if(!el||el.nodeType!==1||el.dataset.keyed||el.tagName==='BUTTON'||el.tagName==='A')return;
+  el.dataset.keyed='1';
+  el.setAttribute('role','button');
+  el.setAttribute('tabindex','0');
+}
+function makeKeyable(root){
+  if(!root||root.nodeType!==1)return;
+  if(root.matches&&root.matches(KEYABLE))stamp(root);
+  if(root.querySelectorAll)root.querySelectorAll(KEYABLE).forEach(stamp);
+}
+/* Second pass, debounced to the end of the task. A class list cannot be the only
+   signal here: most of this codebase appends the node first and assigns .onclick
+   afterwards, so at insertion time an element that is about to become a button
+   looks like a div. The catalog card was exactly this — fourteen of them on the
+   first screen a learner sees, none reachable. Anything inside #app that ends up
+   with a click handler becomes operable, whatever it happens to be called. */
+let sweepTimer=null;
+function sweepKeyable(){
+  clearTimeout(sweepTimer);
+  sweepTimer=setTimeout(()=>{
+    const root=document.getElementById('app');
+    if(root)root.querySelectorAll('*').forEach(el=>{ if(typeof el.onclick==='function')stamp(el); });
+  },0);
+}
+/* Guarded because the three DOM-shim checks (docs/07's stand-in for a test
+   runner) execute this file's script block in a bare VM with no MutationObserver
+   and no document.body. Weakening the checks to accommodate a11y wiring would be
+   the wrong trade; the wiring simply no-ops where there is no DOM. */
+if(typeof MutationObserver!=='undefined'&&document.body){
+  new MutationObserver(ms=>{
+    for(const m of ms) m.addedNodes.forEach(makeKeyable);
+    sweepKeyable();
+  }).observe(document.body,{childList:true,subtree:true});
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.key!==' '&&e.key!=='Spacebar')return;
+    const el=e.target;
+    if(!el||!el.dataset||el.dataset.keyed!=='1')return;
+    if(typeof el.onclick!=='function')return;
+    e.preventDefault();   // Space must not scroll the page out from under them
+    el.click();
+  });
 }
 
 boot();

@@ -650,6 +650,154 @@ def job_analysis(body: JobPostingBody, request: Request,
             "authenticated": bool(learner), "progress": progress}
 
 
+# ---- The live lesson: the landing IS the product running (docs/11) ---------
+# A stranger cannot try this product — access is invite-gated — and its value
+# (verified work, not video) is invisible from outside. Every competitor claims
+# an AI tutor; nobody can tell them apart by reading. So the public surface
+# teaches one real lesson and evaluates one real answer BEFORE asking for
+# anything, and the invite wall arrives after value was delivered rather than
+# before.
+#
+# ONE lesson, fixed server-side. The node id is never taken from the caller:
+# this codebase already shipped a bug where a write granted a read (docs/07),
+# and the mirror of it is an unauthenticated read that accepts an id. A demo
+# endpoint parameterised by node_id would publish all 420 gated videos.
+DEMO_NODE_ID = int(os.environ.get("DEMO_NODE_ID", "1"))
+# Strangers get a much tighter budget than the job analyser (3/h): the analyser
+# is worth an expensive call because a posting is high intent, while this fires
+# on curiosity.
+_DEMO_MAX = int(os.environ.get("DEMO_RATE_MAX", "4"))
+_DEMO_WINDOW = int(os.environ.get("DEMO_RATE_WINDOW", "3600"))
+_DEMO_RATE: dict[str, deque] = {}
+
+
+def _demo_rate_ok(ip: str) -> bool:
+    now = time.time()
+    q = _DEMO_RATE.setdefault(ip, deque())
+    while q and now - q[0] > _DEMO_WINDOW:
+        q.popleft()
+    if len(q) >= _DEMO_MAX:
+        return False
+    q.append(now)
+    return True
+
+
+def _demo_node(conn):
+    node = conn.execute("SELECT * FROM syllabus_nodes WHERE id = %s",
+                        (DEMO_NODE_ID,)).fetchone()
+    if not node:
+        return None, None
+    course = conn.execute("SELECT * FROM courses WHERE id = %s",
+                          (node["course_id"],)).fetchone()
+    return node, course
+
+
+@router.get("/public/demo")
+def public_demo():
+    """The one lesson a stranger can actually take, whole: video, key points,
+    written guide and the question. No auth, no id, nothing to enumerate."""
+    with db.connect() as conn:
+        node, course = _demo_node(conn)
+        if not node:
+            raise HTTPException(503, "demo no disponible")
+        caps = db.course_capstones(conn, course["id"])
+    quiz = node.get("quiz") or {}
+    ex = (quiz.get("exercise") or {}) if isinstance(quiz, dict) else {}
+    tpl = writer.PROJECT_TEMPLATES.get(course["slug"], writer.PROJECT_TEMPLATES["default"])
+    reto = next((c for c in caps if c["module_no"] == node["module_no"]), None)
+    return {
+        "course_slug": course["slug"], "course_title": course["title"],
+        "module_no": node["module_no"],
+        "module_title": node.get("module_title") or "",
+        "title": node["title"],
+        "objectives": node.get("objectives") or "",
+        "key_points": node.get("key_points") or [],
+        "written": node.get("written") or "",
+        "transcript": node.get("transcript") or "",
+        "explain_prompt": node.get("explain_prompt") or "",
+        "has_video": bool(node["video_file"]),
+        # What comes AFTER the free lesson, shown as real content rather than a
+        # claim: the exercise this lesson ends in, the module's reto, and the
+        # document the course compiles into.
+        "exercise": {"instruction": ex.get("instruction", ""),
+                     "deliverable": ex.get("deliverable", "")} if ex else None,
+        "reto": {"title": reto["title"], "scenario": reto["scenario"]} if reto else None,
+        "doc_type": tpl["doc_type"],
+    }
+
+
+@router.get("/public/demo-video")
+def public_demo_video():
+    """The demo lesson's video, and only ever that one. Deliberately takes no
+    parameter: see DEMO_NODE_ID."""
+    with db.connect() as conn:
+        node, _ = _demo_node(conn)
+    if not node or not node["video_file"]:
+        raise HTTPException(404, "video no disponible")
+    path = OUTPUT_DIR / node["video_file"]
+    if not path.is_file():
+        raise HTTPException(404, "archivo no encontrado")
+    return FileResponse(path, media_type="video/mp4")
+
+
+class DemoExplainBody(BaseModel):
+    content: str = ""
+    company: str = ""      # honeypot, same as every other public text intake
+
+
+@router.post("/public/demo-explain")
+def public_demo_explain(body: DemoExplainBody, request: Request):
+    """Evaluate a stranger's answer to the demo lesson's question.
+
+    This is the whole argument of the surface: they get a real verdict from the
+    real evaluator, on their own words, before meeting any wall. It returns a
+    verdict and never a score, exactly like the logged-in explain step — putting
+    a number on a comprehension check is a category error this product already
+    made once (docs/02).
+    """
+    if body.company.strip():                 # honeypot tripped — silently no-op
+        raise HTTPException(400, "no pudimos leer tu respuesta")
+    content = body.content.strip()
+    if not 40 <= len(content) <= 4000:
+        raise HTTPException(400, "escribe tu respuesta con tus palabras: "
+                                 "entre 40 y 4000 caracteres")
+    ip = _client_ip(request)
+    if not _demo_rate_ok(ip):
+        raise HTTPException(429, "ya evaluamos varias respuestas desde aquí. "
+                                 "Pide tu invitación y seguimos adentro.")
+    if not _JOB_SLOTS.acquire(blocking=False):
+        raise HTTPException(503, "estamos evaluando varias respuestas ahora mismo. "
+                                 "Intenta en un par de minutos.")
+    try:
+        with db.connect() as conn:
+            node, _ = _demo_node(conn)
+        if not node:
+            raise HTTPException(503, "demo no disponible")
+        try:
+            evaluation = writer.evaluate_explanation(node, content)
+        except Exception as exc:
+            print(f"demo explain failed: {exc}", file=sys.stderr)
+            raise HTTPException(503, "no pudimos evaluar tu respuesta ahora. "
+                                     "Intenta de nuevo en un momento.")
+        # Kept because it is the only record of what a stranger writes when
+        # asked to explain something. At 16 real submissions total, that is the
+        # evidence this project is short of, and it costs one row.
+        try:
+            with db.connect() as conn:
+                db.record_demo_attempt(conn, node["id"], content, evaluation)
+                conn.commit()
+        except Exception as exc:                    # never fail the learner on telemetry
+            print(f"demo attempt not stored: {exc}", file=sys.stderr)
+    finally:
+        _JOB_SLOTS.release()
+    return {"ok": True, "evaluation": {
+        "verdict": evaluation.get("verdict"),
+        "feedback": evaluation.get("feedback", ""),
+        "misconception": evaluation.get("misconception"),
+        "missing": evaluation.get("missing") or [],
+    }}
+
+
 @router.get("/public/ruta/{token}")
 def public_route(token: str):
     """The analysis as a public, shareable artifact (docs/09).

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Aprende IA</title>
+<title>Rumbo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
@@ -351,6 +351,31 @@
   .tabbar button .ic{width:21px;height:21px}
   .tabbar button.on{color:var(--amber)}
 
+  /* ---- the public surface, on a real screen ----
+     The One Column Rule holds for the app: one decision per screen, on a phone,
+     in stolen time. It does not hold for a page a stranger opens on a laptop,
+     where a 560px column in the middle of a dark field reads as unfinished.
+     Only body.wide opens up, and only the landing sets it. */
+  @media(min-width:900px){
+    body.wide .app{max-width:1000px;padding-left:var(--s6);padding-right:var(--s6)}
+    body.wide .lessonsplit{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);
+      gap:var(--s5);align-items:start}
+    body.wide .lessonsplit video{max-height:none}
+    body.wide .doors{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s3)}
+    body.wide .demohead{max-width:70ch}
+    body.wide .cluster-body{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);align-items:start}
+    body.wide .cluster-body>*{margin-bottom:0}
+  }
+  /* The live lesson: the one place a stranger meets the product working. */
+  .demoq{background:linear-gradient(160deg,var(--raised),var(--panel));
+    border:1px solid rgba(240,164,60,.35);border-radius:var(--r-lg);padding:var(--s5) var(--s4);
+    box-shadow:var(--glow-amber)}
+  .demoq textarea{background:var(--ink);min-height:120px;margin-top:var(--s3)}
+  .nextup{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) 0;border-bottom:1px solid var(--line)}
+  .nextup:last-child{border-bottom:0}
+  .nextup .nn{flex:none;width:26px;height:26px;border-radius:8px;background:var(--ink);
+    border:1px solid var(--line);color:var(--amber);display:grid;place-items:center;
+    font-size:var(--fs-sm);font-weight:800}
   .hide{display:none!important}
   a.textlink{color:var(--amber);font-weight:700;text-decoration:none}
   .center{text-align:center}
@@ -377,6 +402,23 @@
 </script>
 </head>
 <body>
+<!-- DIRECTION CONTRACT · public landing · seed c4df1581 (surface/persuade, dealt 4·7·3)
+ THESIS: The page teaches one real lesson and evaluates one real answer before
+   asking for anything. It refuses the category default — a hero claim above a
+   feature grid — because every competitor claims an AI tutor and a stranger
+   cannot tell them apart by reading.
+ OWN-WORLD: El Taller Nocturno, unchanged. Warm near-black bench, one amber
+   lamp, paper reserved for the learner's own work. Grotesk interface, serif for
+   the work and its verdicts. Tone and hairlines for depth; glow only for "lit".
+ STORY: A stranger learns something true in ninety seconds, writes their own
+   explanation, and is answered personally by the same tutor a paying learner
+   gets. Only then do the doors appear.
+ FIRST VIEWPORT: Brand row, one line of framing, then the lesson itself — video
+   at 360px left, the written guide right (stacked under 900px). The lit
+   question card sits directly below the fold; the primary action is inside it.
+ FORM: "La lección, en vivo" — index 4 of 7, the dealt lead.
+ FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+-->
 <div class="app" id="app"><div class="center muted" style="margin-top:40px">Cargando…</div></div>
 <div class="tabbar hide" id="tabbar"></div>
 
@@ -497,6 +539,8 @@ window.addEventListener('hashchange', route);
 async function route(){
   const h=location.hash.replace(/^#\/?/,'');
   const [seg,arg,step]=h.split('/');
+  // Only the landing runs wide; every other view is the phone column.
+  document.body.classList.remove('wide');
   if(!AUTH){
     if(seg==='login')renderLogin(new URLSearchParams(location.search).get('error'));
     else if(seg==='lista')renderWaitlistForm();
@@ -551,9 +595,9 @@ async function boot(){
 /* ---------- login ---------- */
 function renderLogin(err){
   tabbar.classList.add('hide'); app.innerHTML='';
-  const back=$(`<div class="back" style="margin-bottom:10px">‹ Conocer Aprende IA</div>`);
+  const back=$(`<div class="back" style="margin-bottom:10px">‹ Conocer Rumbo</div>`);
   back.onclick=()=>nav('#/'); app.append(back);
-  app.append($(`<div class="brandrow"><div class="brandmark"></div><div class="brandname">Aprende IA<small>Aprende haciendo, con tutora IA</small></div></div>`));
+  app.append($(`<div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Aprende haciendo, con tutora IA</small></div></div>`));
   const box=$(`<div style="margin:auto 0;display:flex;flex-direction:column;gap:15px">
     <div><div class="eyebrow">Tu clase de hoy te espera</div>
     <h1 style="margin-top:10px">Aprende haciendo, un día a la vez.</h1>
@@ -614,40 +658,21 @@ function renderHow(target){
   target.append($(`<p class="faint t-sm" style="margin:12px 2px 0">No damos certificados: nadie contrata por uno nuestro. Damos el trabajo que hiciste, con tu nombre.</p>`));
 }
 
+/* ---------- The landing IS the lesson ---------------------------------------
+   A stranger cannot try this product — access is invite-gated — and its value,
+   verified work rather than video, is invisible from outside. Every competitor
+   in the category claims an AI tutor, so a claim buys nothing here. This page
+   does not describe the loop: it runs one real lesson, takes one real answer,
+   and returns one real verdict from the same evaluator a logged-in learner
+   gets, before asking for anything. The wall arrives after the value. */
 async function renderLanding(){
   tabbar.classList.add('hide'); app.innerHTML='';
-  app.append($(`<div class="brandrow"><div class="brandmark"></div><div class="brandname">Aprende IA<small>Aprende haciendo, con tutora IA</small></div></div>`));
-  // Lead with the goal engine, not a list of subjects: the catalog now spans six
-  // clusters and enumerating them ages badly (this line still said "marketing,
-  // publicidad y automatización" after seven more courses shipped). The promise
-  // that stays true as the catalog grows is the mechanism, not its contents.
-  app.append($(`<div style="margin-top:14px"><div class="eyebrow">Aprende haciendo</div>
-    <h1 style="font-size:36px;margin-top:10px">Dinos qué quieres ser. Nosotros armamos el plan.</h1>
-    <p class="muted" style="margin-top:10px">Pega la oferta de trabajo que quieres, o solo el puesto. Te decimos qué pide de verdad, qué te falta, qué estudiar y en qué orden — y terminas con un documento profesional tuyo para llevar a la entrevista. En español, para LatAm, con tutora IA.</p></div>`));
-  const mock=$(`<div class="docmock">
-    <!-- Ejemplo, no una alumna real: este documento se armó con entregas de
-         demostración (la cuenta no tiene lecciones completadas). Decía
-         "documento real de una alumna", y la honestidad editorial es
-         literalmente la marca (docs/01) — se corrige hasta que haya un
-         documento de verdad que mostrar. -->
-    <div class="dm-eyebrow">Ejemplo del documento que armas aquí</div>
-    <div class="dm-title">Auditoría SEO + AEO — Casaideas</div>
-    <div class="dm-line w9"></div><div class="dm-line w7"></div><div class="dm-line w8"></div><div class="dm-line w5"></div>
-    <div class="dm-sig">Ejemplo · ver completo →</div></div>`);
-  mock.onclick=()=>window.open('/aprende/doc/ZgLgHKMdSPwMIfed','_blank');
-  app.append(mock);
-  // The job-posting box is the front door: it turns "aprender IA" into
-  // "conseguir ESTE trabajo", which is the only motivation that survives
-  // contact with a 30-day course. See docs/08-job-target.md.
-  const cta=$(`<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
-    <button class="btn btn-primary" id="joboffer">Dinos qué quieres ser ${I('arrow','ic ic-s')}</button>
-    <p class="faint t-sm center" style="margin:-2px 0 6px">Pega una oferta real o solo el puesto: te armamos el plan y el documento para la entrevista.</p>
-    <button class="btn btn-ghost" id="join">Quiero entrar</button>
-    <button class="btn btn-ghost" id="haveinvite">Tengo una invitación</button></div>`);
-  cta.querySelector('#joboffer').onclick=()=>nav('#/oferta');
-  cta.querySelector('#join').onclick=()=>nav('#/lista');
-  cta.querySelector('#haveinvite').onclick=()=>nav('#/login');
-  app.append(cta);
+  document.body.classList.add('wide');
+  app.append($(`<div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Aprende haciendo, con tutora IA</small></div></div>`));
+  app.append($(`<div class="demohead" style="margin-top:14px"><div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
+    <h1 style="font-size:var(--fd-lg);margin-top:10px">No te contamos cómo funciona. Haz una clase.</h1>
+    <p class="muted" style="margin-top:10px">Esta es la primera lección del curso de Marketing con IA, entera. Mira el video, lee la guía y explícalo con tus palabras: tu tutora te responde de verdad, aquí mismo, antes de pedirte nada.</p></div>`));
+  await renderDemoLesson(app);
   renderHow(app);
   app.append($(`<div class="microlabel" style="margin-top:16px">Las áreas · toca una para ver sus cursos y temarios</div>`));
   const d=await api('/public/catalog');
@@ -663,6 +688,115 @@ async function renderLanding(){
   renderClusters(cats, cats[0]?cats[0][0]:null, pubCard);
   app.append($(`<p class="muted t-sm center" style="margin:14px 0 0">¿Tu tema no está? Dentro de la plataforma puedes <b>pedir tu curso</b> y lo construimos.</p>`));
   app.append($(`<p class="faint t-sm center" style="margin:10px 0 8px">Acceso por invitación mientras estamos en fase alfa.</p>`));
+}
+/* The free lesson, whole. Video, guide, and the question — then a real verdict
+   from the real evaluator. Everything below the verdict is the rest of the loop
+   shown as actual content (this lesson's exercise, this module's reto, the
+   document the course compiles into), never as a list of promises. */
+async function renderDemoLesson(target){
+  const d=await api('/public/demo');
+  if(!d||d.detail){ target.append($(`<div class="note note-warn">${I('alert','ic ic-s')} <span>La clase de muestra no está disponible ahora mismo.</span></div>`)); return; }
+  const split=$(`<div class="lessonsplit" style="margin-top:var(--s4)"></div>`);
+  const left=$(`<div></div>`), right=$(`<div></div>`);
+  split.append(left); split.append(right); target.append(split);
+
+  left.append($(`<div class="microlabel">${esc(d.course_title)} · lección 1</div>`));
+  left.append($(`<h3 style="margin:6px 0 10px">${esc(d.title)}</h3>`));
+  if(d.has_video){
+    left.append($(`<video controls preload="metadata" playsinline src="/api/learn/public/demo-video"></video>`));
+  }
+  if((d.key_points||[]).length){
+    const kp=$(`<div class="card" style="margin-top:var(--s3)"><div class="microlabel">Lo que te llevas</div></div>`);
+    d.key_points.forEach(p=>kp.append($(`<div class="gaprow"><span class="gx" style="color:var(--amber)">${I('check','ic ic-s')}</span><span>${esc(p)}</span></div>`)));
+    left.append(kp);
+  }
+
+  right.append($(`<div class="ai-tag" style="margin-bottom:8px"><span class="dot"></span> La guía escrita</div>`));
+  const guide=$(`<div class="card card-paper written" style="max-height:440px;overflow:auto"></div>`);
+  // renderMD(target, markdown) — it WRITES into the element and returns nothing.
+  // It is also the XSS control (marked → DOMPurify), so this is the only way
+  // this content may ever reach the DOM.
+  renderMD(guide, d.written||d.transcript||'');
+  right.append(guide);
+
+  /* The question. This is the surface's whole argument, so it is the lit card. */
+  const q=$(`<div class="demoq" style="margin-top:var(--s5)">
+    <div class="eyebrow">Ahora tú</div>
+    <h3 style="margin:8px 0 4px">${esc(d.explain_prompt||'Explícalo en tus palabras.')}</h3>
+    <p class="faint t-sm" style="margin-top:6px">Con tus palabras, como se lo explicarías a alguien. No hay nota: esto se responde con <b>Lo tienes</b>, <b>Casi</b> o <b>Todavía no</b>, y con lo que te falta.</p>
+    <textarea id="dq" maxlength="4000" placeholder="Escribe aquí tu explicación…"></textarea>
+    <input id="dqc" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
+    <button class="btn btn-primary" id="dqgo" style="margin-top:var(--s3)">Que la tutora lo lea ${I('arrow','ic ic-s')}</button>
+    <div id="dqmsg" class="center muted t-sm" style="margin-top:8px"></div></div>`);
+  target.append(q);
+  const ta=q.querySelector('#dq');
+  attachDraft(ta,'demo',0);
+  const after=$(`<div></div>`); target.append(after);
+
+  q.querySelector('#dqgo').onclick=async()=>{
+    const content=ta.value.trim(), msg=q.querySelector('#dqmsg'), btn=q.querySelector('#dqgo');
+    if(content.length<40){msg.textContent='Escríbelo con tus palabras: unas dos o tres frases bastan.';return;}
+    btn.disabled=true; msg.textContent='';
+    const rc=readingCard('Tu tutora está leyendo tu respuesta…'); q.append(rc);
+    const r=await postWithTimeout('/api/learn/public/demo-explain',
+      {content,company:q.querySelector('#dqc').value},EVAL_TIMEOUT_MS);
+    rc.remove(); btn.disabled=false;
+    if(!r.res||!r.res.ok){ msg.textContent=(r.data&&r.data.detail)||'No pudimos evaluarla ahora. Intenta en un momento.'; return; }
+    clearDraft('demo',0);
+    renderDemoVerdict(after, r.data.evaluation||{}, d);
+    after.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+}
+
+const VERDICT_WORD={lo_tienes:'Lo tienes',casi:'Casi',todavia_no:'Todavía no'};
+function renderDemoVerdict(target, ev, d){
+  target.innerHTML='';
+  const v=ev.verdict||'casi';
+  const card=$(`<div class="card card-spot" style="margin-top:var(--s4)">
+    <div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px">
+      <div class="verdict ${v}">${VERDICT_WORD[v]||'Casi'}</div>
+      <span class="vchip ${v}">tu tutora</span></div>
+    <p class="t-base" style="margin-top:var(--s3);white-space:pre-wrap">${esc(ev.feedback||'')}</p>
+    ${ev.misconception?`<div class="note note-warn" style="margin-top:var(--s3)">${I('alert','ic ic-s')} <span>${esc(ev.misconception)}</span></div>`:''}</div>`);
+  target.append(card);
+  if((ev.missing||[]).length){
+    target.append($(`<div class="microlabel" style="margin-top:var(--s3)">Para redondearlo te falta</div>`));
+    const box=$(`<div class="card"></div>`);
+    ev.missing.forEach(x=>box.append($(`<div class="gaprow"><span class="gx">${I('alert','ic ic-s')}</span><span>${esc(x)}</span></div>`)));
+    target.append(box);
+  }
+
+  /* What the rest of the loop actually is — shown with this lesson's real
+     exercise, this module's real reto and the real document the course ends in.
+     Sections that restate a claim in different words add length, not substance. */
+  target.append($(`<div class="microlabel" style="margin-top:var(--s5)">Eso fue un paso de cinco. Así sigue</div>`));
+  const next=$(`<div class="card"></div>`);
+  const row=(n,title,body)=>`<div class="nextup"><div class="nn">${n}</div>
+    <div><div style="font-weight:700;font-size:var(--fs-md)">${esc(title)}</div>
+    <div class="muted t-sm" style="margin-top:3px">${esc(body)}</div></div></div>`;
+  next.innerHTML=
+    row('3','El quiz','Tres preguntas donde las respuestas equivocadas también enseñan.')+
+    (d.exercise&&d.exercise.instruction
+      ? row('4','El ejercicio, sobre tu proyecto real',d.exercise.instruction.slice(0,190))
+      : row('4','El ejercicio','Produces algo real y lo pegas; tu tutora lo evalúa en tres dimensiones.'))+
+    (d.reto
+      ? row('5','El reto del módulo',d.reto.scenario.slice(0,190))
+      : row('5','El reto del módulo','Un caso nuevo que las lecciones no cubrieron.'));
+  target.append(next);
+  target.append($(`<div class="card card-paper" style="margin-top:var(--s3)">
+    <div class="ai-tag"><span class="dot"></span> Al final</div>
+    <h3 style="margin-top:8px">${esc(d.doc_type||'Un documento profesional tuyo')}</h3>
+    <p class="t-sm" style="margin-top:6px;opacity:.85">Tu trabajo evaluado se compila en el documento que un cliente habría pagado por recibir, con tu firma. No damos certificados: damos el trabajo.</p></div>`));
+
+  const doors=$(`<div class="doors" style="display:flex;flex-direction:column;gap:8px;margin-top:var(--s5)">
+    <button class="btn btn-primary" id="ljob">Dinos qué quieres ser ${I('arrow','ic ic-s')}</button>
+    <button class="btn btn-ghost" id="ljoin">Quiero entrar</button>
+    <button class="btn btn-ghost" id="linv">Tengo una invitación</button></div>`);
+  doors.querySelector('#ljob').onclick=()=>nav('#/oferta');
+  doors.querySelector('#ljoin').onclick=()=>nav('#/lista');
+  doors.querySelector('#linv').onclick=()=>nav('#/login');
+  target.append(doors);
+  target.append($(`<p class="faint t-sm center" style="margin:10px 0 0">Pega una oferta real o solo el puesto y te armamos la ruta completa — también sin cuenta.</p>`));
 }
 async function renderPublicOutline(slug){
   tabbar.classList.add('hide'); app.innerHTML='';
@@ -938,7 +1072,7 @@ function renderJobResult(a, token, progress){
 function renderOrientation(revisit){
   tabbar.classList.toggle('hide',!revisit); app.innerHTML='';
   if(revisit){const back=$(`<div class="back">‹ Perfil</div>`); back.onclick=()=>nav('#/perfil'); app.append(back);}
-  app.append($(`<div style="margin-top:10px"><div class="eyebrow">${revisit?'Cómo funciona':'Bienvenida a Aprende IA'}</div>
+  app.append($(`<div style="margin-top:10px"><div class="eyebrow">${revisit?'Cómo funciona':'Bienvenida a Rumbo'}</div>
     <h1 style="margin-top:10px">Así vas a trabajar aquí.</h1></div>`));
   // On a phone the four how-it-works cards ran ~1700px, which buried the project
   // form and its buttons below them: every learner so far scrolled past it and
@@ -1320,7 +1454,7 @@ async function viewToday(){
   STATE.objetivo=jt;   // the continue-card measures the route, not the course
   if(d.__unauth)return renderLogin();
   app.innerHTML='';
-  app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Aprende IA<small>Hola, ${esc(d.name)}</small></div></div>${flameChip(d.streak)}</div>`));
+  app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Hola, ${esc(d.name)}</small></div></div>${flameChip(d.streak)}</div>`));
   // The goal is the spine of the experience (docs/09): if there is an active
   // job target, the day starts from it, not from a loose course.
   if(jt&&jt.exists){
@@ -1421,7 +1555,7 @@ async function viewToday(){
 async function viewCatalog(){
   const d=await api('/courses'); if(d.__unauth)return renderLogin();
   app.innerHTML='';
-  app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Aprende IA<small>Tus cursos</small></div></div>${flameChip(d.streak)}</div>`));
+  app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Tus cursos</small></div></div>${flameChip(d.streak)}</div>`));
   app.append($(`<h2 style="margin-top:6px">Cursos</h2>`));
   const courseCard=(c)=>{
     const pct=c.total?Math.round(c.done/c.total*100):0;
@@ -2229,7 +2363,7 @@ async function viewProfile(){
     d.courses.forEach(c=>{const pct=Math.round(c.done/c.total*100);
       app.append($(`<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><span style="font-weight:700;font-size:var(--fs-base)">${esc(c.title)}</span><span class="muted t-sm">${c.done}/${c.total}</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>`));});
   }
-  const how=$(`<button class="btn btn-ghost" style="margin-top:8px">¿Cómo funciona Aprende IA?</button>`);
+  const how=$(`<button class="btn btn-ghost" style="margin-top:8px">¿Cómo funciona Rumbo?</button>`);
   how.onclick=()=>nav('#/como-funciona'); app.append(how);
   const out=$(`<button class="btn btn-ghost" style="margin-top:2px">Salir</button>`);
   out.onclick=async()=>{await api('/logout',{method:'POST'});location.href='/aprende';}; app.append(out);

@@ -256,6 +256,18 @@ CREATE TABLE IF NOT EXISTS cv_profiles (
 --                this and no further.
 --   acreditado — they passed the module's reto (a novel case, deliberately not
 --                covered in the lessons). Counts as the module's outcome met.
+-- What strangers write on the public lesson (docs/11). Not a submission: no
+-- learner owns it, it earns nothing, and it never reaches a portfolio. It is
+-- kept because it is the only record of how someone explains a concept before
+-- they have any stake in the product, and this project's documented shortage is
+-- evidence, not features.
+CREATE TABLE IF NOT EXISTS demo_attempts (
+    id SERIAL PRIMARY KEY,
+    node_id INT NOT NULL REFERENCES syllabus_nodes(id),
+    content TEXT NOT NULL,
+    evaluation JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 CREATE TABLE IF NOT EXISTS module_exemptions (
     id SERIAL PRIMARY KEY,
     learner_id INT NOT NULL REFERENCES learners(id),
@@ -801,6 +813,18 @@ def active_job_target(conn: psycopg.Connection, learner_id: int) -> dict | None:
         "SELECT * FROM job_targets WHERE learner_id = %s AND active "
         "ORDER BY id DESC LIMIT 1", (learner_id,),
     ).fetchone()
+
+
+def record_demo_attempt(conn: psycopg.Connection, node_id: int, content: str,
+                        evaluation: dict) -> None:
+    """Store one public-lesson answer (docs/11). Deliberately NOT a submission:
+    submissions belong to a learner, count toward a portfolio and can never go
+    down. This is anonymous, earns nothing, and exists only as evidence."""
+    import json as _json
+    conn.execute(
+        "INSERT INTO demo_attempts (node_id, content, evaluation) VALUES (%s, %s, %s)",
+        (node_id, content[:8000], _json.dumps(evaluation or {}, ensure_ascii=False)),
+    )
 
 
 def save_cv_profile(conn: psycopg.Connection, learner_id: int, cv_text: str,

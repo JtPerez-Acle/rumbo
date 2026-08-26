@@ -1,6 +1,6 @@
 # 06 — Status, roadmap and parked designs
 
-*Current as of 2026-08-12.*
+*Verified against the live database 2026-08-25.*
 
 ## Where we actually are
 
@@ -9,31 +9,40 @@ every decision:
 
 | | |
 |---|---|
-| Courses live | **14** (420 lessons, 420 videos) — 7 added 2026-08-12: grafos-cultura, cultura-latam, gestión deportiva, vóleibol, influencer marketing, social media, analítica |
-| Lessons completed **by humans** | **3** |
-| Submissions | 13 |
-| Conversations answered genuinely | 0 (two answered adversarially by an operator account) |
-| Project documents | 1 (a seeded demo) |
-| Concierge requests / waitlist | 0 / 0 (both surfaces went live 2026-08-07) |
-| Active learners | the design partner (2 lessons), the operator (1) |
+| Courses live | **14** (420 lessons, 420 videos, all with written guides) |
+| Route library | 70 module contracts with declared prerequisites |
+| Learners | **5** · 16 submissions · **1 lesson-2 completion, ever** |
+| Verdicts produced by real learners | 1 |
+| Conversations answered | 3 of 7 asked |
+| Transversal projects declared | **0 of 5** |
+| Job analyses run | 3 (12 distinct gaps, **none recurring**) |
+| Modules never selected by any route | **43 of 70** |
+| Concierge requests / waitlist | 0 / 0 |
 
-**We build roughly seventy times faster than we learn.** Nearly every system —
-comprehension layer, dimensional scoring, the conversation, unlimited retries,
-portfolio documents, navigation, the redesign, categories — was shipped on a
-*single* round of feedback about an earlier version of the product. The
-machinery is good and cost pennies; the bottleneck is not shipping capacity, it
-is evidence.
+**We build roughly seventy times faster than we learn.** The machinery is now
+genuinely complete — goal engine, verified learning, portfolio compilation,
+security hardening, two calibration suites — and the gap between what is built
+and what is known is **wider than ever**, not narrower.
 
-**The alpha exit criterion is unchanged and unmet:** one design partner
-completes Module 1 (6 lessons) and produces an artifact she actually uses.
+**The alpha exit criterion is unchanged and unmet:** one design partner completes
+Module 1 (6 lessons) and produces an artifact she actually uses.
 
-**2026-08-12 changes nothing about that.** The catalog doubled (7 → 14 courses)
-and the goal engine completed — posting *or* role → prereq-aware module route →
-route-aware access → a goal document compiled from real work, with non-destructive
-goal switching. A 15-use invite code (`Cohorte agosto 2026`) exists and has not
-been shared. So the machinery is now genuinely ready and the gap between what is
-built and what is known is **wider than ever**, not narrower. The next real
-progress is a stranger finishing lesson 1.
+### What is blocking, concretely
+
+1. **Email reaches exactly one inbox.** `EMAIL_FROM` is Resend's test sender, so
+   every learner except the account owner gets a 403 and lands in the *Esperando
+   acceso* queue. **Someone is in that queue right now.** Verify a domain at
+   resend.com/domains and point `EMAIL_FROM` at it (`docs/05`). Until then no
+   cohort can log itself back in.
+2. **The 15-use invite code has never been shared.**
+3. Only after those two does any of the roadmap below matter.
+
+### What the data says NOT to do
+
+**Do not build course #15.** 43 of 70 modules have never been selected for
+anyone's goal, and no gap in the demand ledger recurs. The catalog is ahead of
+demand, not behind it. `GET /api/demand` is the instrument that says so; check it
+before generating anything.
 
 ## Success gates (fixed before the data, so the data can't negotiate)
 
@@ -65,29 +74,29 @@ evaluation flagging · offsite DB backups · learner access links.
 
 ## Next, in the order I'd do it
 
-*(Updated 2026-08-12. Shipped since the original list: learner profile — the
-transversal project now lives on the learner and feeds the evaluator; the
-matcher has a real fixture suite; docs 08–09 shipped the whole goal engine.)*
+*(Updated 2026-08-25.)*
 
-1. **Read the submissions and watch a learner do a lesson.** Not a build. The
-   reading view exists (dashboard → Alumnos → *Leer su trabajo*); the habit
-   doesn't. Everything below is guesswork until this happens.
-2. **Human review of the unreviewed courses** — now 10 of 14 no human has read
-   (courses 4–7 plus tonight's seven, minus sampled module 1s). Priority:
-   module 1 of each, because at current traffic nobody reaches lesson 7.
-3. **`RESEND_API_KEY`** — one key + DNS. Unlocks returning-user login (today an
-   invite code gates *every* login), "your module opened" re-engagement, and the
-   concierge "your course is ready" notification.
-4. ~~**Tutor-evaluator fixture set in the repo**~~ **Shipped 2026-08-12** —
-   `check_tutor.py`, 6 cases, real LLM calls, exits non-zero. It asserts what the
-   product actually promises: identical work scores the same (spread 1 on the
-   first run, band 10), better work scores higher (95 / 50 / 10), and restoring
-   what the rubric rewards pays (**45 → 94** through the retry path). Real
-   learner work is pulled from `submissions` at runtime rather than committed.
-   Run it before any change to the evaluator prompts.
-5. **Social channels** — fully built, dormant since July, blocked only on
-   Upload-Post credentials. This is the acquisition engine, and the public
-   landing + shareable rutas now exist with nothing pointing traffic at them.
+1. **Verify the sending domain and repoint `EMAIL_FROM`.** Everything else is
+   downstream of this: no cohort can log itself back in until it is done, and
+   someone is queued in *Esperando acceso* right now. `docs/05` →
+   "Runbook: turn on email".
+2. **Share the 15-use invite code** and watch what happens. The instruments are
+   all in place — demand ledger, access queue, both calibration suites — and they
+   are measuring an empty room.
+3. **Read the submissions.** Not a build. Dashboard → Alumnos → *Leer su trabajo*.
+   The reading view exists; the habit does not. Everything below is guesswork
+   until this happens weekly.
+4. **Human review of the unreviewed courses** — 10 of 14 have never been read by a
+   human. Priority: module 1 of each, because at current traffic nobody reaches
+   lesson 7. `check-narration` will also flag scripts written with page-only
+   devices while you are in there.
+5. **The conversation is still nearly idle** (3 of 7 answered) and **no learner has
+   ever declared a transversal project** (0 of 5) despite the orientation fix.
+   Both are worth watching in real usage before changing again — the project step
+   has already been moved once on a hypothesis.
+6. **Social channels** — built, dormant since July, blocked only on Upload-Post
+   credentials. The public landing and shareable routes exist with nothing
+   pointing traffic at them.
 
 ## Security hardening (shipped 2026-08-12)
 

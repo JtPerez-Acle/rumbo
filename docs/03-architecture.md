@@ -11,7 +11,7 @@ flowchart TB
         APP["FastAPI (dashboard/app.py)\nadmin dashboard + learner app + all APIs"]
         SCHED["APScheduler (in-process, OFF)\n06:00 produce · 12/19/21h publish"]
     end
-    PG[("Postgres — 17 tables\ncourses · syllabus_nodes · module_capstones\nlearners · progress · submissions\nproject_docs · goal_docs · case_studies\njob_targets · requests · waitlist")]
+    PG[("Postgres — 18 tables\ncourses · syllabus_nodes · module_capstones\nlearners · progress · submissions\nproject_docs · goal_docs · case_studies\njob_targets · requests · waitlist")]
     VOL[/"Volume /app/studio/output\n420 course mp4s + channel videos"/]
     OR["OpenRouter → DeepSeek V4 Pro\ngeneration AND evaluation"]
     APP --- PG
@@ -65,7 +65,7 @@ docs/                       ← you are here
 
 ## Data model
 
-17 tables. Schema and additive migrations both run on every boot via
+18 tables. Schema and additive migrations both run on every boot via
 `db.init_db()` — there is no migration framework, and changes must be
 additive (`CREATE TABLE IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS`).
 
@@ -77,7 +77,8 @@ additive (`CREATE TABLE IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS`).
 | `learners` | invite-gated accounts | `email` unique, `invite_code` |
 | `learner_sessions` / `login_tokens` / `invite_codes` | auth | 90-day sessions; single-use magic links; multi-use invite codes |
 | `progress` | per learner × lesson | `quiz_score` (**never lowered** — `GREATEST`), `completed_at`, SM-2 `review_stage`, `next_review_at` |
-| `submissions` | every evaluated piece of work | `kind` explain/exercise/capstone, `content`, `evaluation` JSONB, `flagged` + `flag_note` (operator review) |
+| `submissions` | every evaluated piece of work | `kind` explain/exercise/capstone, `content`, `evaluation` JSONB, `flagged` + `flag_note` (operator review), **`prompt_snapshot`** JSONB |
+| `access_requests` | learners locked out and waiting for a link | `email`, `learner_id`, `reason`, `resolved_at` (self-clearing) |
 | `project_docs` / `case_studies` | per-course portfolio deliverables | `content_md`, stable `share_token` |
 | `job_targets` | goal intake: analyzed job postings (docs/08) | `learner_id` **nullable** (anonymous public analyses are demand data), `analysis` JSONB, `active`, `share_token` |
 | `goal_docs` | the goal document (docs/09): one deliverable per (learner, job target), compiled across the route | `UNIQUE(learner_id, job_target_id)`, stable `share_token`; served by the same paper page as `project_docs` |
@@ -90,6 +91,20 @@ it — their scenario is a novel case by design.
 | `course_requests` | concierge queue | status new→reviewing→building→published/rejected, `course_slug` |
 | `waitlist` | public signups | `email` unique, `motivo`, status |
 | `topics` / `publish_log` | social channels | dedup history; publish audit |
+
+### `prompt_snapshot` — why a submission stores its own question
+
+Lesson content is **compiled output** and will be regenerated (better scripts,
+clearer exercises). `node_id` alone is therefore a dangling pointer: improve an
+exercise and every past submission silently becomes an answer to a question
+nobody was asked, evaluated against a prompt that no longer exists — and the
+portfolio document, the credibility artifact this product sells, quotes it under
+the new heading.
+
+`prompt_snapshot` freezes the instruction/question as the learner saw it, at
+submit time. It is what makes content safely mutable. Rows predating the column
+were backfilled from current content and carry `"reconstructed": true` — a guess
+presented as a guess, never as a record.
 
 ### The `evaluation` JSONB — read this before touching scoring
 
@@ -131,8 +146,8 @@ Rules encoded here, all of them learned from production incidents:
 | Public (no auth) | `GET /public/catalog` · `GET /public/course/{slug}` · `POST /waitlist` · `POST /public/job-analysis` · `GET /public/ruta/{token}` · `GET /doc/{token}` · `GET /caso/{token}` |
 | Home | `GET /today` — continue-card, due reviews, pending conversations, streak |
 | Courses | `GET /courses` · `GET /course/{slug}` · `GET /lesson/{node_id}` · `GET /video/{node_id}` · `POST /complete` |
-| Evaluation | `POST /submit` (explain\|exercise) · `POST /defend` · `POST /reteach` (re-teach on a failed verdict; not stored, not scored) · `GET /capstone/{id}` · `POST /submit-capstone` |
-| **Goal** | `GET /job-target` (active + live route progress) · `GET /job-targets` (history, for switching) · `POST /job-target/claim` (claim **and** switch) |
+| Evaluation | `POST /submit` (explain\|exercise; identical text is **never re-graded** and the response carries `best_score`) · `POST /defend` · `POST /reteach` (re-teach on a failed verdict; not stored, not scored) · `GET /capstone/{id}` · `POST /submit-capstone` |
+| **Goal** | `GET /job-target` (active target, per-course `route`, **and `steps` — the route as an ordered path of module-level capabilities**) · `GET /job-targets` (history) · `POST /job-target/claim` (claim **and** switch) |
 | Portfolio | `GET/POST /goal-doc` · `GET/POST /project-doc/{slug}` · `GET/POST /case-study/{slug}` · `GET /portfolio` |
 | Concierge | `POST /request` · `GET /requests` |
 | Profile | `GET /profile` · `POST /profile` (declare the transversal project) |
@@ -145,7 +160,7 @@ their route progress previewed, and the per-learner evaluation budget.
 **Admin** (token-gated by middleware; `app.py`): `/api/state`, `/api/jobs/{job}`,
 `/api/videos/*`, `/api/upload-media`, `/api/delete-media`, `/api/learners`,
 `/api/learners/{id}/login-link`, `/api/learners/{id}/work`,
-`/api/submissions/{id}/flag`, `/api/waitlist`, `/api/requests`, `/api/demand`, `/api/invites`
+`/api/submissions/{id}/flag`, `/api/waitlist`, `/api/requests`, `/api/demand` (gap ledger + module coverage), `/api/access-requests` (locked-out learners), `/api/invites`
 (list/create), `/api/invites/{code}/toggle`.
 
 > **The gate is an allowlist** (`_is_admin_path`). A new admin route that is not

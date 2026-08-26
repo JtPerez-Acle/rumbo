@@ -29,9 +29,9 @@ One AI content engine powers two products:
 | Marginal cost per course | ≈ $0.35 of LLM + ~2 h of local render compute |
 | Marginal cost per learner | ≈ $0 (videos are canonical; personalization lives in each learner's path) |
 | Cost per AI evaluation | fractions of a cent (DeepSeek V4 Pro via OpenRouter) |
-| Stack | Python/FastAPI · Postgres (17 tables) · vanilla-JS single-file frontends · MoneyPrinterTurbo render engine · Railway |
+| Stack | Python/FastAPI · Postgres (18 tables) · vanilla-JS single-file frontends · MoneyPrinterTurbo render engine · Railway |
 | Access | Invite-gated alpha; public landing + waitlist for strangers |
-| **Real usage** | **3 lessons completed by humans, 13 submissions** — see doc 06 |
+| **Real usage** | **5 learners · 16 submissions · 1 lesson-2 completion** — see doc 06 |
 
 ## Reading map
 

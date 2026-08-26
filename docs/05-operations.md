@@ -234,7 +234,8 @@ demand signal: build what accumulates.
 | 429 on submitting work | per-learner evaluation limit | `EVAL_RATE_MAX` (default 60/h); in-memory, resets on redeploy |
 | Local edits seem to do nothing | preview server was reused, no hot reload | `preview_stop` then `preview_start` — see doc 07 |
 | Authed API test returns "no autenticado" | PowerShell strips the Cookie header | use `curl.exe -H "Cookie: learner_session=…"` |
-| Deploy command times out | Railway CLI flakiness | the upload usually landed — check `list-deployments` before retrying |
+| Deploy command times out | Railway CLI flakiness | the upload usually landed — check `railway deployment list` before retrying |
+| `railway: command not found` | The CLI is a **global npm package**; `nvm use` moves the global dir out from under it | `npm i -g @railway/cli` under the current Node. Node 22+ is required by the video toolchain; the CLI had been installed under Node 20. Every runbook here starts with `railway`, so this looks like total breakage and is a one-line fix. |
 
 ## Verification culture
 

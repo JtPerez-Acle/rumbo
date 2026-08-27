@@ -38,6 +38,12 @@ def fetch(url: str, headers: dict | None = None) -> tuple[int, str]:
         return 0, f"{type(exc).__name__}: {exc}"
 
 
+class AllowlistUnauditable(RuntimeError):
+    """The allowlist audit could not run. Never downgraded to a failed check:
+    a skipped section that still prints a score is how a degraded tool reads as
+    a clean bill of health."""
+
+
 def audit_allowlist(check) -> None:
     """The admin gate is an allowlist, and docs/07 records that a new /api/*
     route which is not on it ships PUBLIC — it nearly happened twice in one day,
@@ -50,10 +56,13 @@ def audit_allowlist(check) -> None:
     sys.path.insert(0, root + "/dashboard")
     sys.path.insert(0, root)
     try:
-        import app as dashboard          # noqa: PLC0415
+        from admin_paths import is_admin_path   # noqa: PLC0415
     except Exception as exc:
-        check("admin allowlist is auditable", False, f"could not import app.py: {exc}")
-        return
+        # This must never read as "one failed check". Skipping this section drops
+        # 25 assertions about which paths are public, and a summary line saying
+        # 31/32 would make that look like a rounding error. It is the whole point
+        # of the file.
+        raise AllowlistUnauditable(str(exc)) from exc
 
     gated = [
         ("/panel", "the dashboard itself"),
@@ -86,10 +95,10 @@ def audit_allowlist(check) -> None:
         ("/aprende/doc/sometoken", "a share page"),
     ]
     for path, why in gated:
-        check(f"gated: {path} ({why})", dashboard._is_admin_path(path) is True,
+        check(f"gated: {path} ({why})", is_admin_path(path) is True,
               "NOT on the allowlist — this would ship public")
     for path, why in public:
-        check(f"public: {path} ({why})", dashboard._is_admin_path(path) is False,
+        check(f"public: {path} ({why})", is_admin_path(path) is False,
               "on the admin allowlist — this would 401 for everyone")
 
 
@@ -102,7 +111,22 @@ def main(argv: list[str]) -> int:
         results.append((name, ok, detail))
 
     # Offline first: the allowlist is a pure function and needs no server.
-    audit_allowlist(check)
+    try:
+        audit_allowlist(check)
+    except AllowlistUnauditable as exc:
+        print("=" * 68)
+        print("  THE ADMIN ALLOWLIST AUDIT DID NOT RUN.")
+        print("  25 assertions about which paths are public were SKIPPED.")
+        print(f"  reason: {exc}")
+        print()
+        print("  This is the most important section of this file: it is what")
+        print("  catches an admin route shipping public (docs/07). Do not read")
+        print("  the HTTP results below as a pass.")
+        print()
+        print("  Run it from the repo root so studio/dashboard is importable:")
+        print("    python studio/cloud/check_public_surface.py [base_url]")
+        print("=" * 68)
+        return 2
 
     # Preflight. Without this, an unreachable base means every HTTP assertion
     # below waits out its own timeout and the run takes minutes to tell you the

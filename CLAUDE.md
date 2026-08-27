@@ -184,10 +184,14 @@ DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
   widener there only ever ADDS: **skipped is not locked.**
 - **Real CVs never enter the repo.** `.gitignore` blocks `*.pdf` and `cvs/`;
   this repo is public and those are other people's names and employment history.
-- **Admin routes are gated by an ALLOWLIST** in `app._is_admin_path`. A new `/api/*`
-  route not added to it ships **public**. Add the prefix in the same edit as the
-  route, and curl it tokenless before deploying. The gate now also **fails closed**
-  in production if `DASHBOARD_TOKEN` is unset.
+- **Admin routes are gated by an ALLOWLIST** in `studio/dashboard/admin_paths.py`.
+  A new `/api/*` route not added to it ships **public**. Add the prefix in the
+  same edit as the route, add a row to `check_public_surface.py`'s audit, and
+  curl it tokenless before deploying. The gate also **fails closed** in
+  production if `DASHBOARD_TOKEN` is unset. The predicate lives in its own
+  dependency-free module so the audit runs under any Python — it used to live in
+  `app.py`, and a checker run under an interpreter without FastAPI silently
+  skipped all 25 assertions while still printing a mostly-passing score.
 - **Course TOML = single source of truth for learner-facing copy.** `name` (no
   duration claim), `niche` (≤110 chars), `category` (in `course_factory.CATEGORIES`),
   `course_brief` (internal). After editing a TOML run `<slug> sync`. Never hand-patch

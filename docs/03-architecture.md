@@ -167,10 +167,12 @@ their route progress previewed, and the per-learner evaluation budget.
 `/api/submissions/{id}/flag`, `/api/waitlist`, `/api/requests`, `/api/demand` (gap ledger + module coverage), `/api/access-requests` (locked-out learners), `/api/invites`
 (list/create), `/api/invites/{code}/toggle`.
 
-> **The gate is an allowlist** (`_is_admin_path`). A new admin route that is not
-> added to it ships **public**. Two routes nearly did on 2026-08-12, one of them
-> the invite-code list. Add the prefix in the same edit; curl it tokenless before
-> deploying.
+> **The gate is an allowlist** (`studio/dashboard/admin_paths.py`). A new admin
+> route that is not added to it ships **public**. Two routes nearly did on
+> 2026-08-12, one of them the invite-code list. Add the prefix in the same edit,
+> add a row to `check_public_surface.py`'s audit, and curl it tokenless before
+> deploying. The predicate is a pure function in its own module precisely so the
+> audit can import it without FastAPI and cannot be skipped by accident.
 
 **Pages.** Three surfaces, three roots (docs/11):
 

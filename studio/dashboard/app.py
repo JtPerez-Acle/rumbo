@@ -83,37 +83,14 @@ def _ensure_schema() -> None:
         print(f"auth purge skipped: {exc}", file=sys.stderr)
 
 
-# Admin surface (token-gated). Everything else — the learner app at /aprende and
-# its /api/learn/* routes — self-authenticates with a per-learner session.
-ADMIN_PREFIXES = ("/api/state", "/api/jobs", "/api/videos", "/media")
-
-
-def _is_admin_path(path: str) -> bool:
-    # The dashboard lives at /panel. "/" is the public site and must NOT be
-    # gated: it used to be, which meant the most valuable URL this product has
-    # was spent on an audience of one and returned 401 to everyone who typed the
-    # domain. check_public_surface.py asserts both halves of that offline.
-    if path == "/panel" or path.startswith("/panel/"):
-        return True
-    if path.startswith("/api/state") or path.startswith("/api/jobs"):
-        return True
-    return (path.startswith("/api/videos") or path.startswith("/media")
-            or path.startswith("/api/upload-media") or path.startswith("/api/delete-media")
-            or path.startswith("/api/requests")
-            or path.startswith("/api/learners") or path.startswith("/api/waitlist")
-            # Invite codes ARE the access gate — leaking this route would let
-            # anyone mint themselves a login.
-            or path.startswith("/api/invites")
-            # Demand ledger: every posting strangers pasted, with the roles they
-            # want and what we cannot teach them. Competitive intelligence about
-            # our own catalog — admin-only, and listed here in the same edit that
-            # added the route (docs/07: a new /api/* route not in this list ships
-            # PUBLIC, which nearly happened twice in one day).
-            or path.startswith("/api/demand")
-            # Locked-out learners waiting for an access link — their email
-            # addresses, so admin-only. Listed in the same edit as the route.
-            or path.startswith("/api/access-requests")
-            or path.startswith("/api/submissions"))
+# Admin surface (token-gated). Everything else — the public site at /, the
+# learner app at /aprende and its /api/learn/* routes — self-authenticates with a
+# per-learner session or is public by design.
+#
+# The predicate lives in admin_paths.py so it can be audited without importing
+# FastAPI: it is the allowlist the whole gate rests on, and a checker that cannot
+# import it silently skips the only assertion that matters.
+from admin_paths import is_admin_path as _is_admin_path  # noqa: E402
 
 
 def _https(request: Request) -> bool:

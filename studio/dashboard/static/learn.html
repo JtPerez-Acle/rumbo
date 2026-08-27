@@ -506,6 +506,7 @@ let STATE={tab:'cursos'};
 
 /* ---- drawn icons: one stroke weight, currentColor, no emoji in the chrome ---- */
 const PATHS={
+  eye:'M2 12s3.7-7 10-7 10 7 10 7-3.7 7-10 7-10-7-10-7ZM12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0',
   play:'M8 5.8v12.4c0 .8.9 1.3 1.6.9l10-6.2c.6-.4.6-1.4 0-1.8l-10-6.2c-.7-.4-1.6.1-1.6.9Z',
   book:'M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z',
   tool:'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
@@ -587,7 +588,12 @@ async function route(){
                portafolio:'portafolio',documento:'portafolio','caso-view':'portafolio',perfil:'perfil'};
   STATE.tab=tabOf[seg]||'hoy';
   showTabs();
-  if(seg==='objetivo')viewObjetivo();
+  // The public landing is gated on !AUTH, which is right — a learner mid-course
+  // should not be sold to every time they open the app. But it also meant the
+  // operator could not look at their own marketing page without logging out of
+  // their own product, and that page is now the acquisition surface.
+  if(seg==='portada')renderLanding(true);
+  else if(seg==='objetivo')viewObjetivo();
   // Reachable while logged in too: an existing learner who finds a new offer
   // must be able to analyse it. This branch was missing, so the "Pega tu oferta"
   // button inside #/objetivo silently dropped authed learners on Hoy.
@@ -699,9 +705,19 @@ function renderHow(target){
    does not describe the loop: it runs one real lesson, takes one real answer,
    and returns one real verdict from the same evaluator a logged-in learner
    gets, before asking for anything. The wall arrives after the value. */
-async function renderLanding(){
+async function renderLanding(preview){
   tabbar.classList.add('hide'); app.innerHTML='';
   document.body.classList.add('wide');
+  if(preview){
+    // Say plainly that this is the stranger's view, and give a way back. Without
+    // it the doors below lead to #/login, which is nonsense for someone who is
+    // already signed in.
+    const bar=$(`<div class="note note-goal" style="display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s3)">
+      ${I('eye','ic ic-s')}<span style="flex:1">Estás viendo la <b>portada pública</b>: lo que ve alguien sin cuenta.</span>
+      <button class="btn btn-ghost btn-sm" id="pvback">Volver a la app</button></div>`);
+    bar.querySelector('#pvback').onclick=()=>nav('#/hoy');
+    app.append(bar);
+  }
   const top=$(`<div class="topbar">
     <div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Aprende haciendo, con tutora IA</small></div></div>
     <button class="btn btn-ghost btn-sm" id="topin">Tengo una invitación</button></div>`);
@@ -2443,6 +2459,8 @@ async function viewProfile(){
     d.courses.forEach(c=>{const pct=Math.round(c.done/c.total*100);
       app.append($(`<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><span style="font-weight:700;font-size:var(--fs-base)">${esc(c.title)}</span><span class="muted t-sm">${c.done}/${c.total}</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>`));});
   }
+  const portada=$(`<button class="btn btn-ghost" style="margin-top:8px">Ver la portada pública</button>`);
+  portada.onclick=()=>nav('#/portada'); app.append(portada);
   const how=$(`<button class="btn btn-ghost" style="margin-top:8px">¿Cómo funciona Rumbo?</button>`);
   how.onclick=()=>nav('#/como-funciona'); app.append(how);
   const out=$(`<button class="btn btn-ghost" style="margin-top:2px">Salir</button>`);

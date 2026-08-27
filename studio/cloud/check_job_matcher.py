@@ -110,9 +110,21 @@ def _check_budget_owner(a: dict) -> list[str]:
     if len(deep) < 2:
         fails.append("budget-owning role did not route at least two ads courses "
                      "through module 5 (the bidding/budget module)")
+    # Looker Studio used to be asserted as a GAP here, and that assertion went
+    # stale the day curso-analitica-marketing shipped: M5's own outcome contract
+    # is "Transformarás GA4 + Sheets en un tablero de Looker Studio", lesson 27 is
+    # named after it, and five lessons teach it. The matcher was right and the
+    # fixture was wrong — the same shape docs/08 already records once ("Fixtures
+    # answer to the catalog, not the reverse"), and it had been failing silently
+    # ever since. The honest assertion is the inverse: a role that reports on
+    # spend needs the reporting module, so calling it a gap is under-claiming.
     gapwords = _words(*(g.get("name", "") for g in a["gaps"]))
-    if "looker" not in gapwords:
-        fails.append("Looker Studio not reported as a gap — we do not teach it")
+    if "looker" in gapwords:
+        fails.append("Looker Studio called a gap — curso-analitica-marketing M5 "
+                     "teaches it (lesson 27 is named after it)")
+    if slugs.get("curso-analitica-marketing", 0) < 5:
+        fails.append("a budget-owning role was not routed through the reporting "
+                     "module that teaches Looker Studio")
     # This role's whole job is spending budget, and curso-google-ads M5 is
     # "Pujas, presupuesto y operación semanal". Calling it a gap while routing
     # short of M5 was the original under-claiming bug.

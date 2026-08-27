@@ -124,6 +124,7 @@ DASHBOARD_TOKEN=… PUBLIC_BASE_URL=… python studio/cloud/upload_videos.py <sl
 python studio/cloud/check_job_matcher.py    # matcher, 5 fixtures, ~15 min (real LLM)
 python studio/cloud/check_tutor.py          # tutor, 6 properties, ~5 min (real LLM)
 python studio/cloud/check_cv_matcher.py     # CV matcher; reads REAL CVs from ./cvs (git-ignored)
+python studio/cloud/check_public_surface.py [base_url]   # HTTP: public routes + every admin gate
 node studio/dashboard/check_job_render.js studio/dashboard/static/learn.html \
      studio/fixtures/job-postings/sample-analysis.json
 node studio/dashboard/check_how_section.js

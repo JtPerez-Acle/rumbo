@@ -156,10 +156,21 @@ that nothing claims a testimonial, a price or a real learner document — becaus
 `check_how_section.js` still guards the "Cómo funciona" block, which survives
 below the lesson.
 
-**The endpoints themselves have no automated check.** The sequence that was run
-by hand — 401 on the gated video, 200 on the demo, 206 on a Range request, 429 on
-the fifth evaluation, 400 on the honeypot — is worth scripting before this surface
-takes real traffic.
+`check_public_surface.py` asserts what the **server serves**, which the three
+DOM-shim checks never touched: that every public route answers with a real title
+and og:description, that an unknown course slug is a typo rather than a 500, that
+the demo endpoints serve (including a Range request), that the demo video ignores
+a supplied `node_id`, and that every admin path is gated. Point it at the live URL
+after a deploy — on localhost the admin gate is open by design (docs/03) and the
+check says so rather than failing on it.
+
+```bash
+python studio/cloud/check_public_surface.py https://estudio-production-1b8c.up.railway.app
+```
+
+Still not covered: the evaluator's rate limit and honeypot (429 on the fifth call,
+400 on a filled honeypot). Both were verified by hand; asserting them costs real
+LLM calls, which is why they are not in the script.
 
 ## Related
 

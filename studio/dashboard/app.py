@@ -760,12 +760,31 @@ def aprende():
     return FileResponse(Path(__file__).parent / "static" / "learn.html")
 
 
-def _share_page(template: str, meta: dict | None):
-    """Serve a share page with server-injected <title>/OG tags: link previews on
-    WhatsApp/LinkedIn never run JS, and these pages exist to be shared."""
+def _spa_shell(template: str, meta: dict | None = None,
+               view: str | None = None, arg: str | None = None):
+    """Serve an SPA shell with server-injected <title>/OG tags, and optionally
+    the view it should open on.
+
+    Two different needs, one mechanism. Share pages need metadata because
+    link-preview crawlers on WhatsApp and LinkedIn never run JS. The public
+    surfaces need it for the same reason plus two more: a search engine cannot
+    index a URL fragment, and "pega la oferta que quieres" has to be linkable
+    from a bio, an ad or a message — docs/08 calls that the acquisition asset
+    and it had no address at all.
+
+    The SPA stays hash-routed internally. The server only says which view to
+    open first; `route()` falls back to it when there is no hash. `view` and
+    `arg` are JSON-encoded rather than interpolated, because `arg` carries a
+    course slug and this lands inside a <script>.
+    """
     import html as _html
+    import json as _json
     from fastapi.responses import HTMLResponse
     page = (Path(__file__).parent / "static" / template).read_text(encoding="utf-8")
+    if view:
+        boot = (f'<script>window.__VIEW__={_json.dumps(view)};'
+                f'window.__ARG__={_json.dumps(arg or "")};</script>\n')
+        page = page.replace("</head>", boot + "</head>", 1)
     if meta:
         title = _html.escape(meta["title"], quote=True)
         desc = _html.escape(meta["description"], quote=True)
@@ -778,6 +797,60 @@ def _share_page(template: str, meta: dict | None):
                 f'<meta name="description" content="{desc}">\n')
         page = page.replace("</head>", tags + "</head>", 1)
     return HTMLResponse(page)
+
+
+def _share_page(template: str, meta: dict | None):
+    """Back-compat name for the three token share pages."""
+    return _spa_shell(template, meta)
+
+
+# ---- Public surfaces with real URLs (docs/11) ------------------------------
+# These are NOT in _is_admin_path and must never be: they are the public face.
+# Each one opens the SPA on a view that already exists as a hash route, so the
+# old links keep working and nothing about the app changed.
+
+SITE_NAME = "Rumbo"
+_SITE_DESC = ("Aprende haciendo, con tutora IA. Termina con trabajo real que "
+              "mostrar, no con un certificado.")
+
+
+@app.get("/oferta")
+def public_oferta():
+    """The job analyser. docs/08 calls this the acquisition asset and says it
+    ships standalone — it could not be linked to before this route existed."""
+    return _spa_shell("learn.html", {
+        "title": f"Pega la oferta que quieres — {SITE_NAME}",
+        "description": ("Te decimos qué pide de verdad, qué cubrimos, qué no, y "
+                        "con qué documento llegar a la entrevista. Sin cuenta."),
+    }, view="oferta")
+
+
+@app.get("/lista")
+def public_lista():
+    return _spa_shell("learn.html", {
+        "title": f"Pide tu acceso — {SITE_NAME}",
+        "description": _SITE_DESC,
+    }, view="lista")
+
+
+@app.get("/curso/{slug}")
+def public_curso(slug: str):
+    """A course temario at its own address. docs/02 calls the browsable temarios
+    marketing content: 14 courses and 420 lesson objectives, all real, and until
+    now invisible to search because they lived behind a fragment."""
+    from cloud import db
+    meta = {"title": f"Temario — {SITE_NAME}", "description": _SITE_DESC}
+    if db.enabled():
+        try:
+            with db.connect() as conn:
+                row = conn.execute("SELECT title, description FROM courses "
+                                   "WHERE slug = %s", (slug,)).fetchone()
+            if row:
+                meta = {"title": f"{row['title']} — {SITE_NAME}",
+                        "description": row.get("description") or _SITE_DESC}
+        except Exception as exc:                 # a preview is never worth a 500
+            print(f"temario meta skipped: {exc}", file=sys.stderr)
+    return _spa_shell("learn.html", meta, view="explora", arg=slug)
 
 
 @app.get("/aprende/caso/{token}")

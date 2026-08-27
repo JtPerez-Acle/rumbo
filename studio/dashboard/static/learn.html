@@ -572,7 +572,11 @@ let AUTH=false;
 function nav(hash){ if(location.hash===hash)route(); else location.hash=hash; }
 window.addEventListener('hashchange', route);
 async function route(){
-  const h=location.hash.replace(/^#\/?/,'');
+  // A server-rendered public URL (/oferta, /curso/<slug>, /lista) names the view
+  // it should open on; the hash wins once the visitor starts navigating. This is
+  // the whole bridge between real URLs and the hash router — see _spa_shell.
+  const fromServer=(window.__VIEW__?window.__VIEW__+(window.__ARG__?'/'+window.__ARG__:''):'');
+  const h=location.hash.replace(/^#\/?/,'')||fromServer;
   const [seg,arg,step]=h.split('/');
   // Only the landing runs wide; every other view is the phone column.
   document.body.classList.remove('wide');

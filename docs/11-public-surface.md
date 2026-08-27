@@ -75,8 +75,21 @@ this is asserted rather than assumed:
 **Abuse controls on the evaluator**, which is an unauthenticated LLM call:
 `DEMO_RATE_MAX` 4/hour per IP (the job analyser gets 3/h because a pasted posting
 is high intent; this fires on curiosity), the same honeypot field as every other
-public text intake, a 40–4000 character bound, and the shared in-flight semaphore.
-Verified: the fifth call returns 429 and a filled honeypot returns 400.
+public text intake, and a 40–4000 character bound. Verified: the fifth call
+returns 429 and a filled honeypot returns 400.
+
+It has **its own** in-flight semaphore (`DEMO_MAX_INFLIGHT`), not the job
+analyser's. Sharing them meant four concurrent job analyses — each holding a slot
+for ~2 minutes — would have made every landing visitor's answer return 503: the
+surface's entire argument failing first, under exactly the load it exists to
+attract. Capacity is also checked *before* the visitor's per-IP budget is spent,
+so arriving at a full container does not cost one of their four attempts.
+
+The plain GETs carry a coarse per-IP cap too, and `demo-video` no longer opens a
+Postgres connection per request. `FileResponse` serves Range requests, so one
+browser playing one 5 MB video issues several — a flood would have exhausted the
+connection pool well before the bandwidth, taking real learners down with it. The
+path cannot change (`DEMO_NODE_ID` is fixed at import), so it is cached.
 
 The learner's text still goes through `writer._fenced()` with `UNTRUSTED_RULE`,
 because it reaches the same evaluator as a paying learner's work.
@@ -128,15 +141,25 @@ splits the lesson two-up.
 ## Checks
 
 ```bash
+node studio/dashboard/check_demo_render.js studio/dashboard/static/learn.html  # 34 assertions
 node studio/dashboard/check_how_section.js          # the landing's promises, 13 assertions
-node studio/dashboard/check_cv_render.js studio/dashboard/static/learn.html
 ```
 
+`check_demo_render.js` guards this surface's **argument**, not its layout: that a
+real lesson renders, that the question is asked, that the verdict is a word and
+never a number, that what follows is this module's real exercise and reto, that
+both door sets exist (the finish review found the page had **no** call to action
+until a verdict rendered), that a failed demo still offers somewhere to go, and
+that nothing claims a testimonial, a price or a real learner document — because
+`PRODUCT.md` records that none of those exist.
+
 `check_how_section.js` still guards the "Cómo funciona" block, which survives
-below the lesson. There is **no automated check on the demo endpoints yet** — the
-manual sequence above (401 on the gated video, 200 on the demo, 429 on the fifth
-evaluation, 400 on the honeypot) is what was run, and it is worth turning into a
-script before the surface takes real traffic.
+below the lesson.
+
+**The endpoints themselves have no automated check.** The sequence that was run
+by hand — 401 on the gated video, 200 on the demo, 206 on a Range request, 429 on
+the fifth evaluation, 400 on the honeypot — is worth scripting before this surface
+takes real traffic.
 
 ## Related
 

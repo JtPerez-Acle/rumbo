@@ -128,6 +128,7 @@ node studio/dashboard/check_job_render.js studio/dashboard/static/learn.html \
      studio/fixtures/job-postings/sample-analysis.json
 node studio/dashboard/check_how_section.js
 node studio/dashboard/check_cv_render.js studio/dashboard/static/learn.html
+node studio/dashboard/check_demo_render.js studio/dashboard/static/learn.html
 
 # Offsite backup (all 20 tables) — before anything risky:
 DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14

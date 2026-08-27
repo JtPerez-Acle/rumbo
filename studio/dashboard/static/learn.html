@@ -66,7 +66,7 @@
   /* Rows, cards and the paper mock are divs that behave like buttons; the
      observer below makes them reachable, and this makes the reach visible. */
   .clickable:focus-visible,.back:focus-visible,.cluster:focus-visible,
-  .opt:focus-visible,.docmock:focus-visible{outline:2px solid var(--amber-hi);outline-offset:2px}
+  .opt:focus-visible{outline:2px solid var(--amber-hi);outline-offset:2px}
   /* the lamp: one warm glow from above, plus a whisper of grain */
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
     background:radial-gradient(640px 420px at 50% -120px, rgba(240,164,60,.10), transparent 65%)}
@@ -104,6 +104,9 @@
     font-weight:700;font-size:var(--fs-md);border-radius:999px;padding:14px 22px;
     transition:transform .15s var(--ease),box-shadow .2s}
   .btn:active{transform:scale(.98)}
+  /* There was no rule for this at all: during a 25-35s evaluation the primary
+     button kept its full gradient, glow and pointer cursor while inert. */
+  .btn:disabled{opacity:.5;box-shadow:none;cursor:default;transform:none}
   .btn-primary{background:linear-gradient(140deg,var(--amber-hi),var(--amber));color:var(--amber-ink);box-shadow:var(--glow-amber)}
   .btn-primary:hover{box-shadow:0 14px 40px -10px rgba(240,164,60,.62)}
   .btn-paper:hover{box-shadow:0 12px 38px -12px rgba(241,230,206,.4)}
@@ -331,16 +334,6 @@
   .bigstreak{font-family:var(--serif);font-weight:700;font-size:var(--fd-streak);line-height:1;margin-top:var(--s2);
     font-variant-numeric:tabular-nums;color:var(--amber-hi)}
 
-  /* ---- the paper mock (landing hero): the work, literally glowing ---- */
-  .docmock{background:linear-gradient(160deg,#FBF4E3,var(--paper));color:var(--paper-ink);border-radius:6px;
-    padding:22px 20px;transform:rotate(-1.6deg);box-shadow:0 18px 44px -14px rgba(241,230,206,.3),0 4px 14px rgba(0,0,0,.4);
-    cursor:pointer;margin:var(--s3) var(--s2) var(--s2)}
-  .docmock .dm-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:#8a6d3a}
-  .docmock .dm-title{font-family:var(--serif);font-weight:600;font-size:17px;line-height:1.2;margin:6px 0 12px}
-  .docmock .dm-line{height:5px;border-radius:3px;background:rgba(38,32,15,.16);margin-bottom:7px}
-  .docmock .w9{width:92%}.docmock .w7{width:70%}.docmock .w8{width:82%}.docmock .w5{width:55%}
-  .docmock .dm-sig{font-family:var(--serif);font-style:italic;font-size:12px;margin-top:12px;color:#6b5327;text-align:right}
-
   /* ---- bottom nav ---- */
   .tabbar{position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(16,13,23,.9);backdrop-filter:blur(14px);
     border-top:1px solid var(--line);display:flex;justify-content:space-around;
@@ -363,10 +356,51 @@
     body.wide .lessonsplit video{max-height:none}
     body.wide .doors{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s3)}
     body.wide .demohead{max-width:70ch}
+    /* Measure. Only .app and .demohead were capped, so every flex child below
+       the lesson stretched to 936px and ran 130-155 characters a line — the
+       question card and the verdict included, which are the surface's climax.
+       `ch` resolves against each element's own size, so this caps the text
+       without shrinking the cards that hold tables. */
+    body.wide .app>*:not(.lessonsplit):not(.cluster):not(.cluster-body){max-width:840px}
+    body.wide p,body.wide li,body.wide .lt,body.wide h1,body.wide h2,body.wide h3{max-width:72ch}
+    body.wide .lessonsplit p,body.wide .lessonsplit li{max-width:none}
+    body.wide .lessonsplit .videoplate{max-height:none}
     body.wide .cluster-body{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);align-items:start}
     body.wide .cluster-body>*{margin-bottom:0}
   }
   /* The live lesson: the one place a stranger meets the product working. */
+  /* The lesson plate: a real frame from the lesson, our play affordance, and
+     no <video> element until someone wants one.
+     Chrome would not paint a poster on an element it had already buffered, and
+     with preload="metadata" it buffered 5.4 MB on every visit to a marketing
+     page aimed at people on metered mobile data. Fighting the poster heuristic
+     was the wrong fix: the browser's default video chrome is a control surface
+     nobody designed, and the frame deserves better than being a fallback. */
+  .doors{display:flex;flex-direction:column;gap:var(--s2)}
+  .videoplate{position:relative;border-radius:var(--r-lg);overflow:hidden;background:var(--ink);
+    cursor:pointer;aspect-ratio:9/16;border:1px solid var(--line);
+    /* Same cap the <video> carries, so swapping one for the other on click does
+       not drop the page ~160px on a phone. */
+    max-height:60svh}
+  .videoplate img{width:100%;height:100%;object-fit:cover;display:block}
+  .videoplate::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(to top,rgba(16,13,23,.82),rgba(16,13,23,.05) 42%)}
+  .playbtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+    width:66px;height:66px;border-radius:99px;display:grid;place-items:center;
+    background:linear-gradient(140deg,var(--amber-hi),var(--amber));color:var(--amber-ink);
+    box-shadow:var(--glow-amber);transition:transform .2s var(--ease)}
+  .playbtn .ic{width:26px;height:26px;stroke-width:2;margin-left:3px}
+  .videoplate:hover .playbtn{transform:translate(-50%,-50%) scale(1.07)}
+  .videoplate:focus-visible{outline:2px solid var(--amber-hi);outline-offset:3px}
+  .plate-meta{position:absolute;left:var(--s4);right:var(--s4);bottom:var(--s4);z-index:2}
+  /* The written guide on the landing: masked preview, never a scroll region.
+     A nested scrollable card mid-page steals the wheel — the first scroll over
+     it emptied the card and left the page where it was. */
+  .guidewrap{position:relative;max-height:560px;overflow:hidden}
+  .guidewrap.open{max-height:none}
+  .guidewrap:not(.open)::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;
+    pointer-events:none;border-radius:0 0 var(--r-lg) var(--r-lg);
+    background:linear-gradient(to bottom,rgba(25,21,33,0),var(--panel))}
   .demoq{background:linear-gradient(160deg,var(--raised),var(--panel));
     border:1px solid rgba(240,164,60,.35);border-radius:var(--r-lg);padding:var(--s5) var(--s4);
     box-shadow:var(--glow-amber)}
@@ -668,7 +702,11 @@ function renderHow(target){
 async function renderLanding(){
   tabbar.classList.add('hide'); app.innerHTML='';
   document.body.classList.add('wide');
-  app.append($(`<div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Aprende haciendo, con tutora IA</small></div></div>`));
+  const top=$(`<div class="topbar">
+    <div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Aprende haciendo, con tutora IA</small></div></div>
+    <button class="btn btn-ghost btn-sm" id="topin">Tengo una invitación</button></div>`);
+  top.querySelector('#topin').onclick=()=>nav('#/login');
+  app.append(top);
   app.append($(`<div class="demohead" style="margin-top:14px"><div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
     <h1 style="font-size:var(--fd-lg);margin-top:10px">No te contamos cómo funciona. Haz una clase.</h1>
     <p class="muted" style="margin-top:10px">Esta es la primera lección del curso de Marketing con IA, entera. Mira el video, lee la guía y explícalo con tus palabras: tu tutora te responde de verdad, aquí mismo, antes de pedirte nada.</p></div>`));
@@ -687,7 +725,21 @@ async function renderLanding(){
   const cats=clusterize(d.courses||[]);
   renderClusters(cats, cats[0]?cats[0][0]:null, pubCard);
   app.append($(`<p class="muted t-sm center" style="margin:14px 0 0">¿Tu tema no está? Dentro de la plataforma puedes <b>pedir tu curso</b> y lo construimos.</p>`));
+  app.append(landingDoors('ghost'));
   app.append($(`<p class="faint t-sm center" style="margin:10px 0 8px">Acceso por invitación mientras estamos en fase alfa.</p>`));
+}
+
+/* The doors, in one place. `lit` gives the goal engine the primary treatment —
+   used once, under the verdict, where intent is highest. `ghost` is the quiet
+   copy at the tail of the page and after any failure, so a visitor who does not
+   want to write an answer still has somewhere to go. */
+function landingDoors(kind){
+  const el=$(`<div class="doors" style="margin-top:var(--s5)">
+    <button class="btn ${kind==='lit'?'btn-primary':'btn-ghost'}" data-go="oferta">Dinos qué quieres ser ${I('arrow','ic ic-s')}</button>
+    <button class="btn btn-ghost" data-go="lista">Quiero entrar</button>
+    <button class="btn btn-ghost" data-go="login">Tengo una invitación</button></div>`);
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>nav('#/'+b.dataset.go));
+  return el;
 }
 /* The free lesson, whole. Video, guide, and the question — then a real verdict
    from the real evaluator. Everything below the verdict is the rest of the loop
@@ -695,7 +747,11 @@ async function renderLanding(){
    document the course compiles into), never as a list of promises. */
 async function renderDemoLesson(target){
   const d=await api('/public/demo');
-  if(!d||d.detail){ target.append($(`<div class="note note-warn">${I('alert','ic ic-s')} <span>La clase de muestra no está disponible ahora mismo.</span></div>`)); return; }
+  if(!d||d.detail){
+    target.append($(`<div class="note note-warn">${I('alert','ic ic-s')} <span>La clase de muestra no está disponible ahora mismo. Puedes armar tu ruta igual.</span></div>`));
+    target.append(landingDoors('lit'));
+    return;
+  }
   const split=$(`<div class="lessonsplit" style="margin-top:var(--s4)"></div>`);
   const left=$(`<div></div>`), right=$(`<div></div>`);
   split.append(left); split.append(right); target.append(split);
@@ -703,7 +759,24 @@ async function renderDemoLesson(target){
   left.append($(`<div class="microlabel">${esc(d.course_title)} · lección 1</div>`));
   left.append($(`<h3 style="margin:6px 0 10px">${esc(d.title)}</h3>`));
   if(d.has_video){
-    left.append($(`<video controls preload="metadata" playsinline src="/api/learn/public/demo-video"></video>`));
+    // The plate, not a <video>: a real frame from the lesson with our own play
+    // affordance over it. The element is created on click, so nobody who does
+    // not press play pays 5.4 MB for it — this audience is on metered mobile
+    // data (PRODUCT.md), and a marketing page is the worst place to spend it.
+    const plate=$(`<div class="videoplate" role="button" tabindex="0" aria-label="Reproducir la lección">
+      <img src="/api/learn/public/demo-poster" alt="" width="540" height="960"
+        onerror="this.remove()">
+      <div class="playbtn">${I('play','ic')}</div>
+      <div class="plate-meta"><div class="microlabel" style="color:var(--paper-dim)">Video · 59 segundos</div></div></div>`);
+    plate.onclick=()=>{
+      const v=$(`<video controls autoplay playsinline preload="auto" src="/api/learn/public/demo-video"></video>`);
+      plate.replaceWith(v);
+      // iOS Safari only honours autoplay for muted video and wants the call
+      // inside the gesture; without this the tap does nothing on the product's
+      // stated primary device.
+      const p=v.play(); if(p&&p.catch)p.catch(()=>{});
+    };
+    left.append(plate);
   }
   if((d.key_points||[]).length){
     const kp=$(`<div class="card" style="margin-top:var(--s3)"><div class="microlabel">Lo que te llevas</div></div>`);
@@ -712,26 +785,35 @@ async function renderDemoLesson(target){
   }
 
   right.append($(`<div class="ai-tag" style="margin-bottom:8px"><span class="dot"></span> La guía escrita</div>`));
-  const guide=$(`<div class="card card-paper written" style="max-height:440px;overflow:auto"></div>`);
+  const wrap=$(`<div class="guidewrap card card-paper written"></div>`);
   // renderMD(target, markdown) — it WRITES into the element and returns nothing.
   // It is also the XSS control (marked → DOMPurify), so this is the only way
   // this content may ever reach the DOM.
-  renderMD(guide, d.written||d.transcript||'');
-  right.append(guide);
+  renderMD(wrap, d.written||d.transcript||'');
+  right.append(wrap);
+  const more=$(`<button class="btn btn-ghost btn-sm" aria-expanded="false" style="margin-top:var(--s2)">Seguir leyendo la guía</button>`);
+  more.onclick=()=>{
+    const open=wrap.classList.toggle('open');
+    more.setAttribute('aria-expanded', String(open));
+    more.textContent=open?'Mostrar menos':'Seguir leyendo la guía';
+  };
+  right.append(more);
 
   /* The question. This is the surface's whole argument, so it is the lit card. */
   const q=$(`<div class="demoq" style="margin-top:var(--s5)">
     <div class="eyebrow">Ahora tú</div>
-    <h3 style="margin:8px 0 4px">${esc(d.explain_prompt||'Explícalo en tus palabras.')}</h3>
-    <p class="faint t-sm" style="margin-top:6px">Con tus palabras, como se lo explicarías a alguien. No hay nota: esto se responde con <b>Lo tienes</b>, <b>Casi</b> o <b>Todavía no</b>, y con lo que te falta.</p>
-    <textarea id="dq" maxlength="4000" placeholder="Escribe aquí tu explicación…"></textarea>
+    <h3 id="dqq" style="margin:8px 0 4px">${esc(d.explain_prompt||'Explícalo en tus palabras.')}</h3>
+    <p class="muted t-sm" style="margin-top:6px">Con tus palabras, como se lo explicarías a alguien. No hay nota: esto se responde con <b>Lo tienes</b>, <b>Casi</b> o <b>Todavía no</b>, y con lo que te falta.</p>
+    <label for="dq" class="hide">Tu explicación</label>
+    <textarea id="dq" maxlength="4000" aria-labelledby="dqq" placeholder="Escribe aquí tu explicación…"></textarea>
+    <p class="faint t-sm" style="margin-top:8px">Guardamos lo que escribes, sin tu nombre ni tu correo, solo para saber si la lección enseña.</p>
     <input id="dqc" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
     <button class="btn btn-primary" id="dqgo" style="margin-top:var(--s3)">Que la tutora lo lea ${I('arrow','ic ic-s')}</button>
     <div id="dqmsg" class="center muted t-sm" style="margin-top:8px"></div></div>`);
   target.append(q);
   const ta=q.querySelector('#dq');
   attachDraft(ta,'demo',0);
-  const after=$(`<div></div>`); target.append(after);
+  const after=$(`<div role="status" aria-live="polite"></div>`); target.append(after);
 
   q.querySelector('#dqgo').onclick=async()=>{
     const content=ta.value.trim(), msg=q.querySelector('#dqmsg'), btn=q.querySelector('#dqgo');
@@ -741,10 +823,15 @@ async function renderDemoLesson(target){
     const r=await postWithTimeout('/api/learn/public/demo-explain',
       {content,company:q.querySelector('#dqc').value},EVAL_TIMEOUT_MS);
     rc.remove(); btn.disabled=false;
-    if(!r.res||!r.res.ok){ msg.textContent=(r.data&&r.data.detail)||'No pudimos evaluarla ahora. Intenta en un momento.'; return; }
+    if(!r.res||!r.res.ok){
+      msg.textContent=(r.data&&r.data.detail)||'No pudimos evaluarla ahora. Intenta en un momento.';
+      btn.focus();                 // disabling a focused button loses their place
+      return;
+    }
     clearDraft('demo',0);
     renderDemoVerdict(after, r.data.evaluation||{}, d);
-    after.scrollIntoView({behavior:'smooth',block:'start'});
+    const quiet=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    after.scrollIntoView({behavior:quiet?'auto':'smooth',block:'start'});
   };
 }
 
@@ -769,7 +856,7 @@ function renderDemoVerdict(target, ev, d){
   /* What the rest of the loop actually is — shown with this lesson's real
      exercise, this module's real reto and the real document the course ends in.
      Sections that restate a claim in different words add length, not substance. */
-  target.append($(`<div class="microlabel" style="margin-top:var(--s5)">Eso fue un paso de cinco. Así sigue</div>`));
+  target.append($(`<div class="microlabel" style="margin-top:var(--s5)">Llevas dos de los cinco pasos. Así sigue</div>`));
   const next=$(`<div class="card"></div>`);
   const row=(n,title,body)=>`<div class="nextup"><div class="nn">${n}</div>
     <div><div style="font-weight:700;font-size:var(--fs-md)">${esc(title)}</div>
@@ -788,14 +875,7 @@ function renderDemoVerdict(target, ev, d){
     <h3 style="margin-top:8px">${esc(d.doc_type||'Un documento profesional tuyo')}</h3>
     <p class="t-sm" style="margin-top:6px;opacity:.85">Tu trabajo evaluado se compila en el documento que un cliente habría pagado por recibir, con tu firma. No damos certificados: damos el trabajo.</p></div>`));
 
-  const doors=$(`<div class="doors" style="display:flex;flex-direction:column;gap:8px;margin-top:var(--s5)">
-    <button class="btn btn-primary" id="ljob">Dinos qué quieres ser ${I('arrow','ic ic-s')}</button>
-    <button class="btn btn-ghost" id="ljoin">Quiero entrar</button>
-    <button class="btn btn-ghost" id="linv">Tengo una invitación</button></div>`);
-  doors.querySelector('#ljob').onclick=()=>nav('#/oferta');
-  doors.querySelector('#ljoin').onclick=()=>nav('#/lista');
-  doors.querySelector('#linv').onclick=()=>nav('#/login');
-  target.append(doors);
+  target.append(landingDoors('lit'));
   target.append($(`<p class="faint t-sm center" style="margin:10px 0 0">Pega una oferta real o solo el puesto y te armamos la ruta completa — también sin cuenta.</p>`));
 }
 async function renderPublicOutline(slug){
@@ -2380,7 +2460,7 @@ async function viewProfile(){
    so the ~40 construction sites stay untouched and every screen written after
    this one inherits it for free. The click handler is read at press time, not at
    stamp time, because rows get their onclick assigned after they are appended. */
-const KEYABLE='.clickable,.back,.cluster,.opt,.docmock,.pf-row,.req-row.ready,.course-card';
+const KEYABLE='.clickable,.back,.cluster,.opt,.pf-row,.req-row.ready,.course-card';
 function stamp(el){
   if(!el||el.nodeType!==1||el.dataset.keyed||el.tagName==='BUTTON'||el.tagName==='A')return;
   el.dataset.keyed='1';

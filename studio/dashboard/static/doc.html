@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Documento · Aprende IA</title>
+<title>Documento · Rumbo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
@@ -95,7 +95,7 @@ const renderMD=(el,md)=>{
     // else on this page is escaped with esc().
     box.innerHTML=`<div class="byline">${esc(d.learner_name)} · ${esc(d.updated_at)}</div>
       <div class="doc" id="docbody"></div>
-      <div class="credit">${esc(d.credit || `Documento elaborado por ${d.learner_name} durante el curso «${d.course_title}»`)} · <a href="/aprende">Aprende IA</a></div>`;
+      <div class="credit">${esc(d.credit || `Documento elaborado por ${d.learner_name} durante el curso «${d.course_title}»`)} · <a href="/aprende">Rumbo</a></div>`;
     renderMD(document.getElementById('docbody'), d.content_md);
     const tb=document.getElementById('toolbar'); tb.style.display='flex';
     document.getElementById('pdf').onclick=()=>window.print();

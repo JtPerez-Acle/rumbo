@@ -1373,7 +1373,7 @@ JOB_COVERAGE_FLOOR = 25
 # is told it is data, never instructions — this is the most exposed LLM input in
 # the system (no auth in front of it).
 JOB_MATCH_SYSTEM = (
-    "Armas planes de estudio en Aprende IA. Recibes una oferta de trabajo real y "
+    "Armas planes de estudio en Rumbo. Recibes una oferta de trabajo real y "
     "el catálogo de módulos que existen en la plataforma, y devuelves qué debería "
     "estudiar esta persona para poder postular con evidencia.\n\n"
     "REGLAS INNEGOCIABLES:\n"
@@ -1716,7 +1716,7 @@ def strip_contacts(text: str) -> str:
 
 
 CV_MATCH_SYSTEM = (
-    "Lees el CV de una persona que va a estudiar en Aprende IA y el catálogo de "
+    "Lees el CV de una persona que va a estudiar en Rumbo y el catálogo de "
     "módulos que existen. Dices qué módulos del catálogo esta persona YA "
     "demuestra haber hecho en su trabajo, para no hacerle repetir lo que ya "
     "sabe.\n\n"

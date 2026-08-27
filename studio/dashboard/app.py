@@ -603,7 +603,7 @@ def get_access_requests():
         rows = [dict(r) for r in db.open_access_requests(conn)]
     for r in rows:
         r["created_at"] = r["created_at"].isoformat(timespec="minutes")
-    sender = os.environ.get("EMAIL_FROM", "Aprende IA <hola@aprende-ia.app>")
+    sender = os.environ.get("EMAIL_FROM", "Rumbo <hola@aprende-ia.app>")
     return {"requests": rows,
             "email_configured": bool(os.environ.get("RESEND_API_KEY")),
             # The most dangerous state is not "email off" — it is email that
@@ -749,7 +749,7 @@ def index():
     return FileResponse(Path(__file__).parent / "static" / "index.html")
 
 
-# ---- Learner app (Aprende IA) ----
+# ---- Learner app (Rumbo) ----
 from learn_routes import router as learn_router  # noqa: E402
 
 app.include_router(learn_router)
@@ -839,7 +839,7 @@ def aprende_ruta(token: str):
                 gaps = len(a.get("gaps") or [])
                 falta = (f" y las {gaps} cosas que no cubrimos" if gaps > 1
                          else " y lo que no cubrimos" if gaps == 1 else "")
-                meta = {"title": f"Ruta de estudio para {role} — Aprende IA",
+                meta = {"title": f"Ruta de estudio para {role} — Rumbo",
                         "description": f"Qué pide realmente el puesto, qué cubrimos "
                                        f"({a.get('coverage', 0)}%){falta}, y el documento "
                                        f"con el que llegarías a la entrevista."}

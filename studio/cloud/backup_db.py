@@ -32,6 +32,12 @@ TABLES = [
     # missing from this list since it shipped — anonymous analyses are demand
     # data and goal docs are learner work; both are crown jewels.
     "job_targets", "goal_docs", "waitlist",
+    # Added with the features that created them, because this list has silently
+    # missed a table before (the note above) and every one of these is learner
+    # data or the evidence this project is short of: what a learner told us they
+    # already know, what they proved with a reto, and what strangers wrote on the
+    # public lesson.
+    "cv_profiles", "module_exemptions", "demo_attempts",
 ]
 
 BACKUP_DIR = Path(__file__).resolve().parents[2] / "backups"

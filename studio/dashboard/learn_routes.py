@@ -1,4 +1,4 @@
-"""Learner-facing API for the Aprende IA course app.
+"""Learner-facing API for the Rumbo course app.
 
 Separate front door from the admin dashboard: learners authenticate with a
 magic link (dev mode returns the link directly when no email provider is set)
@@ -201,11 +201,11 @@ def _send_email(email: str, link: str) -> bool:
             "https://api.resend.com/emails",
             headers={"Authorization": f"Bearer {os.environ['RESEND_API_KEY']}"},
             json={
-                "from": os.environ.get("EMAIL_FROM", "Aprende IA <hola@aprende-ia.app>"),
+                "from": os.environ.get("EMAIL_FROM", "Rumbo <hola@aprende-ia.app>"),
                 "to": [email],
-                "subject": "Tu acceso a Aprende IA",
+                "subject": "Tu acceso a Rumbo",
                 "html": f'<p>Toca para entrar a tu clase de hoy:</p>'
-                        f'<p><a href="{base}{link}">Entrar a Aprende IA</a></p>'
+                        f'<p><a href="{base}{link}">Entrar a Rumbo</a></p>'
                         f'<p style="color:#888;font-size:12px">Si no fuiste tú, '
                         f'ignora este correo: el enlace caduca y es de un solo uso.</p>',
                 "text": f"Entra a tu clase de hoy: {base}{link}\n\n"
@@ -669,6 +669,31 @@ DEMO_NODE_ID = int(os.environ.get("DEMO_NODE_ID", "1"))
 _DEMO_MAX = int(os.environ.get("DEMO_RATE_MAX", "4"))
 _DEMO_WINDOW = int(os.environ.get("DEMO_RATE_WINDOW", "3600"))
 _DEMO_RATE: dict[str, deque] = {}
+# The demo does NOT share the job analyser's semaphore. A job analysis holds a
+# slot for ~2 minutes; four concurrent postings would have made every landing
+# visitor's answer return 503, which is the surface's entire argument failing
+# first and loudest under exactly the load it is there to attract.
+_DEMO_SLOTS = threading.BoundedSemaphore(int(os.environ.get("DEMO_MAX_INFLIGHT", "3")))
+# A coarse budget on the plain GETs too. They are cheap, but they are also
+# unauthenticated and one of them streams 5 MB in Range chunks.
+_DEMO_READ_MAX = int(os.environ.get("DEMO_READ_MAX", "300"))
+_DEMO_READ: dict[str, deque] = {}
+
+
+def _demo_read_ok(ip: str) -> bool:
+    now = time.time()
+    q = _DEMO_READ.setdefault(ip, deque())
+    while q and now - q[0] > _DEMO_WINDOW:
+        q.popleft()
+    if not q and len(_DEMO_READ) > 4000:
+        # These dicts only ever grew. A spoofed-header flood was unbounded
+        # memory as well as unbounded calls; drop the entries that have aged out.
+        for k in [k for k, v in _DEMO_READ.items() if not v]:
+            _DEMO_READ.pop(k, None)
+    if len(q) >= _DEMO_READ_MAX:
+        return False
+    q.append(now)
+    return True
 
 
 def _demo_rate_ok(ip: str) -> bool:
@@ -692,10 +717,31 @@ def _demo_node(conn):
     return node, course
 
 
+# The video path never changes: DEMO_NODE_ID is fixed at import. Reading it from
+# Postgres on every hit meant a connection per request — and FileResponse serves
+# Range requests, so one browser playing one 5 MB video takes several. A flood
+# would have exhausted the pool long before the bandwidth, taking real learners
+# down with it.
+_DEMO_VIDEO_PATH: Path | None = None
+
+
+def _demo_video_path() -> Path | None:
+    global _DEMO_VIDEO_PATH
+    if _DEMO_VIDEO_PATH is None:
+        with db.connect() as conn:
+            node, _ = _demo_node(conn)
+        if not node or not node["video_file"]:
+            return None
+        _DEMO_VIDEO_PATH = OUTPUT_DIR / node["video_file"]
+    return _DEMO_VIDEO_PATH
+
+
 @router.get("/public/demo")
-def public_demo():
+def public_demo(request: Request):
     """The one lesson a stranger can actually take, whole: video, key points,
     written guide and the question. No auth, no id, nothing to enumerate."""
+    if not _demo_read_ok(_client_ip(request)):
+        raise HTTPException(429, "demasiadas peticiones")
     with db.connect() as conn:
         node, course = _demo_node(conn)
         if not node:
@@ -726,17 +772,32 @@ def public_demo():
     }
 
 
+@router.get("/public/demo-poster")
+def public_demo_poster(request: Request):
+    """A real frame from the demo lesson, shown before play.
+
+    Without it the first viewport of the whole product is a black rectangle:
+    the hero here IS the lesson, and an unplayed <video> paints nothing. The
+    frame is extracted once with ffmpeg and shipped as a static asset rather
+    than read from the media volume, so the landing does not depend on the
+    volume being mounted."""
+    if not _demo_read_ok(_client_ip(request)):
+        raise HTTPException(429, "demasiadas peticiones")
+    path = Path(__file__).parent / "static" / "demo-poster.jpg"
+    if not path.is_file():
+        raise HTTPException(404, "poster no disponible")
+    return FileResponse(path, media_type="image/jpeg")
+
+
 @router.get("/public/demo-video")
-def public_demo_video():
+def public_demo_video(request: Request):
     """The demo lesson's video, and only ever that one. Deliberately takes no
     parameter: see DEMO_NODE_ID."""
-    with db.connect() as conn:
-        node, _ = _demo_node(conn)
-    if not node or not node["video_file"]:
+    if not _demo_read_ok(_client_ip(request)):
+        raise HTTPException(429, "demasiadas peticiones")
+    path = _demo_video_path()
+    if not path or not path.is_file():
         raise HTTPException(404, "video no disponible")
-    path = OUTPUT_DIR / node["video_file"]
-    if not path.is_file():
-        raise HTTPException(404, "archivo no encontrado")
     return FileResponse(path, media_type="video/mp4")
 
 
@@ -755,19 +816,24 @@ def public_demo_explain(body: DemoExplainBody, request: Request):
     a number on a comprehension check is a category error this product already
     made once (docs/02).
     """
-    if body.company.strip():                 # honeypot tripped — silently no-op
+    if body.company.strip():
+        # Honeypot. Unlike /login (which fakes success so a bot learns nothing),
+        # a 400 is fine here: there is no account to enumerate, and a human who
+        # somehow fills a hidden field deserves to be told something failed.
         raise HTTPException(400, "no pudimos leer tu respuesta")
     content = body.content.strip()
     if not 40 <= len(content) <= 4000:
         raise HTTPException(400, "escribe tu respuesta con tus palabras: "
                                  "entre 40 y 4000 caracteres")
-    ip = _client_ip(request)
-    if not _demo_rate_ok(ip):
-        raise HTTPException(429, "ya evaluamos varias respuestas desde aquí. "
-                                 "Pide tu invitación y seguimos adentro.")
-    if not _JOB_SLOTS.acquire(blocking=False):
+    # Capacity first, budget second: a visitor who arrives while the container is
+    # full should not have one of their four attempts spent on a 503.
+    if not _DEMO_SLOTS.acquire(blocking=False):
         raise HTTPException(503, "estamos evaluando varias respuestas ahora mismo. "
                                  "Intenta en un par de minutos.")
+    if not _demo_rate_ok(_client_ip(request)):
+        _DEMO_SLOTS.release()
+        raise HTTPException(429, "ya evaluamos varias respuestas desde aquí. "
+                                 "Pide tu invitación y seguimos adentro.")
     try:
         with db.connect() as conn:
             node, _ = _demo_node(conn)
@@ -789,7 +855,7 @@ def public_demo_explain(body: DemoExplainBody, request: Request):
         except Exception as exc:                    # never fail the learner on telemetry
             print(f"demo attempt not stored: {exc}", file=sys.stderr)
     finally:
-        _JOB_SLOTS.release()
+        _DEMO_SLOTS.release()
     return {"ok": True, "evaluation": {
         "verdict": evaluation.get("verdict"),
         "feedback": evaluation.get("feedback", ""),

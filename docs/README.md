@@ -47,6 +47,7 @@ One AI content engine powers two products:
 | [08 — Job target](08-job-target.md) | The acquisition wedge: a pasted job posting → a study route + the interview document |
 | [09 — World of knowledge](09-world-of-knowledge.md) | **North star.** "Quiero ser X" → route → verified learning → proof. What has to become true, in order |
 | [10 — CV intake](10-cv-intake.md) | Paste a CV → proposed module skips, credited only by passing the reto. The first feature a real learner asked for |
+| [11 — Public surface](11-public-surface.md) | The landing that runs a real lesson for strangers: the demo endpoints, their security model, and the honesty constraints |
 
 ## If you are a coding agent starting fresh
 

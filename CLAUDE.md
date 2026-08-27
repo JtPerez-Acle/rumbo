@@ -63,6 +63,7 @@ roughly seventy times faster than it learns.
 | Goal engine: posting *or* role → prereq-aware module route, honest gaps | `docs/08` |
 | Route-aware access, goal documents, the "quiero ser X" north star | `docs/09` |
 | CV intake: proposed module skips, credited only by a passed reto | `docs/10` |
+| The public landing: a real lesson for strangers, and its demo endpoints | `docs/11` |
 | Lesson loop, rubrics, verdicts vs scores, the prediction beat | `docs/02` |
 | Schema (20 tables), API surface, request flows, **security controls** | `docs/03` |
 | Course factory pipeline + the authoring standard | `docs/04`, `.claude/skills/course-factory/` |

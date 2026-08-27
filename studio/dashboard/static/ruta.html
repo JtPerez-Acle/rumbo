@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ruta de estudio · Aprende IA</title>
+<title>Ruta de estudio · Rumbo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
@@ -108,10 +108,10 @@ const modLabel=(r)=>{
         ${a.pitch?`<p style="margin-top:10px">${esc(a.pitch)}</p>`:''}`;
     }
     h+=`<a class="cta" href="/aprende">Analizar la oferta que tú quieres →</a>
-      <div class="credit">Ruta generada por <a href="/aprende">Aprende IA</a> a partir de una oferta
+      <div class="credit">Ruta generada por <a href="/aprende">Rumbo</a> a partir de una oferta
       de trabajo real. Cada curso termina en un documento que puedes mostrar.</div>`;
     box.innerHTML=h;
-    document.title=`Ruta para ${a.role_title||'un puesto'} · Aprende IA`;
+    document.title=`Ruta para ${a.role_title||'un puesto'} · Rumbo`;
     setTimeout(()=>{const b=document.getElementById('bar'); if(b)b.style.width=a.coverage+'%';},80);
   }catch(e){box.innerHTML='<p class="err">Esta ruta no existe o ya no está disponible.</p>';}
 })();

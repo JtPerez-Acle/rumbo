@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Caso de estudio · Aprende IA</title>
+<title>Caso de estudio · Rumbo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
@@ -77,7 +77,7 @@ const renderMD=(el,md)=>{
       <div class="doc" id="docbody"></div>
       <div class="footer">Este caso de estudio se construyó con el trabajo real de ${esc(d.learner_name)}
       durante el curso «${esc(d.course_title)}», con ejercicios y retos evaluados lección a lección.
-      · <a href="/aprende">Aprende IA →</a></div>`;
+      · <a href="/aprende">Rumbo →</a></div>`;
     renderMD(document.getElementById('docbody'), d.content_md);
   }catch(e){box.innerHTML='<p class="err">Este caso de estudio no existe o ya no está disponible.</p>';}
 })();

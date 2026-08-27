@@ -109,7 +109,42 @@ const verdict = run('renderDemoVerdict(app, ' + JSON.stringify({
 const doorsLit = returned('landingDoors("lit")');
 const doorsGhost = returned('landingDoors("ghost")');
 
+// ---- routing: the server-named view is consumed once ----------------------
+// A server URL (/login, /oferta, /curso/<slug>) tells the SPA which view to open
+// first. That hint used to be re-read on every route(), which made it sticky:
+// "#/" normalises to an empty segment, empty is falsy, so on /login every attempt
+// to go home fell back to the hint and re-rendered login. "‹ Conocer Rumbo" and
+// the waitlist's "‹ Volver" were both dead ends. The invariant is that the hint
+// applies to the FIRST render only; after that the hash is the authority, empty
+// included — and empty means the landing.
+const routing = (() => {
+  try {
+    const sb = Object.assign({}, sandbox, {
+      window: { addEventListener(){}, open(){}, __VIEW__: 'login', __ARG__: '',
+                matchMedia: () => ({ matches: false }) },
+      // renderLogin reads the query string; without this the view throws and,
+      // because route() is async, it surfaces as an unhandled rejection that
+      // kills the process AFTER the results print — an exit 1 on a clean file.
+      URLSearchParams,
+    });
+    sb.__mk = __mk; sb.__cap = captured; sb.globalThis = sb;
+    vm.createContext(sb);
+    vm.runInContext(src, sb);
+    const before = vm.runInContext('__serverView', sb);
+    // __serverView is cleared synchronously at the top of route(), before any
+    // await, so it can be read straight after the call. The returned promise is
+    // swallowed: this asserts the routing decision, not the render.
+    const p = vm.runInContext('route()', sb);
+    if (p && typeof p.catch === 'function') p.catch(() => {});
+    const after = vm.runInContext('__serverView', sb);
+    return { before, after };
+  } catch (e) { return { before: 'THREW: ' + e.message, after: 'THREW' }; }
+})();
+
 const checks = [
+  ['the server names the first view', routing.before === 'login'],
+  ['...and the hint is consumed, so "home" works afterwards', routing.after === ''],
+
   // The lesson is real content, not a description of content.
   ['the real lesson title renders', lesson.includes(demo.title)],
   ['the course is named as provenance', lesson.includes('Marketing con IA')],

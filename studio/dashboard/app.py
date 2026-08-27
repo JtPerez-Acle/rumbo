@@ -858,6 +858,17 @@ def public_lista():
     }, view="lista")
 
 
+@app.get("/cursos")
+def public_cursos():
+    """The whole catalog at its own address. It used to exist only as a section
+    below a full lesson on the landing, reachable by scrolling past all of it."""
+    return _spa_shell("learn.html", {
+        "title": f"Todos los cursos — {SITE_NAME}",
+        "description": ("14 cursos, 420 lecciones. Cada temario abierto entero: "
+                        "los módulos, lo que sabrás hacer y cada lección."),
+    }, view="cursos")
+
+
 @app.get("/curso/{slug}")
 def public_curso(slug: str):
     """A course temario at its own address. docs/02 calls the browsable temarios

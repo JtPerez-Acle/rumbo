@@ -344,6 +344,23 @@
   .tabbar button .ic{width:21px;height:21px}
   .tabbar button.on{color:var(--amber)}
 
+  /* ---- public navigation ----
+     The public surface had none: a visitor who did not want to do the lesson
+     had to scroll all of it to reach anything, and the catalog and the analyser
+     were only reachable from the doors at the very bottom. */
+  .sitenav{display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap;
+    padding-bottom:var(--s3);border-bottom:1px solid var(--line)}
+  .sitenav .brandrow{margin-right:auto}
+  .sitenav a{color:var(--dim);font-weight:700;font-size:var(--fs-sm);text-decoration:none;cursor:pointer;
+    padding:6px 2px;border-bottom:2px solid transparent;transition:color .18s var(--ease)}
+  .sitenav a:hover{color:var(--text)}
+  .sitenav a.on{color:var(--amber);border-bottom-color:var(--amber)}
+  .sitenav .navlinks{display:flex;gap:var(--s4);align-items:center}
+  @media(max-width:600px){
+    .sitenav{gap:var(--s3)}
+    .sitenav .navlinks{width:100%;gap:var(--s4);order:3}
+  }
+
   /* ---- the public surface, on a real screen ----
      The One Column Rule holds for the app: one decision per screen, on a phone,
      in stolen time. It does not hold for a page a stranger opens on a laptop,
@@ -584,6 +601,7 @@ async function route(){
     if(seg==='login')renderLogin(new URLSearchParams(location.search).get('error'));
     else if(seg==='lista')renderWaitlistForm();
     else if(seg==='oferta')renderJobBox();
+    else if(seg==='cursos')renderPublicCatalog();
     else if(seg==='explora'&&arg)renderPublicOutline(arg);
     else renderLanding();
     return;
@@ -722,31 +740,85 @@ async function renderLanding(preview){
     bar.querySelector('#pvback').onclick=()=>nav('#/hoy');
     app.append(bar);
   }
-  const top=$(`<div class="topbar">
-    <div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Aprende haciendo, con tutora IA</small></div></div>
-    <button class="btn btn-ghost btn-sm" id="topin">Tengo una invitación</button></div>`);
-  top.querySelector('#topin').onclick=()=>nav('#/login');
-  app.append(top);
+  app.append(publicHeader('clase'));
   app.append($(`<div class="demohead" style="margin-top:14px"><div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
     <h1 style="font-size:var(--fd-lg);margin-top:10px">No te contamos cómo funciona. Haz una clase.</h1>
     <p class="muted" style="margin-top:10px">Esta es la primera lección del curso de Marketing con IA, entera. Mira el video, lee la guía y explícalo con tus palabras: tu tutora te responde de verdad, aquí mismo, antes de pedirte nada.</p></div>`));
   await renderDemoLesson(app);
   renderHow(app);
   app.append($(`<div class="microlabel" style="margin-top:16px">Las áreas · toca una para ver sus cursos y temarios</div>`));
-  const d=await api('/public/catalog');
-  const pubCard=(c)=>{
-    const card=$(`<div class="card course-card">
-      <h3 style="padding-right:10px">${esc(c.title)}</h3>
-      ${c.description?`<p class="desc">${esc(c.description)}</p>`:''}
-      ${c.doc_type?`<p class="delivers">${I('doc','ic ic-s')} Termina con: ${esc(c.doc_type)}</p>`:''}
-      <div class="meta"><span>${c.total} lecciones · ${c.modules} módulos</span>${I('arrow','ic ic-s')}</div></div>`);
-    card.onclick=()=>nav('#/explora/'+c.slug); return card;
-  };
-  const cats=clusterize(d.courses||[]);
-  renderClusters(cats, cats[0]?cats[0][0]:null, pubCard);
+  await renderCatalogInto(app, false);
   app.append($(`<p class="muted t-sm center" style="margin:14px 0 0">¿Tu tema no está? Dentro de la plataforma puedes <b>pedir tu curso</b> y lo construimos.</p>`));
   app.append(landingDoors('ghost'));
   app.append($(`<p class="faint t-sm center" style="margin:10px 0 8px">Acceso por invitación mientras estamos en fase alfa.</p>`));
+}
+
+/* One header for every public view. Brand goes home; the three links are the
+   three things a stranger might actually want, in the order they want them:
+   see it work, browse what exists, get a route for their own job. `here` marks
+   the current one so the nav says where you are, not just where you can go. */
+function publicHeader(here){
+  const nav=$(`<div class="sitenav">
+    <div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Aprende haciendo, con tutora IA</small></div></div>
+    <div class="navlinks">
+      <a data-go="" class="${here==='clase'?'on':''}">La clase</a>
+      <a data-go="cursos" class="${here==='cursos'?'on':''}">Cursos</a>
+      <a data-go="oferta" class="${here==='oferta'?'on':''}">Tu ruta</a>
+    </div>
+    <button class="btn btn-ghost btn-sm" data-go="login">Tengo una invitación</button></div>`);
+  nav.querySelectorAll('[data-go]').forEach(el=>{
+    el.onclick=()=>nav2(el.dataset.go);
+  });
+  nav.querySelector('.brandrow').onclick=()=>nav2('');
+  nav.querySelector('.brandrow').style.cursor='pointer';
+  return nav;
+}
+// Public navigation keeps the real URLs the server hands out (/, /cursos,
+// /oferta) rather than turning them into fragments the moment someone clicks.
+function nav2(seg){
+  if(AUTH){ nav('#/'+(seg||'hoy')); return; }   // preview mode stays in the SPA
+  location.href='/'+seg;
+}
+
+/* The catalog as its own page, not a section buried under a full lesson.
+   docs/02 calls the browsable temarios marketing content: 14 courses and 420
+   lesson objectives, all real. */
+// Named for its surface: viewCatalog and renderJobResult each declare their
+// own local courseCard, and a shared bare name across three of them is a trap.
+function publicCourseCard(c){
+  const card=$(`<div class="card course-card">
+    <h3 style="padding-right:10px">${esc(c.title)}</h3>
+    ${c.description?`<p class="desc">${esc(c.description)}</p>`:''}
+    ${c.doc_type?`<p class="delivers">${I('doc','ic ic-s')} Termina con: ${esc(c.doc_type)}</p>`:''}
+    <div class="meta"><span>${c.total} lecciones · ${c.modules} módulos</span>${I('arrow','ic ic-s')}</div></div>`);
+  card.onclick=()=>{ if(AUTH)nav('#/explora/'+c.slug); else location.href='/curso/'+c.slug; };
+  return card;
+}
+async function renderCatalogInto(target, openAll){
+  const d=await api('/public/catalog');
+  const cats=clusterize(d.courses||[]);
+  cats.forEach(([cat,items],i)=>{
+    const open=openAll||i===0;
+    const head=$(`<div class="cluster ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<span class="ct">${esc(cat)}</span><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
+    const body=$(`<div class="cluster-body ${open?'':'hide'}"></div>`);
+    items.forEach(c=>body.append(publicCourseCard(c)));
+    head.onclick=()=>{head.classList.toggle('open');body.classList.toggle('hide');};
+    target.append(head); target.append(body);
+  });
+  return (d.courses||[]).length;
+}
+
+async function renderPublicCatalog(){
+  tabbar.classList.add('hide'); app.innerHTML='';
+  document.body.classList.add('wide');
+  app.append(publicHeader('cursos'));
+  app.append($(`<div class="demohead" style="margin-top:var(--s4)">
+    <div class="eyebrow">El catálogo completo</div>
+    <h1 style="font-size:var(--fd-lg);margin-top:10px">Todo lo que puedes estudiar aquí.</h1>
+    <p class="muted" style="margin-top:10px">Cada curso abre su temario entero: los módulos, lo que sabrás hacer al terminar cada uno, y las lecciones una por una. Nada está escondido detrás del registro.</p></div>`));
+  const n=await renderCatalogInto(app, true);
+  app.append($(`<p class="faint t-sm" style="margin-top:var(--s4)">${n} cursos · toca cualquiera para leer su temario completo.</p>`));
+  app.append(landingDoors('ghost'));
 }
 
 /* The doors, in one place. `lit` gives the goal engine the primary treatment —
@@ -900,9 +972,10 @@ function renderDemoVerdict(target, ev, d){
 }
 async function renderPublicOutline(slug){
   tabbar.classList.add('hide'); app.innerHTML='';
+  document.body.classList.add('wide');
   const d=await api('/public/course/'+slug);
-  if(d.detail){nav('#/');return;}
-  const back=$(`<div class="back">‹ Volver</div>`); back.onclick=()=>nav('#/'); app.append(back);
+  if(d.detail){nav2('cursos');return;}
+  app.append(publicHeader('cursos'));
   app.append($(`<div style="margin-top:6px"><h2>${esc(d.title)}</h2>
     ${d.description?`<p class="muted t-sm" style="margin-top:8px">${esc(d.description)}</p>`:''}
     ${d.doc_type?`<p class="delivers" style="margin-top:8px">${I('doc','ic ic-s')} Termina con: ${esc(d.doc_type)}</p>`:''}</div>`));
@@ -964,8 +1037,10 @@ function renderJobBox(){
   // Authed learners keep their tab bar and go back to their goal, not to the
   // public landing — this screen is reachable from inside the app now.
   tabbar.classList.toggle('hide',!AUTH); app.innerHTML='';
-  const back=$(`<div class="back">${AUTH?'‹ Mi objetivo':'‹ Volver'}</div>`);
-  back.onclick=()=>nav(AUTH?'#/objetivo':'#/'); app.append(back);
+  if(AUTH){
+    const back=$(`<div class="back">‹ Mi objetivo</div>`);
+    back.onclick=()=>nav('#/objetivo'); app.append(back);
+  }else app.append(publicHeader('oferta'));
   // Two front doors, one matcher (docs/09 item 4): a real posting, or just the
   // role/skill the person wants. Same honesty either way.
   const box=$(`<div style="margin-top:14px;display:flex;flex-direction:column;gap:15px">

@@ -86,6 +86,7 @@ def audit_allowlist(check) -> None:
         ("/aprende", "the app"),
         ("/oferta", "the job analyser"),
         ("/lista", "the waitlist"),
+        ("/login", "sign-in"),
         ("/cursos", "the catalog"),
         ("/curso/curso-meta-ads", "a temario"),
         ("/api/learn/public/demo", "the free lesson"),
@@ -144,7 +145,7 @@ def main(argv: list[str]) -> int:
 
     # ---- public surfaces answer, and carry real metadata -------------------
     for path, want_view in (("/oferta", '"oferta"'), ("/lista", '"lista"'),
-                            ("/cursos", '"cursos"')):
+                            ("/cursos", '"cursos"'), ("/login", '"login"')):
         code, body = fetch(base + path)
         check(f"{path} serves", code == 200, f"got {code}")
         check(f"{path} names its view", want_view in body)

@@ -835,6 +835,22 @@ def public_lista():
     }, view="lista")
 
 
+@app.get("/login")
+def public_login():
+    """Sign-in. This was a 404 while the public header linked to it — the header
+    was wired to a real URL that had never been created, so the primary way into
+    the product from every public page was a dead end for anyone logged out.
+
+    It is a real URL rather than only a fragment for the same reason as the
+    others: it has to be linkable. "Ve a rumbo.app/login" is a sentence someone
+    says out loud."""
+    return _spa_shell("learn.html", {
+        "title": f"Entrar — {SITE_NAME}",
+        "description": ("Entra con tu invitación. El acceso es por invitación "
+                        "mientras estamos en fase alfa."),
+    }, view="login")
+
+
 @app.get("/cursos")
 def public_cursos():
     """The whole catalog at its own address. It used to exist only as a section

@@ -630,6 +630,8 @@ async function route(){
   else if(seg==='caso-view'&&arg)viewCaseStudy(arg);
   else if(seg==='perfil')viewProfile();
   else if(seg==='como-funciona')renderOrientation(true);
+  // Already signed in: /login has nothing to offer, so go where they were going.
+  else if(seg==='login')nav('#/hoy');
   else viewToday();
 }
 async function boot(){
@@ -765,7 +767,9 @@ function publicHeader(here){
       <a data-go="cursos" class="${here==='cursos'?'on':''}">Cursos</a>
       <a data-go="oferta" class="${here==='oferta'?'on':''}">Tu ruta</a>
     </div>
-    <button class="btn btn-ghost btn-sm" data-go="login">Tengo una invitación</button></div>`);
+    ${AUTH
+      ? `<button class="btn btn-ghost btn-sm" data-go="hoy">Volver a la app</button>`
+      : `<button class="btn btn-ghost btn-sm" data-go="login">Tengo una invitación</button>`}</div>`);
   nav.querySelectorAll('[data-go]').forEach(el=>{
     el.onclick=()=>nav2(el.dataset.go);
   });

@@ -219,7 +219,7 @@ only gamification. No badges, no XP — measure first, decorate later.
 
 ## The admin side (operator dashboard)
 
-Token-gated dashboard at `/`: production stats, per-channel/course cards, a
+Token-gated dashboard at `/panel`: production stats, per-channel/course cards, a
 14-day production chart, the render queue, the video library with an
 approve-before-publish gate (for the social channels), and **Solicitudes de
 cursos** — the concierge triage table (status pipeline + course-slug linking,

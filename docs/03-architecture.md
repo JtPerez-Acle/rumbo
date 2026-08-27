@@ -172,7 +172,23 @@ their route progress previewed, and the per-learner evaluation budget.
 > the invite-code list. Add the prefix in the same edit; curl it tokenless before
 > deploying.
 
-**Pages:** `/` (dashboard), `/aprende` (learner SPA), `/aprende/entrar`,
+**Pages.** Three surfaces, three roots (docs/11):
+
+| URL | Surface | Gate |
+|---|---|---|
+| `/` · `/oferta` · `/lista` · `/curso/{slug}` | the public site | none — server-rendered `<title>`/OG per route |
+| `/aprende` and its hash routes | the learner app | session cookie |
+| `/panel` | the operator dashboard | `DASHBOARD_TOKEN` |
+
+`/` used to be the dashboard, which meant the root of the product returned **401**
+to anyone who typed the domain while the public surfaces had no addresses at all
+(`/oferta` was a 404 though docs/08 calls it the acquisition asset). `_spa_shell`
+serves the same SPA shell per route with injected metadata and the view to open
+on; `route()` falls back to it when there is no hash.
+`check_public_surface.py` asserts the allowlist offline and the served behaviour
+over HTTP, so the split cannot rot quietly.
+
+**Other pages:** `/aprende/entrar`,
 `/aprende/doc/{token}`, `/aprende/caso/{token}`, `/aprende/ruta/{token}` — the
 share pages inject server-side OG tags because link-preview crawlers don't run
 JS. `/aprende/doc/{token}` serves **both** per-course and goal documents

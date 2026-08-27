@@ -38,6 +38,60 @@ def fetch(url: str, headers: dict | None = None) -> tuple[int, str]:
         return 0, f"{type(exc).__name__}: {exc}"
 
 
+def audit_allowlist(check) -> None:
+    """The admin gate is an allowlist, and docs/07 records that a new /api/*
+    route which is not on it ships PUBLIC — it nearly happened twice in one day,
+    once with the invite-code list. This runs offline against the real predicate,
+    so the bug class cannot come back quietly between deploys.
+
+    Add a row here in the same edit that adds a route. That is the whole point.
+    """
+    root = str(__import__("pathlib").Path(__file__).resolve().parents[1])
+    sys.path.insert(0, root + "/dashboard")
+    sys.path.insert(0, root)
+    try:
+        import app as dashboard          # noqa: PLC0415
+    except Exception as exc:
+        check("admin allowlist is auditable", False, f"could not import app.py: {exc}")
+        return
+
+    gated = [
+        ("/panel", "the dashboard itself"),
+        ("/api/state", "production stats"),
+        ("/api/jobs/render", "job triggers"),
+        ("/api/videos/ch/name", "the video library"),
+        ("/media/curso/x.mp4", "every rendered lesson"),
+        ("/api/upload-media", "writes to the volume"),
+        ("/api/delete-media", "deletes from the volume"),
+        ("/api/learners", "learner names and emails"),
+        ("/api/learners/1/work", "everything a learner ever wrote"),
+        ("/api/submissions/1/flag", "operator review"),
+        ("/api/invites", "invite codes ARE the access gate"),
+        ("/api/waitlist", "signup emails"),
+        ("/api/requests", "the concierge queue"),
+        ("/api/demand", "every posting strangers pasted"),
+        ("/api/access-requests", "locked-out learners' emails"),
+    ]
+    public = [
+        ("/", "the public site"),
+        ("/aprende", "the app"),
+        ("/oferta", "the job analyser"),
+        ("/lista", "the waitlist"),
+        ("/curso/curso-meta-ads", "a temario"),
+        ("/api/learn/public/demo", "the free lesson"),
+        ("/api/learn/public/demo-video", "the free lesson's video"),
+        ("/api/learn/login", "login"),
+        ("/api/learn/today", "a learner's own day (session-gated, not token-gated)"),
+        ("/aprende/doc/sometoken", "a share page"),
+    ]
+    for path, why in gated:
+        check(f"gated: {path} ({why})", dashboard._is_admin_path(path) is True,
+              "NOT on the allowlist — this would ship public")
+    for path, why in public:
+        check(f"public: {path} ({why})", dashboard._is_admin_path(path) is False,
+              "on the admin allowlist — this would 401 for everyone")
+
+
 def main(argv: list[str]) -> int:
     base = (argv[0] if argv else DEFAULT_BASE).rstrip("/")
     print(f"base: {base}\n")
@@ -45,6 +99,23 @@ def main(argv: list[str]) -> int:
 
     def check(name: str, ok: bool, detail: str = "") -> None:
         results.append((name, ok, detail))
+
+    # Offline first: the allowlist is a pure function and needs no server.
+    audit_allowlist(check)
+
+    # Preflight. Without this, an unreachable base means every HTTP assertion
+    # below waits out its own timeout and the run takes minutes to tell you the
+    # server is not running. A tool that is slow to say "no" is a tool nobody
+    # runs before a deploy.
+    code, detail = fetch(base + "/aprende")
+    if code == 0:
+        for name, ok, d in results:
+            print(("  PASS  " if ok else "  FAIL  ") + name + (f" — {d}" if d and not ok else ""))
+        offline_bad = sum(1 for _, ok, _ in results if not ok)
+        print(f"\n{len(results) - offline_bad}/{len(results)} offline checks passed")
+        print(f"\nHTTP checks skipped: {base} is not reachable ({detail}).")
+        print("Start the server (docs/05) or pass the live URL as the first argument.")
+        return 1 if offline_bad else 0
 
     # ---- public surfaces answer, and carry real metadata -------------------
     for path, want_view in (("/oferta", '"oferta"'), ("/lista", '"lista"')):

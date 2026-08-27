@@ -95,7 +95,9 @@ roughly seventy times faster than it learns.
 - Project `8a2e90fe-e597-45d4-92c0-f274ece96af6`, service `estudio`, Postgres addon,
   volume at `/app/studio/output`.
 - **Learner app:** https://estudio-production-1b8c.up.railway.app/aprende
-- **Admin dashboard:** same host `/` — gated by `DASHBOARD_TOKEN`.
+- **Admin dashboard:** same host `/panel` — gated by `DASHBOARD_TOKEN`.
+- **Public site:** the root `/` (docs/11). It used to 401: the dashboard held
+  the most valuable URL in the product and served it to an audience of one.
 - **Secrets are NOT in this repo.** Read at runtime: `railway variables --kv`, and
   `railway variables --service Postgres --kv` (`DATABASE_PUBLIC_URL` is how a local
   script reaches the cloud DB). Never hardcode keys, tokens, or invite codes.

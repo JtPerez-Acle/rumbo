@@ -44,7 +44,7 @@ DEPLOYED = bool(os.environ.get("RAILWAY_ENVIRONMENT"))
 # anyone who asks. They were public in production (verified 2026-08-12). The
 # allowlist is the real gate, but handing out the map is free reconnaissance.
 app = FastAPI(
-    title="Estudio IA — Observabilidad",
+    title="Rumbo — Panel",
     docs_url=None if DEPLOYED else "/docs",
     redoc_url=None if DEPLOYED else "/redoc",
     openapi_url=None if DEPLOYED else "/openapi.json",
@@ -89,7 +89,13 @@ ADMIN_PREFIXES = ("/api/state", "/api/jobs", "/api/videos", "/media")
 
 
 def _is_admin_path(path: str) -> bool:
-    if path == "/" or path.startswith("/api/state") or path.startswith("/api/jobs"):
+    # The dashboard lives at /panel. "/" is the public site and must NOT be
+    # gated: it used to be, which meant the most valuable URL this product has
+    # was spent on an audience of one and returned 401 to everyone who typed the
+    # domain. check_public_surface.py asserts both halves of that offline.
+    if path == "/panel" or path.startswith("/panel/"):
+        return True
+    if path.startswith("/api/state") or path.startswith("/api/jobs"):
         return True
     return (path.startswith("/api/videos") or path.startswith("/media")
             or path.startswith("/api/upload-media") or path.startswith("/api/delete-media")
@@ -744,9 +750,28 @@ def update_request(request_id: int, update: RequestUpdate):
     return {"ok": True, "request": row}
 
 
-@app.get("/")
-def index():
+@app.get("/panel")
+def panel():
+    """The operator dashboard. Gated by _is_admin_path — check that first if you
+    ever move this route, because the gate is an allowlist and a dashboard that
+    is not on it ships public (docs/07)."""
     return FileResponse(Path(__file__).parent / "static" / "index.html")
+
+
+@app.get("/")
+def site_home():
+    """The public site. This is what a stranger gets when they type the domain,
+    and until now it was a 401 from a dashboard nobody but the operator can use.
+
+    Same shell as /aprende — the SPA opens on the landing for a logged-out
+    visitor and on Hoy for a learner with a session, which is the behaviour that
+    was already there. What changes is only which URL reaches it."""
+    return _spa_shell("learn.html", {
+        "title": f"{SITE_NAME} — aprende haciendo, con tutora IA",
+        "description": ("Haz una clase real ahora mismo, sin cuenta: mira el "
+                        "video, lee la guía y explícalo con tus palabras. Tu "
+                        "tutora te responde de verdad."),
+    })
 
 
 # ---- Learner app (Rumbo) ----

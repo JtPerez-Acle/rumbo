@@ -22,7 +22,8 @@ One AI content engine powers two products:
 | | |
 |---|---|
 | Live URL | https://estudio-production-1b8c.up.railway.app/aprende |
-| Admin dashboard | same host, `/` — needs `?token=<DASHBOARD_TOKEN>` once |
+| Public site | same host, `/` — the landing runs a real lesson (doc 11) |
+| Admin dashboard | same host, `/panel` — needs `?token=<DASHBOARD_TOKEN>` once |
 | Courses | **14 × 30 lessons** across 6 clusters: marketing/ads/SEO/email/automatización + Ciencias sociales (grafos, cultura latam) + Deporte (gestión, vóleibol) + Redes y creadores (influencers, social media) + analítica |
 | Videos | 420 rendered — 720p/CRF27 (~5MB per lesson; re-encoded 2026-08-12 for LatAm mobile data and volume capacity) |
 | Goal engine | paste a job posting **or name a role** → module-level route (prereq-aware) → verified learning → one goal document (docs 08–09) |

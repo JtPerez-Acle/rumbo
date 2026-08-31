@@ -141,22 +141,34 @@ not a migration system.
 
 ## Runbook: turn on email (the cohort blocker)
 
-Until `RESEND_API_KEY` is set, **a returning learner cannot let themselves back
+Until mail leaves the building, **a returning learner cannot let themselves back
 in** — closing the account-takeover hole (docs/07) means an existing account can
 only be entered by proving inbox control. They get a 409, land in the
 **Esperando acceso** panel, and wait for you to send a link by hand. That is fine
 for four alpha users and it does not survive a cohort.
 
+**Where this actually stands (verified 2026-08-31).** `RESEND_API_KEY` is set —
+that step is done. `EMAIL_FROM` is still `Aprende IA <onboarding@resend.dev>`,
+Resend's test sender, which delivers only to the Resend account owner and 403s
+for everyone else. And the domain this runbook used to tell you to verify,
+`aprende-ia.app`, **is not registered** — NXDOMAIN on two independent resolvers.
+There is no domain to add DNS records to. So step 1 below is a purchase, not a
+configuration, and it is now entangled with the rename: buying `aprende-ia.app`
+to send mail for a product called Rumbo is a decision, not a default.
+
 Everything on our side is already wired; this is the whole change:
 
-1. Create the Resend account and add the sending domain (`aprende-ia.app` or
-   whichever you use). **This is yours to do — it needs your account.**
+1. **Register a sending domain**, then add it at resend.com/domains.
+   **This is yours to do — it needs your account and a card.** Pick it with the
+   rename in mind (`rumbo.app` and `rumbo.lat` were both taken as of
+   2026-08-31).
 2. Add Resend's DNS records to the domain and wait for verification. An
    unverified domain is the most common cause of "the key is set and nothing
    arrives".
-3. `railway variables --set RESEND_API_KEY=re_…` on service `estudio`.
-   Set `EMAIL_FROM` too if the address is not `Aprende IA <hola@aprende-ia.app>`
-   — it must be **on the verified domain** or Resend rejects every send.
+3. Point `EMAIL_FROM` at an address **on the verified domain** — Resend rejects
+   every send otherwise. `railway variables --set EMAIL_FROM='Rumbo <hola@…>'`
+   on service `estudio`. (`RESEND_API_KEY` is already set; re-set it only if you
+   rotate the key.)
 4. Verify by locking yourself out: log in with an email that already exists.
    Before: 409 + a row in *Esperando acceso*. After: `{"sent": true}` and a real
    email. **Check the inbox, not the status code** — that distinction is the

@@ -142,9 +142,12 @@ DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
 - **Email is configured but only reaches ONE inbox.** `RESEND_API_KEY` is set, but
   `EMAIL_FROM` is Resend's test sender (`onboarding@resend.dev`), which delivers
   **only to the Resend account owner** and 403s for everyone else. The domain
-  `aprende-ia.app` is **not verified**. Until it is, every other learner's login
-  email fails and they queue in the dashboard's *Esperando acceso* panel. Runbook:
-  `docs/05` → "Runbook: turn on email".
+  `aprende-ia.app` is not merely unverified — it is **not registered at all**
+  (NXDOMAIN, checked 2026-08-31 on two resolvers). A domain must be *bought*
+  before any of the email runbook applies. Until then every other learner's login
+  email fails and they queue in the dashboard's *Esperando acceso* panel — where
+  one person has been waiting since 2026-08-24. Runbook: `docs/05` → "Runbook:
+  turn on email".
 - **Returning-user login is deliberately restricted.** An existing account cannot
   be entered without proving inbox control — self-service re-login returns **409**
   and queues the learner. This closed a live account-takeover hole; do not "fix" it
@@ -210,7 +213,14 @@ DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
 
 Run `/graphify .` (skill installed) or query the prebuilt graph:
 `graphify query "..."`, `graphify explain "X"`, `graphify god-nodes`. Report:
-`graphify-out/GRAPH_REPORT.md`. Prefer this over grepping the tree.
+`graphify-out/GRAPH_REPORT.md`.
+
+**The checked-in graph is stale — regenerate before trusting it.** It was built
+**2026-08-05** (171 nodes, 395 edges) and therefore predates CV intake,
+`admin_paths.py`, the public-surface restructure and the Rumbo rename: roughly
+4,500 lines of the current tree are invisible to it, including the security
+predicate the whole admin gate rests on. Run `/graphify .` first, then query.
+Once regenerated it is still the faster way in than grepping.
 
 ## gstack
 

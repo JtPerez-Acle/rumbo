@@ -138,6 +138,54 @@ wrong shape for a stranger on a laptop, so `body.wide` — set only by the landi
 cleared by every other route — opens the public surface to 1000px at ≥900px and
 splits the lesson two-up.
 
+## The pages carry their own content (2026-08-31)
+
+Until this date every public page sent **eleven characters** of body text to
+anything that does not run JavaScript: `Cargando…`. Meta tags were rendered
+server-side, so WhatsApp previews worked and `check_public_surface.py` passed —
+the metadata was never the part that was missing.
+
+The cost was concentrated in the fourteen `/curso/<slug>` temarios. Each is the
+natural landing page for a real query (*curso de Meta Ads en español*), each
+carries thirty real lesson titles, and none of them had ever been readable by a
+crawler. One of the fourteen is **SEO + AEO**, which promises learners they will
+appear in Google and in ChatGPT and Perplexity answers; answer engines fetch raw
+HTML and do not execute JS, so the page selling that course could not do the
+thing the course teaches.
+
+`prerender.py` renders those bodies from plain dicts. It is **dependency-free on
+purpose**, for the same reason `admin_paths.py` is: it can be tested without
+importing FastAPI or opening a connection. `_spa_shell` swaps the markup in for
+the `Cargando…` node **inside `#app`**, and every SPA view begins with
+`app.innerHTML=''`, so hydration erases it cleanly. **That is the entire
+integration contract** — there is no double render and nothing to reconcile,
+which is why the module renders a self-contained block instead of trying to
+match what the SPA will build. Verified live: after hydration the prerendered
+`<h1>` is gone and "Módulo 1" appears exactly once.
+
+Measured on `curso-seo-aeo`: **11 → 8,582 characters**. The catalog now carries
+14 real `<a href="/curso/…">` anchors, which is how a crawler reaches the
+temarios at all. `robots.txt` and a 19-URL `sitemap.xml` exist; both used to 404.
+`robots.txt` excludes `/aprende` and the share pages deliberately — a learner's
+documents live on unguessable tokens, and a token in a search index is no longer
+unguessable.
+
+It is also a load-time fix, which was not the reason for doing it but is the
+larger effect today: **domReady went from 7,489 ms to 382 ms**. Most of that came
+from taking Mermaid off the critical path — it was an eager `import` in `<head>`
+from a floating `mermaid@11`, about **215 KB over 19 requests on every page
+load**, for a landing whose lesson contains no diagram at all. It is now lazy and
+pinned to `11.4.1`. Two things not to redo:
+
+- **It stays on the ESM build.** The single-file UMD bundle is the one that can
+  carry an SRI hash, and it is **2.5 MB** against ~215 KB of chunks. The exact
+  pin is the control instead.
+- **`securityLevel` stays `'loose'`.** 38 of our 402 diagrams use `<br>` in
+  labels and `'strict'` renders those as literal text (verified against the
+  database, not guessed). `'antiscript'` would keep the `<br>` and drop the
+  script surface at the cost of 3 diagrams that use `click` handlers — a separate
+  decision, not a free win.
+
 ## Checks
 
 ```bash

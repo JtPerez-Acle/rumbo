@@ -78,8 +78,11 @@ roughly seventy times faster than it learns.
     `check_tutor.py` (**tutor calibration**), `upload_videos.py`, `invites.py`,
     `backup_db.py`, `producer/publisher/scheduler.py` (dormant), `entrypoint.py`.
   - `dashboard/` — `app.py` (admin API + token gate + share pages),
-    `learn_routes.py` (**the entire learner API**), `check_job_render.js` +
-    `check_how_section.js` (**frontend checks — no bundler, no test runner**),
+    `learn_routes.py` (**the entire learner API**), `admin_paths.py` (the admin
+    allowlist predicate), `prerender.py` (**server-rendered bodies for the public
+    surfaces** — both are dependency-free so they can be audited and tested under
+    any interpreter), `check_job_render.js` + `check_how_section.js` (**frontend
+    checks — no bundler, no test runner**),
     `static/{index,learn,doc,caso,ruta}.html`.
   - `channels/*.toml` — course profiles. **Single source of truth** for learner copy.
   - `research/*.md` — grounding material for generation. `fixtures/` — matcher fixtures.

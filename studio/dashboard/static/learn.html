@@ -707,6 +707,31 @@ const renderMD=(el,md)=>{
 };
 async function api(p,o){const r=await fetch('/api/learn'+p,{headers:{'Content-Type':'application/json'},...o}); if(r.status===401)return{__unauth:true}; return r.json();}
 
+/* THE SECOND LOAD.
+   Hydration wipes #app and rebuilds it, and the rebuild awaited the very data
+   the server had just used to prerender the page. A visitor therefore saw a
+   complete page, then an almost empty one, then it refilled in stages across
+   ~460ms of network. Setting body.wide server-side and removing the enter
+   animation fixed how that looked; neither touched why it happened.
+
+   The server now ships those payloads in window.__BOOT__, and this returns them
+   the FIRST time each is asked for. An await on an already-resolved value yields
+   a microtask, and microtasks run before the next paint — so the wipe and the
+   rebuild land in the same frame and the swap is never visible.
+
+   Consumed once, on purpose: a later in-app navigation must fetch fresh data
+   rather than replay whatever was true when the document was served. */
+function bootOnce(key){
+  const b=window.__BOOT__;
+  if(!b||b[key]===undefined)return null;
+  const v=b[key]; delete b[key];
+  return v;
+}
+async function apiBoot(key,path,opts){
+  const cached=bootOnce(key);
+  return cached!==null?cached:api(path,opts);
+}
+
 /* Evaluations really take 25-35s (measured), and there was no timeout anywhere:
    a stalled request left the "tu tutora está leyendo" card spinning forever with
    the send button hidden, and the only way out — reload — destroyed the work,
@@ -1154,7 +1179,10 @@ function publicCourseCard(c){
   return card;
 }
 async function renderCatalogInto(target, openAll){
-  const d=await api('/public/catalog');
+  // The boot payload is the bare course array; the endpoint wraps it. Normalise
+  // so everything below this line cannot tell which one it got.
+  const raw=await apiBoot('catalog','/public/catalog');
+  const d=Array.isArray(raw)?{courses:raw}:raw;
   const cats=clusterize(d.courses||[]);
   cats.forEach(([cat,items],i)=>{
     const open=openAll||i===0;
@@ -1197,7 +1225,7 @@ function landingDoors(kind){
    shown as actual content (this lesson's exercise, this module's reto, the
    document the course compiles into), never as a list of promises. */
 async function renderDemoLesson(target){
-  const d=await api('/public/demo');
+  const d=await apiBoot('demo','/public/demo');
   if(!d||d.detail){
     target.append($(`<div class="note note-warn">${I('alert','ic ic-s')} <span>La clase de muestra no está disponible ahora mismo. Puedes armar tu ruta igual.</span></div>`));
     target.append(landingDoors('lit'));
@@ -1348,7 +1376,7 @@ function renderDemoVerdict(target, ev, d){
 async function renderPublicOutline(slug){
   tabbar.classList.add('hide'); app.innerHTML='';
   document.body.classList.add('wide');
-  const d=await api('/public/course/'+slug);
+  const d=await apiBoot('course','/public/course/'+slug);
   if(d.detail){nav2('cursos');return;}
   app.append(publicHeader('cursos'));
   app.append($(`<div style="margin-top:6px"><h2>${esc(d.title)}</h2>

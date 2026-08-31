@@ -750,12 +750,14 @@ def site_home():
     Same shell as /aprende — the SPA opens on the landing for a logged-out
     visitor and on Hoy for a learner with a session, which is the behaviour that
     was already there. What changes is only which URL reaches it."""
+    _courses, _demo = _catalog_data(), _demo_data()
     return _spa_shell("learn.html", {
         "title": f"{SITE_NAME} — aprende haciendo, con tutora IA",
         "description": ("Haz una clase real ahora mismo, sin cuenta: mira el "
                         "video, lee la guía y explícalo con tus palabras. Tu "
                         "tutora te responde de verdad."),
-    }, prerender=prerender.landing_html(_catalog_data(), _demo_data()), wide=True)
+    }, prerender=prerender.landing_html(_courses, _demo), wide=True,
+       boot={"catalog": _courses, "demo": _demo})
 
 
 # ---- Learner app (Rumbo) ----
@@ -771,7 +773,8 @@ def aprende():
 
 def _spa_shell(template: str, meta: dict | None = None,
                view: str | None = None, arg: str | None = None,
-               prerender: str | None = None, wide: bool = False):
+               prerender: str | None = None, wide: bool = False,
+               boot: dict | None = None):
     """Serve an SPA shell with server-injected <title>/OG tags, and optionally
     the view it should open on.
 
@@ -792,9 +795,14 @@ def _spa_shell(template: str, meta: dict | None = None,
     from fastapi.responses import HTMLResponse
     page = (Path(__file__).parent / "static" / template).read_text(encoding="utf-8")
     if view:
-        boot = (f'<script>window.__VIEW__={_json.dumps(view)};'
-                f'window.__ARG__={_json.dumps(arg or "")};</script>\n')
-        page = page.replace("</head>", boot + "</head>", 1)
+        # NOT named `boot`: that is a parameter of this function, and calling
+        # this local `boot` silently overwrote the caller's payload on every
+        # route that passes a view. /cursos and /curso/<slug> shipped
+        # window.__BOOT__="<script>window.__VIEW__=…" — the view script,
+        # JSON-encoded as a string — while / worked because it passes no view.
+        view_script = (f'<script>window.__VIEW__={_json.dumps(view)};'
+                       f'window.__ARG__={_json.dumps(arg or "")};</script>\n')
+        page = page.replace("</head>", view_script + "</head>", 1)
     if meta:
         title = _html.escape(meta["title"], quote=True)
         desc = _html.escape(meta["description"], quote=True)
@@ -807,6 +815,23 @@ def _spa_shell(template: str, meta: dict | None = None,
                 f'<meta property="og:type" content="website">\n'
                 f'<meta name="description" content="{desc}">\n')
         page = page.replace("</head>", tags + "</head>", 1)
+    if boot:
+        # THE SECOND LOAD, fixed at the source.
+        # Hydration wipes #app and rebuilds it, and the rebuild AWAITS the same
+        # data the server just used to prerender the page. So a visitor saw a
+        # complete page, then an almost empty one, then it refilled in stages
+        # over ~460ms of network. That is the "it loads twice" — not the layout
+        # flash and not the enter animation, which were symptoms sitting on top
+        # of it.
+        # Handing the SPA the data it is about to ask for makes those awaits
+        # resolve from memory. Awaiting an already-resolved value yields a
+        # microtask, and microtasks run BEFORE the next paint — so the wipe and
+        # the rebuild land in the same frame and the swap is never seen.
+        page = page.replace(
+            "</head>",
+            "<script>window.__BOOT__=" + _json.dumps(boot, ensure_ascii=False,
+                                                     separators=(",", ":"))
+            + ";</script>\n</head>", 1)
     if wide:
         # `body.wide` carries the ENTIRE desktop composition, and until now only
         # JS ever set it — so the first paint of a server-rendered page was the
@@ -964,7 +989,8 @@ def public_cursos():
         "title": f"Todos los cursos — {SITE_NAME}",
         "description": ("14 cursos, 420 lecciones. Cada temario abierto entero: "
                         "los módulos, lo que sabrás hacer y cada lección."),
-    }, view="cursos", prerender=prerender.catalog_html(courses), wide=True)
+    }, view="cursos", prerender=prerender.catalog_html(courses), wide=True,
+       boot={"catalog": courses})
 
 
 @app.get("/curso/{slug}")
@@ -983,7 +1009,8 @@ def public_curso(slug: str):
                 "description": course.get("description") or _SITE_DESC}
         body = prerender.course_html(course)
     return _spa_shell("learn.html", meta, view="explora", arg=slug,
-                      prerender=body, wide=True)
+                      prerender=body, wide=True,
+                      boot={"course": course} if course else None)
 
 
 @app.get("/aprende/caso/{token}")

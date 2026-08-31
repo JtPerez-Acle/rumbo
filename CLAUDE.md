@@ -139,15 +139,20 @@ DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
 
 ## Live operational state you must know
 
-- **Email is configured but only reaches ONE inbox.** `RESEND_API_KEY` is set, but
-  `EMAIL_FROM` is Resend's test sender (`onboarding@resend.dev`), which delivers
-  **only to the Resend account owner** and 403s for everyone else. The domain
-  `aprende-ia.app` is not merely unverified — it is **not registered at all**
-  (NXDOMAIN, checked 2026-08-31 on two resolvers). A domain must be *bought*
-  before any of the email runbook applies. Until then every other learner's login
-  email fails and they queue in the dashboard's *Esperando acceso* panel — where
-  one person has been waiting since 2026-08-24. Runbook: `docs/05` → "Runbook:
-  turn on email".
+- **Email WORKS as of 2026-08-31.** The domain is **`ponrumbo.com`** (registered
+  through Railway, DNS managed there, sending region **São Paulo / sa-east-1** —
+  keep it, it is the right region for LatAm receivers). Resend verified, DKIM +
+  SPF-by-CNAME + DMARC `p=none` in place, `EMAIL_FROM=Rumbo <hola@ponrumbo.com>`.
+  A real magic link was sent and received. This was the #1 blocker for a month;
+  it is gone. *(The old note said `aprende-ia.app` needed verifying — that domain
+  was never registered at all, which is why the runbook never worked.)*
+- **The magic link lives 60 minutes** (`LOGIN_TOKEN_TTL_MIN`), and the email
+  **states the duration, reading it from that constant**. Never hardcode the
+  number in the copy. Two token paths exist and only the first sends mail:
+  self-service login (`learn_routes.py`, `LOGIN_TOKEN_TTL_MIN`, emailed) and the
+  operator-minted link (`app.py`, 24 h, returned to the dashboard, not emailed).
+- **`ponrumbo.com` has no inbound MX** — nobody can reply to a Rumbo email. The
+  footer says so. Adding a real inbox is a decision, not an oversight.
 - **Returning-user login is deliberately restricted.** An existing account cannot
   be entered without proving inbox control — self-service re-login returns **409**
   and queues the learner. This closed a live account-takeover hole; do not "fix" it

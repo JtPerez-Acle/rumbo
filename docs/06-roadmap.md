@@ -36,15 +36,16 @@ Module 1 (6 lessons) and produces an artifact she actually uses.
 
 ### What is blocking, concretely
 
-1. **Email reaches exactly one inbox, and the fix is one step further back than
-   this page used to say.** `EMAIL_FROM` is Resend's test sender, so every
-   learner except the account owner gets a 403 and lands in the *Esperando
-   acceso* queue. **Someone has been in that queue since 2026-08-24.** The
-   instruction was "verify a domain at resend.com/domains" — but
-   `aprende-ia.app` **is not registered** (NXDOMAIN, verified 2026-08-31 on two
-   resolvers). There is nothing to verify. A domain has to be bought first, and
-   the rename makes that a decision rather than a formality. Until then no
-   cohort can log itself back in (`docs/05`).
+1. ~~**Email reaches exactly one inbox.**~~ **RESOLVED 2026-08-31.** The domain
+   `ponrumbo.com` was registered, verified in Resend (São Paulo region), and
+   `EMAIL_FROM` repointed at it; a real magic link was sent and received. The
+   blocker turned out to be one step further back than this page said —
+   `aprende-ia.app`, which the runbook told you to *verify*, had never been
+   registered, so there was nothing to verify and the runbook could not have
+   worked as written. **A returning learner can now log themselves back in.**
+   The one row still in *Esperando acceso* from 2026-08-24 predates the fix and
+   needs a human to tell that person they can simply log in — a successful login
+   does not clear the row.
 2. **The 15-use invite code has been shared once, and that one use bounced.**
    *(Corrected 2026-08-31 — this page previously said it had never been shared.)*
    "Cohorte agosto 2026" sits at **1/15**: learner 42 signed up 2026-08-17, hit
@@ -92,16 +93,14 @@ evaluation flagging · offsite DB backups · learner access links.
 
 *(Updated 2026-08-25.)*
 
-1. **Buy a sending domain, verify it, repoint `EMAIL_FROM`.** Everything else is
-   downstream of this: no cohort can log itself back in until it is done, and
-   someone has been queued in *Esperando acceso* since 2026-08-24. `docs/05` →
-   "Runbook: turn on email".
-2. **Clear the queue by hand today**, independently of item 1 — Dashboard →
-   Alumnos → "🔗 Enlace de acceso" is one click and the person has waited a
-   week. Then **re-share the 15-use invite code** and watch what happens. The
-   instruments are all in place — demand ledger, access queue, both calibration
-   suites — and the one person who used the code walked into the wall item 1
-   describes.
+1. ~~**Buy a sending domain, verify it, repoint `EMAIL_FROM`.**~~ **Done
+   2026-08-31** — `ponrumbo.com`, verified, sending from São Paulo.
+2. **Tell the person queued since 2026-08-24 that they can log in**, then
+   **re-share the 15-use invite code** and watch what happens. The instruments
+   are all in place — demand ledger, access queue, both calibration suites — and
+   the one person who used the code in August walked into the login wall that no
+   longer exists. This is now the top of the list, and nothing about it is a
+   build.
 3. **Read the submissions.** Not a build. Dashboard → Alumnos → *Leer su trabajo*.
    The reading view exists; the habit does not. Everything below is guesswork
    until this happens weekly.

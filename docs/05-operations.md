@@ -147,14 +147,25 @@ only be entered by proving inbox control. They get a 409, land in the
 **Esperando acceso** panel, and wait for you to send a link by hand. That is fine
 for four alpha users and it does not survive a cohort.
 
-**Where this actually stands (verified 2026-08-31).** `RESEND_API_KEY` is set —
-that step is done. `EMAIL_FROM` is still `Aprende IA <onboarding@resend.dev>`,
-Resend's test sender, which delivers only to the Resend account owner and 403s
-for everyone else. And the domain this runbook used to tell you to verify,
-`aprende-ia.app`, **is not registered** — NXDOMAIN on two independent resolvers.
-There is no domain to add DNS records to. So step 1 below is a purchase, not a
-configuration, and it is now entangled with the rename: buying `aprende-ia.app`
-to send mail for a product called Rumbo is a decision, not a default.
+> **DONE 2026-08-31.** Email is live on **`ponrumbo.com`**: registered through
+> Railway, verified in Resend, region **São Paulo (sa-east-1)**, sending as
+> `Rumbo <hola@ponrumbo.com>`. A real magic link was sent and received. The
+> steps below are kept as the record of how it was done and what to repeat if
+> the domain ever changes.
+>
+> What made this take a month: the runbook said to *verify* `aprende-ia.app`,
+> and that domain had never been registered. There was nothing to verify. If a
+> setup step keeps not working, check that its subject exists before debugging
+> the step.
+>
+> **DNS lives in Railway** (railway.com/workspace/domains → ponrumbo.com → DNS
+> records) — dashboard only, no CLI or API. Do not switch to custom nameservers;
+> that disables the one-click custom-domain flow.
+>
+> Resend delivers SPF by **CNAME delegation** (`rsend` and `send` →
+> `forge.rmta.net`), not the older SPF-TXT-plus-MX pattern most tutorials still
+> describe. **Never add a `v=spf1 include:amazonses.com` TXT record** — a second
+> SPF record fails the domain outright.
 
 Everything on our side is already wired; this is the whole change:
 

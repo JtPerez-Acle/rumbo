@@ -78,9 +78,39 @@ def _nav() -> str:
     )
 
 
-def landing_html(courses: list[dict] | None = None) -> str:
-    """The landing's argument, in text, above whatever the SPA later builds."""
+def landing_html(courses: list[dict] | None = None,
+                 demo: dict | None = None) -> str:
+    """The landing's argument, in text, above whatever the SPA later builds.
+
+    `demo` is the actual free lesson. Without it this page described a lesson
+    without containing one — the single most valuable block on the site, and the
+    entire reason a stranger should believe the pitch, reachable only by running
+    JavaScript. A crawler saw the sales copy and none of the teaching.
+    """
     courses = courses or []
+    lesson = ""
+    if demo:
+        pts = "".join(f'<li style="{_SMALL}">{_esc(p)}</li>'
+                      for p in (demo.get("key_points") or []))
+        lesson = (
+            f'<h2 style="{_H2}">La clase, entera: {_esc(demo.get("title"))}</h2>'
+            f'<p style="{_SMALL}">{_esc(demo.get("course_title"))} · '
+            f'módulo {_esc(demo.get("module_no"))} · {_esc(demo.get("module_title"))}</p>'
+            + (f'<p style="{_P}">{_esc(demo.get("objectives"))}</p>'
+               if demo.get("objectives") else "")
+            + (f'<h3 style="{_H3}">Lo que te llevas</h3>'
+               f'<ul style="padding-left:18px;margin:0 0 14px">{pts}</ul>' if pts else "")
+            + (f'<h3 style="{_H3}">La pregunta que te hace tu tutora</h3>'
+               f'<p style="{_P}">{_esc(demo.get("explain_prompt"))}</p>'
+               if demo.get("explain_prompt") else "")
+            + (f'<h3 style="{_H3}">El ejercicio</h3>'
+               f'<p style="{_P}">{_esc((demo.get("exercise") or {}).get("instruction"))}</p>'
+               if (demo.get("exercise") or {}).get("instruction") else "")
+            + (f'<h3 style="{_H3}">El reto del módulo</h3>'
+               f'<p style="{_P}"><b>{_esc((demo.get("reto") or {}).get("title"))}</b> — '
+               f'{_esc((demo.get("reto") or {}).get("scenario"))}</p>'
+               if (demo.get("reto") or {}).get("title") else "")
+        )
     items = "".join(
         f'<li style="{_SMALL}"><a href="/curso/{_esc(c.get("slug"))}" style="{_LINK}">'
         f'{_esc(c.get("title"))}</a> — {_esc(c.get("description"))}</li>'
@@ -95,7 +125,8 @@ def landing_html(courses: list[dict] | None = None) -> str:
 <p style="{_P}">Cada lección es un video corto con el porqué, una guía escrita con el cómo, y un ejercicio donde pegas el trabajo que hiciste de verdad. Tu tutora lo lee, te puntúa, te dice qué te falta para llegar a 100 y te hace una pregunta que solo puede contestar quien hizo el trabajo. Reintentas sin límite y siempre se queda tu mejor intento.</p>
 <p style="{_P}">No damos certificados. Damos el trabajo que hiciste, con tu nombre: una estrategia, un plan de campaña, una auditoría — con enlace para compartir y PDF para imprimir.</p>
 <h2 style="{_H2}">Haz una clase ahora, sin cuenta</h2>
-<p style="{_P}">La primera lección del curso de Marketing con IA está abierta en esta página, entera. Mira el video, lee la guía y explícala con tus palabras: la tutora te responde de verdad antes de pedirte nada.</p>
+<p style="{_P}">La primera lección del curso de Marketing con IA está abierta en esta página, entera. Mira el video, lee la guía y explícala con tus palabras: Vera, tu tutora, te responde de verdad antes de pedirte nada.</p>
+{lesson}
 {catalog}
 <p style="{_SMALL}"><a href="/oferta" style="{_LINK}">Arma tu ruta desde una oferta de trabajo</a> · <a href="/login" style="{_LINK}">Ya tengo una invitación</a></p>
 </div>"""

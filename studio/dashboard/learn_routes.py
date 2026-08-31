@@ -880,6 +880,20 @@ def public_demo(request: Request):
     written guide and the question. No auth, no id, nothing to enumerate."""
     if not _demo_read_ok(_client_ip(request)):
         raise HTTPException(429, "demasiadas peticiones")
+    return demo_payload()
+
+
+def demo_payload() -> dict:
+    """The demo lesson's data, with no request and no rate limiting.
+
+    Split out so the server-rendered landing can embed the SAME lesson the SPA
+    fetches. Calling the route directly would have been the obvious shortcut and
+    is wrong twice: it needs a Request it has no business inventing, and it
+    would spend the visitor's own /public/demo budget on rendering the page they
+    are only just opening. Duplicating the assembly instead would let the
+    prerendered lesson and the hydrated one drift apart, which is the one thing
+    this whole prerender must never do.
+    """
     with db.connect() as conn:
         node, course = _demo_node(conn)
         if not node:

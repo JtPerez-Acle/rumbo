@@ -366,30 +366,12 @@
      in stolen time. It does not hold for a page a stranger opens on a laptop,
      where a 560px column in the middle of a dark field reads as unfinished.
      Only body.wide opens up, and only the landing sets it. */
+  /* Width is now the grid's job (see THE GRID below), not a max-width plus a
+     list of exceptions. What stays here is only what the grid cannot express. */
   @media(min-width:900px){
-    body.wide .app{max-width:1000px;padding-left:var(--s6);padding-right:var(--s6)}
-    body.wide .lessonsplit{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);
-      gap:var(--s5);align-items:start}
+    body.wide .lessonsplit{display:grid}
     body.wide .lessonsplit video{max-height:none}
-    body.wide .doors{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s3)}
-    body.wide .demohead{max-width:70ch}
-    /* Measure. Only .app and .demohead were capped, so every flex child below
-       the lesson stretched to 936px and ran 130-155 characters a line — the
-       question card and the verdict included, which are the surface's climax.
-       `ch` resolves against each element's own size, so this caps the text
-       without shrinking the cards that hold tables. */
-    /* Measure for prose, full width for structure. The exemption list is the
-       whole contract: anything NOT named here is text and gets capped, anything
-       named here is a layout container and must not be. `.full` is the opt-out
-       for sections that hold their own grid — added after a band composed at
-       100vw was silently clamped to 840px by this very rule and every card
-       inside it collapsed to 132px. */
-    body.wide .app>*:not(.lessonsplit):not(.cluster):not(.cluster-body):not(.band):not(.hero):not(.full){max-width:840px}
-    body.wide p,body.wide li,body.wide .lt,body.wide h1,body.wide h2,body.wide h3{max-width:72ch}
-    body.wide .lessonsplit p,body.wide .lessonsplit li{max-width:none}
     body.wide .lessonsplit .videoplate{max-height:none}
-    body.wide .cluster-body{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);align-items:start}
-    body.wide .cluster-body>*{margin-bottom:0}
   }
 
   /* ================= EL TALLER, A ESCALA =================
@@ -421,47 +403,146 @@
   .grain{opacity:.55;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E")}
   .app,.tabbar{position:relative;z-index:1}
 
+  /* ---- THE GRID ----
+     Three widths, one grid, sections opt in. Replaces the previous scheme of a
+     max-width on the shell plus a `:not()` chain of exceptions plus a negative
+     margin trick for full-bleed — which collided with itself the first time a
+     band was added (a 100vw section silently clamped to 840px, every card
+     inside it 132px wide).
+
+     Comeau's named-column pattern: the row is always full width and the columns
+     do the work, so `grid-column:full` needs no negative margins and cannot be
+     clamped by a parent. Default is text measure; a section says `u-wide` or
+     `u-full` to take more. Capped at --w-wide: past 1280px the page stops
+     growing and the gutters absorb the rest, because a 1900px measure is not a
+     better page, it is a harder one to read. */
+  :root{--w-text:640px; --w-wide:1280px; --gutter:var(--s6);
+    /* The ground, in four steps. Sections differ by floor, not by rule. */
+    --band-hi:#16121F;      /* hero — lifted toward the lamp */
+    --band-lo:#0C0913;      /* los cuatro pasos — one step under the base */
+    --band-deep:#08060F;    /* fase alfa — the far end of the room */
+  }
   @media(min-width:900px){
-    /* Wider bench. 1000px was still a column; 1240 lets the lesson breathe
-       beside its guide without either half running past measure. */
-    body.wide .app{max-width:1240px;padding-left:var(--s6);padding-right:var(--s6)}
+    body.wide .app{
+      display:grid;max-width:none;padding-left:0;padding-right:0;
+      row-gap:var(--s4);
+      grid-template-columns:
+        [full-start] minmax(var(--gutter),1fr)
+        [wide-start] minmax(0,calc((var(--w-wide) - var(--w-text))/2))
+        [text-start] min(var(--w-text),100% - var(--gutter)*2) [text-end]
+        minmax(0,calc((var(--w-wide) - var(--w-text))/2)) [wide-end]
+        minmax(var(--gutter),1fr) [full-end];
+    }
+    body.wide .app>*{grid-column:text}
+    body.wide .app>.u-wide{grid-column:wide}
+    body.wide .app>.u-full{grid-column:full}
 
-    /* Full-bleed bands. The page had no sections, only a stack — every block
-       the same width on the same ground. A band changes the floor under a
-       section so the eye knows a new idea started. */
-    body.wide .band{max-width:none;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);
-      width:100vw;padding:var(--s6) max(var(--s6),calc(50vw - 620px + var(--s6)));
-      border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-    body.wide .band-panel{background:linear-gradient(180deg,#171320,#14111C)}
-    body.wide .band>*{max-width:none}
+    /* A full-bleed section paints its own floor and re-establishes the grid
+       inside itself, so its content lines up with everything above it. */
+    body.wide .u-full{display:grid;padding:var(--s6) 0;
+      grid-template-columns:inherit;grid-template-columns:
+        [full-start] minmax(var(--gutter),1fr)
+        [wide-start] minmax(0,calc((var(--w-wide) - var(--w-text))/2))
+        [text-start] min(var(--w-text),100% - var(--gutter)*2) [text-end]
+        minmax(0,calc((var(--w-wide) - var(--w-text))/2)) [wide-end]
+        minmax(var(--gutter),1fr) [full-end]}
+    body.wide .u-full>*{grid-column:text}
+    body.wide .u-full>.u-wide{grid-column:wide}
 
-    /* El encabezado. Fraunces at display scale with tight leading: the one
-       place on the site where the serif is allowed to be loud. Measure is
-       capped in `ch` so the line breaks where the sentence does. */
-    body.wide .hero{max-width:none;padding:calc(var(--s6)*1.5) 0 var(--s6)}
-    body.wide .hero h1{font-size:clamp(44px,5.2vw,72px);line-height:1.015;
-      letter-spacing:-.032em;max-width:15ch;margin-top:var(--s4)}
-    body.wide .hero .lede{font-size:var(--fs-lg);line-height:1.5;max-width:58ch;
+    body.wide .band-hi{background:var(--band-hi)}
+    body.wide .band-lo{background:var(--band-lo)}
+    body.wide .band-deep{background:var(--band-deep)}
+
+    /* El encabezado. Headline stays at text measure and the block centres;
+       Fraunces at display scale is the one place the serif is allowed to be
+       loud. */
+    body.wide .hero{padding:calc(var(--s6)*2) 0 calc(var(--s6)*1.75);row-gap:var(--s5)}
+    body.wide .hero h1{font-size:clamp(44px,4.6vw,68px);line-height:1.02;
+      letter-spacing:-.032em;max-width:none;margin-top:var(--s4)}
+    body.wide .hero .lede{font-size:var(--fs-lg);line-height:1.5;
       margin-top:var(--s5);color:var(--dim)}
     body.wide .hero .eyebrow{color:var(--amber)}
+    /* Headline left, the product's own voice right. */
+    body.wide .herogrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);
+      gap:var(--s6);align-items:center}
 
-    /* The bench itself. The lesson is the product working, so it gets the most
-       room and the only frame on the page. */
-    body.wide .lessonsplit{grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:var(--s6)}
+    /* The bench. Equal-height columns so the guide and the video finish level. */
+    body.wide .lessonsplit{grid-template-columns:minmax(0,440px) minmax(0,1fr);
+      gap:var(--s6);align-items:stretch}
+    body.wide .lessonsplit>*{display:flex;flex-direction:column}
+    body.wide .lessonsplit .guidewrap{flex:1}
 
-    /* Los cuatro pasos are a real sequence, so they get numerals — and four
-       across, which is what makes them read as one motion instead of four
-       announcements. */
-    body.wide .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4);max-width:none}
-    body.wide .takeaways{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);max-width:none;align-items:start}
+    body.wide .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4)}
+    body.wide .takeaways{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);align-items:stretch}
     body.wide .takeaways>*{margin:0}
-    body.wide .doors{grid-template-columns:auto auto auto;justify-content:start;gap:var(--s4)}
+    /* Three across so fourteen courses never leave an orphan on a row of two. */
+    body.wide .cluster-body{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);align-items:stretch}
+    body.wide .cluster-body>*{margin-bottom:0}
+    body.wide .doors{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s4)}
 
-    /* El umbral. The closing is where a stranger decides, and it was three
-       ghost buttons and a line of small print. */
+    body.wide .threshold{padding:calc(var(--s6)*1.75) 0}
     body.wide .threshold h2{font-size:clamp(30px,3.2vw,44px);line-height:1.08;
-      letter-spacing:-.02em;max-width:18ch}
+      letter-spacing:-.02em}
   }
+
+  .navcta{display:flex;align-items:center;gap:var(--s5)}
+  @media(min-width:900px){
+    body.wide .sitenav{padding-top:var(--s5);padding-bottom:var(--s4);flex-wrap:nowrap}
+    body.wide .sitenav .navlinks{gap:var(--s5)}
+  }
+  .navlink-quiet{color:var(--dim);font-weight:600;font-size:var(--fs-sm);
+    text-decoration:none;cursor:pointer;white-space:nowrap}
+  .navlink-quiet:hover{color:var(--text);text-decoration:underline}
+  .doorlink{color:var(--dim);font-weight:600;font-size:var(--fs-base);
+    text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+  .doorlink:hover{color:var(--text)}
+
+  /* ---- the tutor panel: the product's own voice, shown not described ---- */
+  .tutorpanel{border:1px solid var(--line-strong);border-radius:var(--r-md);
+    background:linear-gradient(180deg,#1B1626,#171320);padding:var(--s5);margin:0;
+    box-shadow:0 24px 60px -30px rgba(0,0,0,.8)}
+  .tutorpanel .microlabel{color:var(--faint)}
+  .tp-who{font-size:var(--fs-xs);font-weight:700;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--faint)}
+  .tp-said{margin-top:var(--s4);padding-left:var(--s4);border-left:2px solid var(--line-strong)}
+  .tp-said p{font-family:var(--serif);font-size:var(--fs-md);line-height:1.45;
+    color:var(--dim);margin-top:var(--s2)}
+  .tp-verdict{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s5)}
+  .tp-badge{font-size:var(--fs-xs);font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+    background:var(--amber);color:var(--amber-ink);padding:4px 10px;border-radius:999px}
+  .tp-fb{font-size:var(--fs-base);line-height:1.55;color:var(--text);margin-top:var(--s3)}
+  .tp-gaps{margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid var(--line)}
+  .tp-gap{display:flex;gap:var(--s2);align-items:flex-start;margin-top:var(--s2);
+    font-size:var(--fs-sm);line-height:1.5;color:var(--dim)}
+  .tp-gap .ic{color:var(--amber);flex:none;margin-top:2px}
+  .tp-foot{font-size:var(--fs-xs);color:var(--faint);margin-top:var(--s4)}
+
+  .tp-misc{display:flex;gap:var(--s2);align-items:flex-start;margin-top:var(--s4);
+    padding:var(--s3);border-radius:var(--r-sm);background:rgba(240,164,60,.08);
+    border:1px solid rgba(240,164,60,.22);font-size:var(--fs-sm);line-height:1.5;color:var(--text)}
+  .tp-misc .ic{color:var(--amber);flex:none;margin-top:1px}
+  @media(min-width:900px){
+    body.wide .afterq{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+      gap:var(--s5);align-items:start;margin-top:var(--s5)}
+    body.wide .afterq-note{padding-top:var(--s6)}
+  }
+  .afterq{margin-top:var(--s5)}
+  .afterq-note p{max-width:46ch}
+
+  /* ---- founder note ---- */
+  .founder{display:flex;gap:var(--s4);align-items:flex-start;margin-top:var(--s5);
+    padding-top:var(--s5);border-top:1px solid var(--line)}
+  .founder-face{width:52px;height:52px;flex:none;border-radius:999px;overflow:hidden;
+    background:var(--raised);border:1px solid var(--line-strong);
+    display:flex;align-items:center;justify-content:center;color:var(--faint)}
+  .founder-face img{width:100%;height:100%;object-fit:cover;display:block}
+  .founder-text{font-family:var(--serif);font-size:var(--fs-md);line-height:1.5;color:var(--dim)}
+  .founder-who{font-size:var(--fs-xs);font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--faint);margin-top:var(--s2)}
+  /* A real name pointing at a real profile is the cheapest credibility on the
+     page, and it stands in for the photo until there is one. */
+  .founder-link{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-deep)}
+  .founder-link:hover{color:var(--amber-hi)}
 
   /* The step numeral. On a phone it is the compact amber chip the One Column
      Rule wants beside its title. On a laptop, four across, the number IS the
@@ -480,19 +561,16 @@
     body.wide .kpgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2) var(--s6)}
   }
 
-  /* One orchestrated arrival, not scattered micro-interactions: the page
-     assembles itself once, top to bottom, and then holds still. */
-  @media(min-width:900px){
-    body.wide .rise{opacity:0;transform:translateY(14px);
-      animation:rise .62s var(--ease) forwards}
-    body.wide .rise:nth-of-type(1){animation-delay:.02s}
-    body.wide .rise:nth-of-type(2){animation-delay:.10s}
-    body.wide .rise:nth-of-type(3){animation-delay:.18s}
-    body.wide .rise:nth-of-type(4){animation-delay:.26s}
-  }
-  @keyframes rise{to{opacity:1;transform:none}}
+  /* No page-enter animation on the public surface, deliberately.
+     `.app>*{animation:rise}` above is right for the app: a learner moves
+     between views and each one arrives. It is wrong for a server-rendered page.
+     The visitor already sees the real content in the first paint; when
+     hydration rebuilds the same sections and fades them in, the animation
+     re-announces something they have already read, and the page reads as
+     having loaded twice. Motion earns its place by revealing something new —
+     here it was arguing with the prerender. */
+  body.wide .app>*{animation:none}
   @media(prefers-reduced-motion:reduce){
-    body.wide .rise{opacity:1;transform:none;animation:none}
     .lamp,.grain{display:none}
   }
   /* The live lesson: the one place a stranger meets the product working. */
@@ -523,11 +601,14 @@
   /* The written guide on the landing: masked preview, never a scroll region.
      A nested scrollable card mid-page steals the wheel — the first scroll over
      it emptied the card and left the page where it was. */
-  .guidewrap{position:relative;max-height:560px;overflow:hidden}
-  .guidewrap.open{max-height:none}
-  .guidewrap:not(.open)::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;
-    pointer-events:none;border-radius:0 0 var(--r-lg) var(--r-lg);
-    background:linear-gradient(to bottom,rgba(25,21,33,0),var(--panel))}
+  /* The collapsed guide used to fade out over whatever happened to be at 560px,
+   which on this lesson is the middle of a table row — it read as a broken
+   render, not as "there is more". A real scroll cuts on nothing and lets a
+   reader who wants the rest have it without the expand. */
+  .guidewrap{position:relative;max-height:560px;overflow-y:auto;
+    scrollbar-width:thin;overscroll-behavior:contain}
+  .guidewrap.open{max-height:none;overflow:visible}
+  /* (the fade is gone: see .guidewrap above) */
   .demoq{background:linear-gradient(160deg,var(--raised),var(--panel));
     border:1px solid rgba(240,164,60,.35);border-radius:var(--r-lg);padding:var(--s5) var(--s4);
     box-shadow:var(--glow-amber)}
@@ -686,7 +767,12 @@ const I=(n,cls='ic')=>`<svg class="${cls}" viewBox="0 0 24 24"><path d="${PATHS[
 /* catalog clustering: categories come from the course TOMLs; unknowns bucket
    into 'Más cursos'. One cluster starts open — the relevant one — the rest
    show a count. Built for the catalog this becomes, not the one it is. */
-const CAT_ICON={'Marketing y contenido':'pen','Publicidad digital':'target','IA y automatización':'spark'};
+// One icon per area. 'IA y automatización' never matched a real category name
+// ('Analítica y automatización'), so four of the six fell through to the same
+// book glyph and the accordion read as one repeated row.
+const CAT_ICON={'Marketing y contenido':'pen','Publicidad digital':'target',
+  'Analítica y automatización':'spark','Ciencias sociales':'user',
+  'Deporte':'flag','Redes y creadores':'send'};
 function clusterize(courses){
   const m=new Map();
   courses.forEach(c=>{const k=c.category||'Más cursos';if(!m.has(k))m.set(k,[]);m.get(k).push(c);});
@@ -695,8 +781,8 @@ function clusterize(courses){
 function renderClusters(cats, openCat, renderCourse){
   cats.forEach(([cat,items])=>{
     const open=cat===openCat;
-    const head=$(`<div class="cluster ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<span class="ct">${esc(cat)}</span><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
-    const body=$(`<div class="cluster-body ${open?'':'hide'}"></div>`);
+    const head=$(`<div class="cluster u-wide ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<span class="ct">${esc(cat)}</span><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
+    const body=$(`<div class="cluster-body u-wide ${open?'':'hide'}"></div>`);
     items.forEach(c=>body.append(renderCourse(c)));
     head.onclick=()=>{head.classList.toggle('open');body.classList.toggle('hide');};
     app.append(head); app.append(body);
@@ -851,7 +937,7 @@ const STEPS=[
 const GETS=[
   ['doc','El documento que vas a mostrar','Tus entregas compiladas en un entregable profesional con tu nombre: una estrategia, un plan de campaña, una auditoría. Con enlace para compartir y PDF para imprimir.'],
   ['target','Tu ruta, siempre a la vista','Cuánto llevas del puesto que quieres, curso por curso y módulo por módulo. Empiezas por lo que más pesa, no por el principio de todo.'],
-  ['alert','Lo que te falta, dicho por su nombre','Si el puesto pide algo que no enseñamos, te lo decimos y te lo listamos. Preferimos eso a venderte un curso que no lo cubre.']
+  ['target','Lo que te falta, dicho por su nombre','Si el puesto pide algo que no enseñamos, te lo decimos y te lo listamos. Preferimos eso a venderte un curso que no lo cubre.']
 ];
 const howCard=([ic,t,p])=>$(`<div class="card"><div class="row" style="gap:10px;color:var(--amber)">${I(ic)}<b class="t-md" style="color:var(--text)">${t}</b></div><p class="muted t-sm" style="margin-top:8px">${p}</p></div>`);
 /* The numeral carries the sequence, and the sequence is real — the four steps
@@ -862,14 +948,14 @@ const stepCard=(i,[t,p])=>$(`<div class="card"><div class="stephead">
   <span class="stepnum">${i}</span>
   <b class="t-md">${t}</b></div><p class="muted t-sm" style="margin-top:8px">${p}</p></div>`);
 function renderHow(target){
-  const how=$(`<section class="band rise"></section>`);
+  const how=$(`<section class="u-full band-lo"></section>`);
   how.append($(`<div class="microlabel">Cómo funciona · cuatro pasos</div>`));
-  const steps=$(`<div class="steps" style="margin-top:var(--s4)"></div>`);
+  const steps=$(`<div class="u-wide steps" style="margin-top:var(--s4)"></div>`);
   STEPS.forEach((s,i)=>steps.append(stepCard(i+1,s)));
   how.append(steps);
   target.append(how);
 
-  const gets=$(`<section class="rise full" style="margin-top:var(--s6)"></section>`);
+  const gets=$(`<section class="u-wide" style="margin-top:var(--s6)"></section>`);
   gets.append($(`<div class="microlabel">Qué te llevas</div>`));
   const tk=$(`<div class="takeaways" style="margin-top:var(--s4)"></div>`);
   GETS.forEach(g=>tk.append(howCard(g)));
@@ -900,12 +986,27 @@ async function renderLanding(preview){
   }
   lightTheLamp();
   app.append(publicHeader('clase'));
-  app.append($(`<div class="demohead hero rise"><div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
-    <h1>No te contamos cómo funciona. Haz una clase.</h1>
-    <p class="muted lede">Esta es la primera lección del curso de Marketing con IA, entera. Mira el video, lee la guía y explícalo con tus palabras: tu tutora te responde de verdad, aquí mismo, antes de pedirte nada.</p></div>`));
+
+  /* The hero states the offer on the left and PROVES it on the right. The panel
+     is not an illustration: it is a real exchange, produced by the same
+     evaluator this page runs, and labelled as an example rather than as
+     somebody's coursework — docs/06 records what happened the last time seeded
+     data was captioned "documento real de una alumna". */
+  const hero=$(`<section class="u-full band-hi hero"></section>`);
+  hero.append($(`<div class="u-wide herogrid">
+    <div>
+      <div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
+      <h1>No te contamos cómo funciona. Haz una clase.</h1>
+      <p class="muted lede">Esta es la primera lección del curso de Marketing con IA, entera. Mira el video, lee la guía y explícala con tus palabras: ${TUTOR}, tu tutora, te responde de verdad, aquí mismo, antes de pedirte nada.</p>
+    </div>
+    ${tutorPanel('casi')}
+  </div>`));
+  app.append(hero);
+
   await renderDemoLesson(app);
   renderHow(app);
-  const cat=$(`<section class="rise full" style="margin-top:var(--s6)"></section>`);
+
+  const cat=$(`<section class="u-wide" style="margin-top:var(--s6)"></section>`);
   cat.append($(`<div class="microlabel">Las áreas · toca una para ver sus cursos y temarios</div>`));
   app.append(cat);
   await renderCatalogInto(app, false);
@@ -915,13 +1016,89 @@ async function renderLanding(preview){
      weakest moment on the page sitting exactly where a stranger decides. The
      scarcity named here is real and checkable: access IS invite-gated in alpha,
      which is why it can be said plainly instead of manufactured. */
-  const th=$(`<section class="band band-panel threshold" style="margin-top:var(--s6)">
+  const th=$(`<section class="u-full band-deep threshold"></section>`);
+  th.append($(`<div>
     <div class="eyebrow" style="color:var(--amber)">Fase alfa</div>
     <h2 style="margin-top:var(--s3)">Entramos de a poco, y a propósito.</h2>
-    <p class="muted" style="margin-top:var(--s4);max-width:60ch">Cada persona que entra escribe trabajo real y una tutora lo lee. Eso no escala de golpe, así que abrimos por invitación y de a pocos. Si quieres uno de los cupos, dinos qué quieres ser: es la forma más rápida de que sepamos qué construirte.</p>
-  </section>`);
+    <p class="muted" style="margin-top:var(--s4)">Cada persona que entra escribe trabajo real y ${TUTOR} lo lee de verdad. Eso no escala de golpe, así que abrimos por invitación y de a pocos. Si quieres uno de los cupos, dinos qué quieres ser: es la forma más rápida de que sepamos qué construirte.</p>
+  </div>`));
+  th.append(founderNote());
   th.append(landingDoors('lit'));
   app.append(th);
+}
+
+/* The tutor has a name. "Tu tutora" is a product with no identity, and this
+   page asks a stranger to hand their work to it. Vera: short, unambiguous in
+   Spanish, and it means true — which is the one thing this product sells.
+   NOTE: only the public surface says it so far. The app still says "tu tutora"
+   in a few hundred strings; renaming those is a separate, mechanical pass. */
+const TUTOR='Vera';
+
+/* Real exchanges, from the real evaluator.
+   Each was produced by POSTing an answer to /public/demo-explain and keeping
+   EXACTLY what came back — verdict, feedback, misconception, gaps. Not one
+   sentence of tutor output here was written by a copywriter, which is the only
+   reason any of it can be on the page: the whole argument of this surface is
+   that the evaluation is real, and an invented one would be the single most
+   damaging thing on it.
+
+   Both shown answers are WRONG on purpose. A model answer next to the textarea
+   would be copied, and `demo_attempts` exists to record what strangers actually
+   write when nobody is grading them — the one honest read we have on whether
+   the lesson teaches. Showing the answer would destroy the measurement. */
+const EXCHANGES={
+  // Half right: the page's proof that the tutor names gaps instead of scoring.
+  casi:{
+    badge:'Casi',
+    said:'Un objetivo SMART es un objetivo bien hecho, que sea claro y que se pueda cumplir. Sirve para no gastar de más en publicidad porque si tienes claro lo que quieres entonces no andas probando cosas al azar.',
+    fb:'Dices bien que un objetivo SMART es claro y que evita gastar de más porque no andas probando al azar. Eso captura el porqué. Pero cuando la pregunta te pide <b>qué significa</b>, necesitas explicar qué hay detrás de las siglas. Sin eso, la definición queda muy vaga.',
+    misconception:null,
+    gaps:['Explica qué significa cada letra de SMART: Específico, Medible, Alcanzable, Relevante, con Plazo.',
+          'Conecta cómo cada criterio ayuda a no malgastar dinero: “medible” evita no saber si funcionó, “plazo” evita campañas sin fin.']
+  },
+  // Confidently wrong: the only place the misconception mechanic is visible,
+  // and the thing no competitor's "AI tutor" actually does.
+  todavia:{
+    badge:'Todavía no',
+    said:'SMART significa que el objetivo tiene que ser específico, o sea muy detallado. Mientras más detalles le pongas mejor es el objetivo. Si escribes un párrafo largo explicando todo lo que quieres lograr, eso ya es un objetivo SMART.',
+    fb:'Captaste bien la idea de que escribir el objetivo ayuda a no ir a ciegas, y que la claridad es importante. Pero centrarte solo en “específico” y en escribir un párrafo largo deja fuera la parte más importante de SMART. De hecho, un párrafo muy detallado puede ser todo menos SMART si no cumple los otros cuatro criterios, y por ahí es justo donde se escapa el dinero.',
+    misconception:'Ojo: SMART no es sinónimo de “muy detallado” ni de escribir un texto largo. Es un acrónimo de cinco criterios que se revisan uno por uno.',
+    gaps:['Te faltaron las otras cuatro letras: Medible, Alcanzable, Relevante y con Plazo.',
+          'No explicaste por qué evitan malgastar dinero: sin métrica no sabes si la campaña funciona, sin plazo todo se dilata.']
+  }
+};
+
+function tutorPanel(key,extraClass){
+  const x=EXCHANGES[key];
+  return `<figure class="tutorpanel ${extraClass||''}">
+    <figcaption class="microlabel">Ejemplo real · una respuesta y lo que ${TUTOR} contestó</figcaption>
+    <div class="tp-said">
+      <span class="tp-who">Alguien escribió</span>
+      <p>“${x.said}”</p>
+    </div>
+    <div class="tp-verdict"><span class="tp-badge">${x.badge}</span><span class="tp-who">${TUTOR} respondió</span></div>
+    <p class="tp-fb">${x.fb}</p>
+    ${x.misconception?`<div class="tp-misc">${I('spark','ic ic-s')}<span>${esc(x.misconception)}</span></div>`:''}
+    <div class="tp-gaps">
+      <span class="microlabel">Lo que te falta</span>
+      ${x.gaps.map(g=>`<div class="tp-gap">${I('arrow','ic ic-s')}<span>${esc(g)}</span></div>`).join('')}
+    </div>
+    <p class="tp-foot">Reintentas sin límite. Se queda tu mejor intento.</p>
+  </figure>`;
+}
+
+/* Who is behind this. A page that asks for trust and shows no person is asking
+   for more than it gives. */
+function founderNote(){
+  return $(`<div class="founder">
+    <div class="founder-face" aria-hidden="true">${I('user')}</div>
+    <div>
+      <p class="founder-text">Lo abro de a poco porque leo lo que escribe cada persona que entra. Prefiero que a diez les sirva de verdad antes que a mil les sirva a medias.</p>
+      <p class="founder-who">Jose Tomás Pérez-Acle · fundador de Rumbo ·
+        <a href="https://www.linkedin.com/in/jose-tomas-perez-acle-833a761b9/"
+           target="_blank" rel="noopener noreferrer" class="founder-link">LinkedIn</a></p>
+    </div>
+  </div>`);
 }
 
 /* One lamp per page, and only on the public surface. Idempotent: renderLanding
@@ -937,7 +1114,7 @@ function lightTheLamp(){
    see it work, browse what exists, get a route for their own job. `here` marks
    the current one so the nav says where you are, not just where you can go. */
 function publicHeader(here){
-  const nav=$(`<div class="sitenav">
+  const nav=$(`<div class="sitenav u-wide">
     <div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Aprende haciendo, con tutora IA</small></div></div>
     <div class="navlinks">
       <a data-go="" class="${here==='clase'?'on':''}">La clase</a>
@@ -946,7 +1123,8 @@ function publicHeader(here){
     </div>
     ${AUTH
       ? `<button class="btn btn-ghost btn-sm" data-go="hoy">Volver a la app</button>`
-      : `<button class="btn btn-ghost btn-sm" data-go="login">Tengo una invitación</button>`}</div>`);
+      : `<span class="navcta"><a class="navlink-quiet" data-go="login">Tengo una invitación</a>`
+        + `<button class="btn btn-primary btn-sm" data-go="oferta">Dinos qué quieres ser</button></span>`}</div>`);
   nav.querySelectorAll('[data-go]').forEach(el=>{
     el.onclick=()=>nav2(el.dataset.go);
   });
@@ -980,8 +1158,8 @@ async function renderCatalogInto(target, openAll){
   const cats=clusterize(d.courses||[]);
   cats.forEach(([cat,items],i)=>{
     const open=openAll||i===0;
-    const head=$(`<div class="cluster ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<span class="ct">${esc(cat)}</span><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
-    const body=$(`<div class="cluster-body ${open?'':'hide'}"></div>`);
+    const head=$(`<div class="cluster u-wide ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<span class="ct">${esc(cat)}</span><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
+    const body=$(`<div class="cluster-body u-wide ${open?'':'hide'}"></div>`);
     items.forEach(c=>body.append(publicCourseCard(c)));
     head.onclick=()=>{head.classList.toggle('open');body.classList.toggle('hide');};
     target.append(head); target.append(body);
@@ -994,7 +1172,7 @@ async function renderPublicCatalog(){
   document.body.classList.add('wide');
   lightTheLamp();
   app.append(publicHeader('cursos'));
-  app.append($(`<div class="demohead hero rise">
+  app.append($(`<div class="demohead hero">
     <div class="eyebrow">El catálogo completo</div>
     <h1>Todo lo que puedes estudiar aquí.</h1>
     <p class="muted" style="margin-top:10px">Cada curso abre su temario entero: los módulos, lo que sabrás hacer al terminar cada uno, y las lecciones una por una. Nada está escondido detrás del registro.</p></div>`));
@@ -1010,9 +1188,8 @@ async function renderPublicCatalog(){
 function landingDoors(kind){
   const el=$(`<div class="doors" style="margin-top:var(--s5)">
     <button class="btn ${kind==='lit'?'btn-primary':'btn-ghost'}" data-go="oferta">Dinos qué quieres ser ${I('arrow','ic ic-s')}</button>
-    <button class="btn btn-ghost" data-go="lista">Quiero entrar</button>
-    <button class="btn btn-ghost" data-go="login">Tengo una invitación</button></div>`);
-  el.querySelectorAll('button').forEach(b=>b.onclick=()=>nav('#/'+b.dataset.go));
+    <a class="doorlink" data-go="lista">o pide tu acceso</a></div>`);
+  el.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>nav('#/'+b.dataset.go));
   return el;
 }
 /* The free lesson, whole. Video, guide, and the question — then a real verdict
@@ -1026,7 +1203,7 @@ async function renderDemoLesson(target){
     target.append(landingDoors('lit'));
     return;
   }
-  const split=$(`<div class="lessonsplit" style="margin-top:var(--s4)"></div>`);
+  const split=$(`<div class="lessonsplit u-wide" style="margin-top:var(--s4)"></div>`);
   const left=$(`<div></div>`), right=$(`<div></div>`);
   let kpAfter=null;                       // key points render below the split
   split.append(left); split.append(right); target.append(split);
@@ -1059,7 +1236,7 @@ async function renderDemoLesson(target){
   // visible flaw on the page. Full width, two columns of bullets, it fills that
   // space and reads as the lesson's takeaway instead of a caption to the video.
   if((d.key_points||[]).length){
-    const kp=$(`<div class="card keypoints full" style="margin-top:var(--s4)"><div class="microlabel">Lo que te llevas</div></div>`);
+    const kp=$(`<div class="card keypoints u-wide" style="margin-top:var(--s4)"><div class="microlabel">Lo que te llevas</div></div>`);
     const grid=$(`<div class="kpgrid" style="margin-top:var(--s2)"></div>`);
     d.key_points.forEach(p=>grid.append($(`<div class="gaprow"><span class="gx" style="color:var(--amber)">${I('check','ic ic-s')}</span><span>${esc(p)}</span></div>`)));
     kp.append(grid);
@@ -1094,6 +1271,13 @@ async function renderDemoLesson(target){
     <button class="btn btn-primary" id="dqgo" style="margin-top:var(--s3)">Que la tutora lo lea ${I('arrow','ic ic-s')}</button>
     <div id="dqmsg" class="center muted t-sm" style="margin-top:8px"></div></div>`);
   target.append(q);
+  /* What happens after you press send, shown as a real exchange rather than
+     promised. Deliberately a WRONG answer: this sits beside the textarea, and a
+     model answer here would be copied straight into it. */
+  target.append($(`<div class="u-wide afterq">${tutorPanel('todavia','tp-inline')}
+    <div class="afterq-note">
+      <p class="muted t-sm">Esto es lo que recibe cualquiera que escriba algo aquí: un veredicto, el error de fondo si lo hay, y qué le falta — no una nota. La misma ${TUTOR} que lee el trabajo de quienes ya están dentro.</p>
+    </div></div>`));
   const ta=q.querySelector('#dq');
   attachDraft(ta,'demo',0);
   const after=$(`<div role="status" aria-live="polite"></div>`); target.append(after);

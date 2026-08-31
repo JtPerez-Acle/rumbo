@@ -755,7 +755,7 @@ def site_home():
         "description": ("Haz una clase real ahora mismo, sin cuenta: mira el "
                         "video, lee la guía y explícalo con tus palabras. Tu "
                         "tutora te responde de verdad."),
-    }, prerender=prerender.landing_html(_catalog_data()))
+    }, prerender=prerender.landing_html(_catalog_data(), _demo_data()), wide=True)
 
 
 # ---- Learner app (Rumbo) ----
@@ -771,7 +771,7 @@ def aprende():
 
 def _spa_shell(template: str, meta: dict | None = None,
                view: str | None = None, arg: str | None = None,
-               prerender: str | None = None):
+               prerender: str | None = None, wide: bool = False):
     """Serve an SPA shell with server-injected <title>/OG tags, and optionally
     the view it should open on.
 
@@ -803,9 +803,18 @@ def _spa_shell(template: str, meta: dict | None = None,
         page = _re.sub(r"<title data-og>.*?</title>", f"<title>{title}</title>", page, count=1)
         tags = (f'<meta property="og:title" content="{title}">\n'
                 f'<meta property="og:description" content="{desc}">\n'
-                f'<meta property="og:type" content="article">\n'
+                # website, not article: these are product surfaces, not posts.
+                f'<meta property="og:type" content="website">\n'
                 f'<meta name="description" content="{desc}">\n')
         page = page.replace("</head>", tags + "</head>", 1)
+    if wide:
+        # `body.wide` carries the ENTIRE desktop composition, and until now only
+        # JS ever set it — so the first paint of a server-rendered page was the
+        # phone layout, and hydration snapped it to desktop. Invisible while the
+        # body was just "Cargando…"; very visible once there was real content to
+        # watch reflow. The server already knows which view it is opening, so it
+        # can say so in the markup instead of making the client discover it.
+        page = page.replace("<body>", '<body class="wide">', 1)
     if prerender:
         # Swap the loading node INSIDE #app. Every SPA view starts with
         # `app.innerHTML=''`, so hydration erases this cleanly — no double
@@ -850,6 +859,17 @@ def _catalog_data() -> list[dict]:
     except Exception as exc:
         print(f"prerender catalog skipped: {exc}", file=sys.stderr)
         return []
+
+
+def _demo_data() -> dict | None:
+    """The free lesson, for the landing's server-rendered body. Same endpoint
+    the SPA calls, so the two can never describe different lessons."""
+    try:
+        import learn_routes
+        return learn_routes.demo_payload()
+    except Exception as exc:
+        print(f"prerender demo skipped: {exc}", file=sys.stderr)
+        return None
 
 
 def _course_data(slug: str) -> dict | None:
@@ -944,7 +964,7 @@ def public_cursos():
         "title": f"Todos los cursos — {SITE_NAME}",
         "description": ("14 cursos, 420 lecciones. Cada temario abierto entero: "
                         "los módulos, lo que sabrás hacer y cada lección."),
-    }, view="cursos", prerender=prerender.catalog_html(courses))
+    }, view="cursos", prerender=prerender.catalog_html(courses), wide=True)
 
 
 @app.get("/curso/{slug}")
@@ -963,7 +983,7 @@ def public_curso(slug: str):
                 "description": course.get("description") or _SITE_DESC}
         body = prerender.course_html(course)
     return _spa_shell("learn.html", meta, view="explora", arg=slug,
-                      prerender=body)
+                      prerender=body, wide=True)
 
 
 @app.get("/aprende/caso/{token}")

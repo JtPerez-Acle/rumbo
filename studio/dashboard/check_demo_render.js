@@ -178,10 +178,17 @@ const checks = [
   ['the real document type is named', verdict.includes('Estrategia de marketing digital')],
   ['no certificate is promised', /No damos certificados/.test(verdict)],
 
-  // Reachability — both found missing by the finish review.
-  ['the verdict offers all three doors',
-   /Dinos qué quieres ser/.test(doorsLit) && /Quiero entrar/.test(doorsLit) && /Tengo una invitación/.test(doorsLit)],
-  ['a quiet door set exists for the page tail', /Tengo una invitación/.test(doorsGhost)],
+  // Reachability — both found missing by the finish review, which caught a page
+  // that offered NOTHING until a verdict rendered. What that guards is that a
+  // visitor always has a way forward, not a specific button count: the doors
+  // went from three equal buttons to one primary plus a text link, on purpose,
+  // because three equal choices at the decision point is no hierarchy at all.
+  // The assertion now tests the intent that survived the change.
+  ['the verdict leads with the goal engine', /Dinos qué quieres ser/.test(doorsLit)],
+  ['the verdict offers a second way out', /o pide tu acceso/.test(doorsLit)],
+  ['a door set exists for the page tail', /Dinos qué quieres ser/.test(doorsGhost)],
+  ['the closing does not stack equal buttons',
+   (doorsLit.match(/<button/g) || []).length === 1],
   ['only the lit set uses the primary treatment',
    /btn-primary/.test(doorsLit) && !/btn-primary/.test(doorsGhost)],
   ['a failed demo still offers somewhere to go', /Dinos qué quieres ser/.test(failed)],

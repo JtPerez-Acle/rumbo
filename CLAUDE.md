@@ -211,3 +211,39 @@ DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
 Run `/graphify .` (skill installed) or query the prebuilt graph:
 `graphify query "..."`, `graphify explain "X"`, `graphify god-nodes`. Report:
 `graphify-out/GRAPH_REPORT.md`. Prefer this over grepping the tree.
+
+## gstack
+
+**All web browsing goes through the `/browse` skill from gstack. Never use the
+`mcp__claude-in-chrome__*` tools.** `/browse` drives a headless Chromium built at
+`~/.claude/skills/gstack/browse/dist/browse.exe` and is the only sanctioned
+browsing path in this repo — for QA, dogfooding the live site, and reading docs.
+
+Installed at `~/.claude/skills/gstack` (v1.77.0.0, solo install, short names).
+**Windows installs by file copy, so re-run `~/.claude/skills/gstack/setup` after
+every `git pull` of gstack** or the skill files go stale. `/gstack-upgrade` does
+both.
+
+Available skills:
+
+| | |
+|---|---|
+| Planning | `/office-hours` `/autoplan` `/plan-ceo-review` `/plan-eng-review` `/plan-design-review` `/plan-devex-review` |
+| Design | `/design-consultation` `/design-shotgun` `/design-html` `/design-review` |
+| Ship | `/review` `/ship` `/land-and-deploy` `/canary` `/benchmark` |
+| Browser | `/browse` `/qa` `/qa-only` `/connect-chrome` `/setup-browser-cookies` |
+| Diagnose | `/investigate` `/retro` `/devex-review` `/cso` |
+| Docs | `/document-release` `/document-generate` `/learn` |
+| Safety | `/careful` `/freeze` `/guard` `/unfreeze` |
+| Setup | `/setup-deploy` `/setup-gbrain` `/gstack-upgrade` `/codex` |
+
+`/connect-chrome` and `/open-gstack-browser` are the same thing under two names:
+they launch GStack Browser, an AI-controlled Chromium with the sidebar extension.
+Use them (or `/pair-agent`) when a task genuinely needs a real, logged-in browser
+rather than the headless `/browse` session; `/setup-browser-cookies` imports your
+Chromium cookies into the headless session and usually removes the need.
+
+The install also registers skills this list does not cover — `/spec`, `/scrape`,
+`/diagram`, `/health`, `/make-pdf`, `/context-save`, `/context-restore`,
+`/skillify`, `/plan-tune`, `/landing-report`, `/benchmark-models`, and the
+`/ios-*` family. Run `/gstack` for the router.

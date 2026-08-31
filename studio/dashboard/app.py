@@ -586,7 +586,10 @@ def get_access_requests():
         rows = [dict(r) for r in db.open_access_requests(conn)]
     for r in rows:
         r["created_at"] = r["created_at"].isoformat(timespec="minutes")
-    sender = os.environ.get("EMAIL_FROM", "Rumbo <hola@aprende-ia.app>")
+    # Fallback must name a domain that exists — aprende-ia.app never was
+    # registered, so an unset EMAIL_FROM used to fail every send with an
+    # unverified-domain error and show a healthy-looking sender here.
+    sender = os.environ.get("EMAIL_FROM", "Rumbo <hola@ponrumbo.com>")
     return {"requests": rows,
             "email_configured": bool(os.environ.get("RESEND_API_KEY")),
             # The most dangerous state is not "email off" — it is email that

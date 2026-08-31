@@ -29,6 +29,34 @@ LESSONS_PER_DAY = int(os.environ.get("LESSONS_PER_DAY", "1"))
 OUTPUT_DIR = STUDIO / "output"
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
+# How long a self-service magic link lives. The email STATES this number, and
+# takes it from here rather than repeating it in prose: a link that dies before
+# the learner opens their inbox is indistinguishable from a broken product, and
+# copy that drifts from the real TTL is worse than no copy at all.
+# (The operator-minted link in app.py is deliberately longer — it is handed over
+# a channel where the person is already waiting for it.)
+LOGIN_TOKEN_TTL_MIN = int(os.environ.get("LOGIN_TOKEN_TTL_MIN", "60"))
+
+
+def _spanish_duration(minutes: int) -> str:
+    """Render a minute count the way a person would say it in Spanish.
+
+    Exists because the email states the TTL, and "60 minutos" is what a machine
+    says where a person says "1 hora". Whole hours read as hours; anything else
+    stays in minutes rather than inventing "1 hora y 30 minutos" for a value
+    nobody is likely to set.
+    """
+    if minutes >= 60 and minutes % 60 == 0:
+        hours = minutes // 60
+        return "1 hora" if hours == 1 else f"{hours} horas"
+    return "1 minuto" if minutes == 1 else f"{minutes} minutos"
+
+# Sending identity. The fallback must be a domain that EXISTS: it used to point
+# at aprende-ia.app, which was never registered, so an unset EMAIL_FROM meant
+# every send failed with an unverified-domain error instead of anything a log
+# reader would recognise.
+DEFAULT_EMAIL_FROM = "Rumbo <hola@ponrumbo.com>"
+
 # In-memory per-IP rate limiter for the login endpoint. Resets on redeploy —
 # fine at this scale; move to Redis/DB if the service goes multi-instance.
 _RATE: dict[str, deque] = {}
@@ -157,7 +185,8 @@ def login(body: LoginBody, request: Request):
             if invite_row:
                 db.consume_invite(conn, body.invite)
         token = secrets.token_urlsafe(24)
-        db.create_login_token(conn, learner["id"], token)
+        db.create_login_token(conn, learner["id"], token,
+                              ttl_minutes=LOGIN_TOKEN_TTL_MIN)
         conn.commit()
 
     link = f"/aprende/entrar?token={token}"
@@ -184,6 +213,118 @@ def login(body: LoginBody, request: Request):
     return {"sent": False, "dev_link": link}
 
 
+def _login_email_body(url: str, ttl_min: int) -> tuple[str, str]:
+    """The magic-link email, as (html, text).
+
+    Split out from `_send_email` so it can be rendered and looked at without
+    sending anything — the previous version was four unstyled <p> tags that
+    nobody had ever seen in a client, because seeing it required a real send to
+    a real inbox.
+
+    Email is not the web. No flexbox, no external stylesheet, no webfont: the
+    layout is tables, every style is inline, and the typefaces fall back to what
+    the device already has. El Taller Nocturno survives the trip as its two
+    load-bearing ideas — the work sits on paper, and the one amber accent is the
+    lamp — because those are a background colour and a button, which every
+    client since 2003 renders correctly. Georgia stands in for Fraunces; the
+    system sans stands in for Archivo.
+
+    `ttl_min` is stated in the copy rather than written as prose. A link that
+    dies before the learner opens their inbox looks like a broken product, and
+    the number has to come from the same place the token does.
+    """
+    minutes = _spanish_duration(ttl_min)
+    preheader = f"Tu enlace para entrar a Rumbo. Vale por {minutes}."
+
+    html = f"""\
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
+<meta name="supported-color-schemes" content="only light">
+<title>Tu enlace para entrar a Rumbo</title>
+</head>
+<body style="margin:0;padding:0;background-color:#E8E3DA;">
+<div style="display:none;font-size:1px;color:#E8E3DA;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">{preheader}</div>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#E8E3DA;">
+<tr><td align="center" style="padding:32px 16px;">
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:100%;max-width:600px;">
+
+    <tr><td style="padding:0 4px 14px;">
+      <span style="font-family:Georgia,'Times New Roman',serif;font-size:19px;font-weight:bold;color:#8A5A16;letter-spacing:-0.01em;">Rumbo</span>
+    </td></tr>
+
+    <tr><td style="background-color:#F1E6CE;border-radius:4px;padding:34px 30px;">
+
+      <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-size:25px;line-height:1.2;font-weight:normal;color:#26200F;">
+        Entra a tu clase de hoy
+      </h1>
+
+      <p style="margin:0 0 26px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#4A4030;">
+        Toca el botón y entras directo. No hay contraseña que recordar.
+      </p>
+
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+        <tr><td align="center" bgcolor="#F0A43C" style="background-color:#F0A43C;border-radius:3px;">
+          <a href="{url}" style="display:inline-block;padding:15px 34px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:bold;color:#241603;text-decoration:none;">Entrar a Rumbo</a>
+        </td></tr>
+      </table>
+
+      <p style="margin:26px 0 6px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;color:#6B6050;">
+        Si el botón no funciona, copia esta dirección en tu navegador:
+      </p>
+      <p style="margin:0;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;word-break:break-all;">
+        <a href="{url}" style="color:#8A5A16;text-decoration:underline;">{url}</a>
+      </p>
+
+    </td></tr>
+
+    <tr><td style="padding:22px 30px 0;">
+      <p style="margin:0 0 8px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:#5C5344;">
+        El enlace vale por <strong style="color:#3D3527;">{minutes}</strong> y se usa una sola vez. Si se te vence, pide otro desde la misma pantalla.
+      </p>
+      <p style="margin:0;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:#5C5344;">
+        Si no lo pediste tú, ignora este correo. Nadie entra a tu cuenta sin este enlace.
+      </p>
+    </td></tr>
+
+    <tr><td style="padding:24px 30px 0;">
+      <p style="margin:0;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:#8A8172;">
+        Rumbo · aprende haciendo, con tutora IA<br>
+        Este correo es automático y nadie lee las respuestas.
+      </p>
+    </td></tr>
+
+  </table>
+
+</td></tr>
+</table>
+</body>
+</html>"""
+
+    # Accents stay. The plain-text part is what a screen reader, a text-only
+    # client and most spam filters actually read, and a Spanish-language product
+    # writing "contrasena" to a native speaker looks careless in the one place
+    # it can least afford to. Resend sends UTF-8; there is no reason to strip.
+    text = (
+        "Entra a tu clase de hoy\n"
+        "=======================\n\n"
+        "Toca este enlace y entras directo. No hay contraseña que recordar:\n\n"
+        f"{url}\n\n"
+        f"El enlace vale por {minutes} y se usa una sola vez. Si se te vence,\n"
+        "pide otro desde la misma pantalla.\n\n"
+        "Si no lo pediste tú, ignora este correo. Nadie entra a tu cuenta sin\n"
+        "este enlace.\n\n"
+        "--\n"
+        "Rumbo · aprende haciendo, con tutora IA\n"
+        "Este correo es automático y nadie lee las respuestas.\n"
+    )
+    return html, text
+
+
 def _send_email(email: str, link: str) -> bool:
     """Send the magic link. Returns whether it actually went out.
 
@@ -196,20 +337,17 @@ def _send_email(email: str, link: str) -> bool:
     """
     import requests
     base = os.environ.get("PUBLIC_BASE_URL", "")
+    html, text = _login_email_body(f"{base}{link}", LOGIN_TOKEN_TTL_MIN)
     try:
         r = requests.post(
             "https://api.resend.com/emails",
             headers={"Authorization": f"Bearer {os.environ['RESEND_API_KEY']}"},
             json={
-                "from": os.environ.get("EMAIL_FROM", "Rumbo <hola@aprende-ia.app>"),
+                "from": os.environ.get("EMAIL_FROM", DEFAULT_EMAIL_FROM),
                 "to": [email],
-                "subject": "Tu acceso a Rumbo",
-                "html": f'<p>Toca para entrar a tu clase de hoy:</p>'
-                        f'<p><a href="{base}{link}">Entrar a Rumbo</a></p>'
-                        f'<p style="color:#888;font-size:12px">Si no fuiste tú, '
-                        f'ignora este correo: el enlace caduca y es de un solo uso.</p>',
-                "text": f"Entra a tu clase de hoy: {base}{link}\n\n"
-                        f"El enlace caduca y es de un solo uso.",
+                "subject": "Tu enlace para entrar a Rumbo",
+                "html": html,
+                "text": text,
             },
             timeout=20,
         )

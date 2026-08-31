@@ -378,12 +378,122 @@
        question card and the verdict included, which are the surface's climax.
        `ch` resolves against each element's own size, so this caps the text
        without shrinking the cards that hold tables. */
-    body.wide .app>*:not(.lessonsplit):not(.cluster):not(.cluster-body){max-width:840px}
+    /* Measure for prose, full width for structure. The exemption list is the
+       whole contract: anything NOT named here is text and gets capped, anything
+       named here is a layout container and must not be. `.full` is the opt-out
+       for sections that hold their own grid — added after a band composed at
+       100vw was silently clamped to 840px by this very rule and every card
+       inside it collapsed to 132px. */
+    body.wide .app>*:not(.lessonsplit):not(.cluster):not(.cluster-body):not(.band):not(.hero):not(.full){max-width:840px}
     body.wide p,body.wide li,body.wide .lt,body.wide h1,body.wide h2,body.wide h3{max-width:72ch}
     body.wide .lessonsplit p,body.wide .lessonsplit li{max-width:none}
     body.wide .lessonsplit .videoplate{max-height:none}
     body.wide .cluster-body{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);align-items:start}
     body.wide .cluster-body>*{margin-bottom:0}
+  }
+
+  /* ================= EL TALLER, A ESCALA =================
+     The One Column Rule governs the app: one decision per screen, on a phone,
+     in stolen time. The landing is a different room. A stranger opens it on a
+     laptop and decides in about four seconds whether this looks like something
+     serious, and until now `body.wide` widened the shell to 1000px and then
+     capped every child at 840px — so a 1440px screen showed an 840px stack
+     floating in a dark field. Not a desktop page: the phone layout, stretched.
+
+     What follows composes the field rather than filling it. One lamp, one
+     bench, and sections that differ in WEIGHT instead of repeating. The
+     material vocabulary is unchanged and this adds no new colour: the whole
+     effect is the amber we already had, used as light rather than as a button.
+
+     Everything here is >=900px. The phone layout above is untouched, and the
+     app (which never sets body.wide) never sees any of it. */
+
+  /* La lámpara. One warm source, high and centred, falling off fast. This is
+     the single highest-leverage element on the page: it turns a flat dark
+     rectangle into a lit room, and it costs one gradient. */
+  .lamp,.grain{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .lamp{background:
+    radial-gradient(64rem 40rem at 50% -16rem, rgba(240,164,60,.15), transparent 66%),
+    radial-gradient(90rem 60rem at 50% 120%, rgba(241,230,206,.035), transparent 70%)}
+  /* El polvo del taller. Fine grain so the ground reads as a surface with
+     tooth, not as #100D17. Two percent opacity is the whole trick — visible as
+     texture, invisible as noise. */
+  .grain{opacity:.55;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E")}
+  .app,.tabbar{position:relative;z-index:1}
+
+  @media(min-width:900px){
+    /* Wider bench. 1000px was still a column; 1240 lets the lesson breathe
+       beside its guide without either half running past measure. */
+    body.wide .app{max-width:1240px;padding-left:var(--s6);padding-right:var(--s6)}
+
+    /* Full-bleed bands. The page had no sections, only a stack — every block
+       the same width on the same ground. A band changes the floor under a
+       section so the eye knows a new idea started. */
+    body.wide .band{max-width:none;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);
+      width:100vw;padding:var(--s6) max(var(--s6),calc(50vw - 620px + var(--s6)));
+      border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    body.wide .band-panel{background:linear-gradient(180deg,#171320,#14111C)}
+    body.wide .band>*{max-width:none}
+
+    /* El encabezado. Fraunces at display scale with tight leading: the one
+       place on the site where the serif is allowed to be loud. Measure is
+       capped in `ch` so the line breaks where the sentence does. */
+    body.wide .hero{max-width:none;padding:calc(var(--s6)*1.5) 0 var(--s6)}
+    body.wide .hero h1{font-size:clamp(44px,5.2vw,72px);line-height:1.015;
+      letter-spacing:-.032em;max-width:15ch;margin-top:var(--s4)}
+    body.wide .hero .lede{font-size:var(--fs-lg);line-height:1.5;max-width:58ch;
+      margin-top:var(--s5);color:var(--dim)}
+    body.wide .hero .eyebrow{color:var(--amber)}
+
+    /* The bench itself. The lesson is the product working, so it gets the most
+       room and the only frame on the page. */
+    body.wide .lessonsplit{grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:var(--s6)}
+
+    /* Los cuatro pasos are a real sequence, so they get numerals — and four
+       across, which is what makes them read as one motion instead of four
+       announcements. */
+    body.wide .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4);max-width:none}
+    body.wide .takeaways{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);max-width:none;align-items:start}
+    body.wide .takeaways>*{margin:0}
+    body.wide .doors{grid-template-columns:auto auto auto;justify-content:start;gap:var(--s4)}
+
+    /* El umbral. The closing is where a stranger decides, and it was three
+       ghost buttons and a line of small print. */
+    body.wide .threshold h2{font-size:clamp(30px,3.2vw,44px);line-height:1.08;
+      letter-spacing:-.02em;max-width:18ch}
+  }
+
+  /* The step numeral. On a phone it is the compact amber chip the One Column
+     Rule wants beside its title. On a laptop, four across, the number IS the
+     structure, so it becomes the serif numeral and the title drops below it. */
+  .stephead{display:flex;align-items:center;gap:10px}
+  .stepnum{width:26px;height:26px;flex:none;border-radius:8px;display:flex;
+    align-items:center;justify-content:center;font-size:var(--fs-sm);font-weight:800;
+    background:var(--amber);color:var(--amber-ink)}
+  @media(min-width:900px){
+    body.wide .stephead{display:block}
+    body.wide .stepnum{width:auto;height:auto;border-radius:0;background:none;display:block;
+      font-family:var(--serif);font-weight:700;font-size:38px;line-height:1;
+      color:var(--amber-deep);font-variant-numeric:tabular-nums;margin-bottom:var(--s2)}
+    body.wide .steps .card,body.wide .takeaways .card{height:100%}
+    /* Four short takeaways read as a block at 1176px, not a list. */
+    body.wide .kpgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2) var(--s6)}
+  }
+
+  /* One orchestrated arrival, not scattered micro-interactions: the page
+     assembles itself once, top to bottom, and then holds still. */
+  @media(min-width:900px){
+    body.wide .rise{opacity:0;transform:translateY(14px);
+      animation:rise .62s var(--ease) forwards}
+    body.wide .rise:nth-of-type(1){animation-delay:.02s}
+    body.wide .rise:nth-of-type(2){animation-delay:.10s}
+    body.wide .rise:nth-of-type(3){animation-delay:.18s}
+    body.wide .rise:nth-of-type(4){animation-delay:.26s}
+  }
+  @keyframes rise{to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){
+    body.wide .rise{opacity:1;transform:none;animation:none}
+    .lamp,.grain{display:none}
   }
   /* The live lesson: the one place a stranger meets the product working. */
   /* The lesson plate: a real frame from the lesson, our play affordance, and
@@ -744,16 +854,28 @@ const GETS=[
   ['alert','Lo que te falta, dicho por su nombre','Si el puesto pide algo que no enseñamos, te lo decimos y te lo listamos. Preferimos eso a venderte un curso que no lo cubre.']
 ];
 const howCard=([ic,t,p])=>$(`<div class="card"><div class="row" style="gap:10px;color:var(--amber)">${I(ic)}<b class="t-md" style="color:var(--text)">${t}</b></div><p class="muted t-sm" style="margin-top:8px">${p}</p></div>`);
-const stepCard=(i,[t,p])=>$(`<div class="card"><div class="row" style="gap:10px">
-  <span style="width:26px;height:26px;flex:none;border-radius:8px;display:flex;align-items:center;justify-content:center;
-    font-size:var(--fs-sm);font-weight:800;background:var(--amber);color:var(--amber-ink)">${i}</span>
+/* The numeral carries the sequence, and the sequence is real — the four steps
+   happen in this order. On a phone it stays the compact amber pill the One
+   Column Rule wants; on a laptop it becomes the serif numeral, because at four
+   across the number IS the structure and a 26px chip cannot carry it. */
+const stepCard=(i,[t,p])=>$(`<div class="card"><div class="stephead">
+  <span class="stepnum">${i}</span>
   <b class="t-md">${t}</b></div><p class="muted t-sm" style="margin-top:8px">${p}</p></div>`);
 function renderHow(target){
-  target.append($(`<div class="microlabel" style="margin-top:16px">Cómo funciona · cuatro pasos</div>`));
-  STEPS.forEach((s,i)=>target.append(stepCard(i+1,s)));
-  target.append($(`<div class="microlabel" style="margin-top:16px">Qué te llevas</div>`));
-  GETS.forEach(g=>target.append(howCard(g)));
-  target.append($(`<p class="faint t-sm" style="margin:12px 2px 0">No damos certificados: nadie contrata por uno nuestro. Damos el trabajo que hiciste, con tu nombre.</p>`));
+  const how=$(`<section class="band rise"></section>`);
+  how.append($(`<div class="microlabel">Cómo funciona · cuatro pasos</div>`));
+  const steps=$(`<div class="steps" style="margin-top:var(--s4)"></div>`);
+  STEPS.forEach((s,i)=>steps.append(stepCard(i+1,s)));
+  how.append(steps);
+  target.append(how);
+
+  const gets=$(`<section class="rise full" style="margin-top:var(--s6)"></section>`);
+  gets.append($(`<div class="microlabel">Qué te llevas</div>`));
+  const tk=$(`<div class="takeaways" style="margin-top:var(--s4)"></div>`);
+  GETS.forEach(g=>tk.append(howCard(g)));
+  gets.append(tk);
+  gets.append($(`<p class="faint t-sm" style="margin:var(--s4) 2px 0">No damos certificados: nadie contrata por uno nuestro. Damos el trabajo que hiciste, con tu nombre.</p>`));
+  target.append(gets);
 }
 
 /* ---------- The landing IS the lesson ---------------------------------------
@@ -776,17 +898,38 @@ async function renderLanding(preview){
     bar.querySelector('#pvback').onclick=()=>nav('#/hoy');
     app.append(bar);
   }
+  lightTheLamp();
   app.append(publicHeader('clase'));
-  app.append($(`<div class="demohead" style="margin-top:14px"><div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
-    <h1 style="font-size:var(--fd-lg);margin-top:10px">No te contamos cómo funciona. Haz una clase.</h1>
-    <p class="muted" style="margin-top:10px">Esta es la primera lección del curso de Marketing con IA, entera. Mira el video, lee la guía y explícalo con tus palabras: tu tutora te responde de verdad, aquí mismo, antes de pedirte nada.</p></div>`));
+  app.append($(`<div class="demohead hero rise"><div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
+    <h1>No te contamos cómo funciona. Haz una clase.</h1>
+    <p class="muted lede">Esta es la primera lección del curso de Marketing con IA, entera. Mira el video, lee la guía y explícalo con tus palabras: tu tutora te responde de verdad, aquí mismo, antes de pedirte nada.</p></div>`));
   await renderDemoLesson(app);
   renderHow(app);
-  app.append($(`<div class="microlabel" style="margin-top:16px">Las áreas · toca una para ver sus cursos y temarios</div>`));
+  const cat=$(`<section class="rise full" style="margin-top:var(--s6)"></section>`);
+  cat.append($(`<div class="microlabel">Las áreas · toca una para ver sus cursos y temarios</div>`));
+  app.append(cat);
   await renderCatalogInto(app, false);
   app.append($(`<p class="muted t-sm center" style="margin:14px 0 0">¿Tu tema no está? Dentro de la plataforma puedes <b>pedir tu curso</b> y lo construimos.</p>`));
-  app.append(landingDoors('ghost'));
-  app.append($(`<p class="faint t-sm center" style="margin:10px 0 8px">Acceso por invitación mientras estamos en fase alfa.</p>`));
+
+  /* El umbral. This was three ghost buttons and a line of small print — the
+     weakest moment on the page sitting exactly where a stranger decides. The
+     scarcity named here is real and checkable: access IS invite-gated in alpha,
+     which is why it can be said plainly instead of manufactured. */
+  const th=$(`<section class="band band-panel threshold" style="margin-top:var(--s6)">
+    <div class="eyebrow" style="color:var(--amber)">Fase alfa</div>
+    <h2 style="margin-top:var(--s3)">Entramos de a poco, y a propósito.</h2>
+    <p class="muted" style="margin-top:var(--s4);max-width:60ch">Cada persona que entra escribe trabajo real y una tutora lo lee. Eso no escala de golpe, así que abrimos por invitación y de a pocos. Si quieres uno de los cupos, dinos qué quieres ser: es la forma más rápida de que sepamos qué construirte.</p>
+  </section>`);
+  th.append(landingDoors('lit'));
+  app.append(th);
+}
+
+/* One lamp per page, and only on the public surface. Idempotent: renderLanding
+   and renderPublicCatalog both call it, and hydration can run twice. */
+function lightTheLamp(){
+  if(document.querySelector('.lamp'))return;
+  document.body.prepend($(`<div class="grain" aria-hidden="true"></div>`));
+  document.body.prepend($(`<div class="lamp" aria-hidden="true"></div>`));
 }
 
 /* One header for every public view. Brand goes home; the three links are the
@@ -849,10 +992,11 @@ async function renderCatalogInto(target, openAll){
 async function renderPublicCatalog(){
   tabbar.classList.add('hide'); app.innerHTML='';
   document.body.classList.add('wide');
+  lightTheLamp();
   app.append(publicHeader('cursos'));
-  app.append($(`<div class="demohead" style="margin-top:var(--s4)">
+  app.append($(`<div class="demohead hero rise">
     <div class="eyebrow">El catálogo completo</div>
-    <h1 style="font-size:var(--fd-lg);margin-top:10px">Todo lo que puedes estudiar aquí.</h1>
+    <h1>Todo lo que puedes estudiar aquí.</h1>
     <p class="muted" style="margin-top:10px">Cada curso abre su temario entero: los módulos, lo que sabrás hacer al terminar cada uno, y las lecciones una por una. Nada está escondido detrás del registro.</p></div>`));
   const n=await renderCatalogInto(app, true);
   app.append($(`<p class="faint t-sm" style="margin-top:var(--s4)">${n} cursos · toca cualquiera para leer su temario completo.</p>`));
@@ -884,6 +1028,7 @@ async function renderDemoLesson(target){
   }
   const split=$(`<div class="lessonsplit" style="margin-top:var(--s4)"></div>`);
   const left=$(`<div></div>`), right=$(`<div></div>`);
+  let kpAfter=null;                       // key points render below the split
   split.append(left); split.append(right); target.append(split);
 
   left.append($(`<div class="microlabel">${esc(d.course_title)} · lección 1</div>`));
@@ -908,10 +1053,17 @@ async function renderDemoLesson(target){
     };
     left.append(plate);
   }
+  // Key points sit BELOW the split, not in the left column. The guide starts
+  // collapsed, so the right column is shorter than the video column and this
+  // card used to leave a large dead field beside it on a wide screen — the most
+  // visible flaw on the page. Full width, two columns of bullets, it fills that
+  // space and reads as the lesson's takeaway instead of a caption to the video.
   if((d.key_points||[]).length){
-    const kp=$(`<div class="card" style="margin-top:var(--s3)"><div class="microlabel">Lo que te llevas</div></div>`);
-    d.key_points.forEach(p=>kp.append($(`<div class="gaprow"><span class="gx" style="color:var(--amber)">${I('check','ic ic-s')}</span><span>${esc(p)}</span></div>`)));
-    left.append(kp);
+    const kp=$(`<div class="card keypoints full" style="margin-top:var(--s4)"><div class="microlabel">Lo que te llevas</div></div>`);
+    const grid=$(`<div class="kpgrid" style="margin-top:var(--s2)"></div>`);
+    d.key_points.forEach(p=>grid.append($(`<div class="gaprow"><span class="gx" style="color:var(--amber)">${I('check','ic ic-s')}</span><span>${esc(p)}</span></div>`)));
+    kp.append(grid);
+    kpAfter=kp;
   }
 
   right.append($(`<div class="ai-tag" style="margin-bottom:8px"><span class="dot"></span> La guía escrita</div>`));
@@ -928,6 +1080,7 @@ async function renderDemoLesson(target){
     more.textContent=open?'Mostrar menos':'Seguir leyendo la guía';
   };
   right.append(more);
+  if(kpAfter)target.append(kpAfter);
 
   /* The question. This is the surface's whole argument, so it is the lit card. */
   const q=$(`<div class="demoq" style="margin-top:var(--s5)">

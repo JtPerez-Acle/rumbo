@@ -19,9 +19,27 @@ verification".
 """
 from __future__ import annotations
 
+import re
 import sys
 import urllib.error
 import urllib.request
+
+
+def _no_scripts(html: str) -> str:
+    """Markup with <script>/<style> removed, tags otherwise intact.
+
+    Needed because a needle found inside a <script> proves nothing here: the
+    SPA's source contains every string it will ever render, so searching the raw
+    body would pass even when the server sent a blank page. Keeps tags so that
+    href assertions still work.
+    """
+    html = re.sub(r"<script.*?</script>", " ", html, flags=re.S | re.I)
+    return re.sub(r"<style.*?</style>", " ", html, flags=re.S | re.I)
+
+
+def _strip_scripts(html: str) -> str:
+    """Body text as a non-JS client sees it: scripts gone, tags flattened."""
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", _no_scripts(html))).strip()
 
 DEFAULT_BASE = "http://localhost:8799"
 DEMO_SLUG = "curso-meta-ads"
@@ -160,6 +178,51 @@ def main(argv: list[str]) -> int:
     # An unknown slug is a visitor's typo, never a 500.
     code, _ = fetch(f"{base}/curso/no-existe-este-curso")
     check("/curso/<unknown> does not error", code == 200, f"got {code}")
+
+    # ---- the pages carry their CONTENT, not just their metadata ------------
+    # Every public page used to serve exactly eleven characters of body text —
+    # "Cargando…" — to anything that does not run JS. Meta tags passed the checks
+    # above the whole time, which is precisely why this section exists: the
+    # metadata was never the thing that was missing.
+    for path, needle, why, markup in (
+        ("/", "tutora", "the landing's argument", False),
+        ("/cursos", '<a href="/curso/', "links a crawler can walk to the temarios", True),
+        (f"/curso/{DEMO_SLUG}", "Módulo 1", "the modules", False),
+        ("/oferta", "aviso de trabajo", "what the analyser does", False),
+    ):
+        _, body = fetch(base + path)
+        hay = _no_scripts(body) if markup else _strip_scripts(body)
+        check(f"{path} prerenders {why}", needle in hay,
+              "body is client-rendered only — invisible to crawlers and answer engines")
+
+    _, body = fetch(f"{base}/curso/{DEMO_SLUG}")
+    text = _strip_scripts(body)
+    check("/curso/<slug> prerenders real lesson content", len(text) > 3000,
+          f"only {len(text)} chars of body text; the temario is 30 lessons")
+
+    # ---- robots + sitemap --------------------------------------------------
+    code, body = fetch(base + "/robots.txt")
+    check("/robots.txt serves", code == 200, f"got {code}")
+    check("robots allows the temarios", "Allow: /curso/" in body)
+    check("robots keeps crawlers out of the app", "Disallow: /aprende" in body,
+          "learner share tokens must never enter a search index")
+    check("robots points at the sitemap", "Sitemap:" in body)
+
+    code, body = fetch(base + "/sitemap.xml")
+    check("/sitemap.xml serves", code == 200, f"got {code}")
+    check("sitemap lists every course", body.count("/curso/") >= 14,
+          f"only {body.count('/curso/')} course URLs")
+    check("sitemap uses the public base url", "ponrumbo.com" in body or "localhost" in body)
+
+    # ---- mermaid is off the critical path ----------------------------------
+    # It used to be an eager import in <head>: ~215 KB over 19 requests on every
+    # page load, from a floating major tag, for a landing whose lesson has no
+    # diagram at all.
+    _, body = fetch(base + "/")
+    check("mermaid is not eagerly imported", "import mermaid from" not in body,
+          "back on the critical path — 215 KB on every page load")
+    check("mermaid is pinned to an exact version", "mermaid@11.4.1" in body,
+          "a floating tag lets a bad release arrive on its own")
 
     # ---- the app still serves ---------------------------------------------
     code, body = fetch(base + "/aprende")

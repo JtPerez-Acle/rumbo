@@ -446,10 +446,35 @@
         integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"
         integrity="sha384-+VfUPEb0PdtChMwmBcBmykRMDd+v6D/oFmB3rZM/puCMDYcIvF968OimRh4KQY9a" crossorigin="anonymous"></script>
+<!-- Mermaid is LAZY and PINNED, and both words are load-bearing.
+     It used to be an eager `import` in this head from a floating `mermaid@11`
+     tag: ~215 KB over 19 chunk requests, on every page load, from a major-version
+     tag that resolves to whatever the CDN serves today. Two problems in one line.
+     The public landing paid that cost on every visit and its lesson contains no
+     diagram at all, on a product that re-encodes 420 videos to ~5 MB each so a
+     learner on LatAm mobile data does not pay the difference.
+     Now: nothing loads until a lesson actually renders a diagram, and the version
+     is exact so a bad 11.x cannot arrive on its own. Diagrams come from our own
+     generator, never from a learner, but this runs on the same origin as the
+     session cookie and the portfolio pages. -->
 <script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-  mermaid.initialize({startOnLoad:false, theme:'default', securityLevel:'loose'});
-  window.renderMermaid=async(el)=>{try{await mermaid.run({nodes:[el]});}catch(e){el.textContent='(diagrama no disponible)';}};
+  // Stays on the ESM build: the single-file UMD bundle is 2.5 MB against ~215 KB
+  // for these chunks, so "one request with an integrity hash" would cost twelve
+  // times the bytes on exactly the lesson pages that do load a diagram. ESM
+  // imports cannot carry `integrity`, so the exact pin is the control here.
+  // securityLevel stays 'loose' — 38 of our 402 diagrams use <br> in labels and
+  // 'strict' would render those as literal text. Diagrams come from writer.py,
+  // never from a learner. Moving to 'antiscript' would keep the <br> and drop
+  // the script surface, at the cost of 3 diagrams that use click handlers; that
+  // is a separate decision, not a free win.
+  let loading = null;
+  const load = () => (loading ??= import('https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs')
+    .then(m => { m.default.initialize({startOnLoad:false, theme:'default', securityLevel:'loose'}); return m.default; }));
+  window.renderMermaid = async (el) => {
+    if (!el) return;
+    try { const mermaid = await load(); await mermaid.run({nodes:[el]}); }
+    catch (e) { el.textContent = '(diagrama no disponible)'; }
+  };
 </script>
 </head>
 <body>

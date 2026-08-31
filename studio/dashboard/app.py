@@ -91,6 +91,10 @@ def _ensure_schema() -> None:
 # FastAPI: it is the allowlist the whole gate rests on, and a checker that cannot
 # import it silently skips the only assertion that matters.
 from admin_paths import is_admin_path as _is_admin_path  # noqa: E402
+# Server-rendered bodies for the public surfaces. Dependency-free, same reason
+# as admin_paths above: it renders from plain dicts and can be tested without
+# FastAPI or a database.
+import prerender  # noqa: E402
 
 
 def _https(request: Request) -> bool:
@@ -751,7 +755,7 @@ def site_home():
         "description": ("Haz una clase real ahora mismo, sin cuenta: mira el "
                         "video, lee la guía y explícalo con tus palabras. Tu "
                         "tutora te responde de verdad."),
-    })
+    }, prerender=prerender.landing_html(_catalog_data()))
 
 
 # ---- Learner app (Rumbo) ----
@@ -766,7 +770,8 @@ def aprende():
 
 
 def _spa_shell(template: str, meta: dict | None = None,
-               view: str | None = None, arg: str | None = None):
+               view: str | None = None, arg: str | None = None,
+               prerender: str | None = None):
     """Serve an SPA shell with server-injected <title>/OG tags, and optionally
     the view it should open on.
 
@@ -801,6 +806,18 @@ def _spa_shell(template: str, meta: dict | None = None,
                 f'<meta property="og:type" content="article">\n'
                 f'<meta name="description" content="{desc}">\n')
         page = page.replace("</head>", tags + "</head>", 1)
+    if prerender:
+        # Swap the loading node INSIDE #app. Every SPA view starts with
+        # `app.innerHTML=''`, so hydration erases this cleanly — no double
+        # render, nothing to reconcile. Before this, the body a crawler saw was
+        # the eleven characters of "Cargando…"; it is also what a phone on
+        # mobile data stared at for the several seconds hydration takes.
+        loading = '<div class="center muted" style="margin-top:40px">Cargando…</div>'
+        if loading in page:
+            page = page.replace(loading, prerender, 1)
+        else:                                    # template changed under us
+            print("prerender skipped: loading node not found in template",
+                  file=sys.stderr)
     return HTMLResponse(page)
 
 
@@ -819,6 +836,53 @@ _SITE_DESC = ("Aprende haciendo, con tutora IA. Termina con trabajo real que "
               "mostrar, no con un certificado.")
 
 
+def _catalog_data() -> list[dict]:
+    """Courses for the prerendered catalog and the sitemap.
+
+    Reuses the endpoint the SPA already calls, so the server-rendered page and
+    the hydrated one can never disagree about what the catalog contains. Any
+    failure degrades to an empty list: a page that renders without its catalog
+    still beats a 500, and the SPA will fill it in a second later.
+    """
+    try:
+        import learn_routes
+        return learn_routes.public_catalog().get("courses", [])
+    except Exception as exc:
+        print(f"prerender catalog skipped: {exc}", file=sys.stderr)
+        return []
+
+
+def _course_data(slug: str) -> dict | None:
+    """One temario, via the same endpoint the SPA uses. None if absent."""
+    try:
+        import learn_routes
+        return learn_routes.public_course(slug)
+    except Exception as exc:
+        print(f"prerender course {slug} skipped: {exc}", file=sys.stderr)
+        return None
+
+
+@app.get("/robots.txt", include_in_schema=False)
+def robots():
+    """Public surfaces open, the app and the API closed.
+
+    Notably excludes /aprende and the share pages: a learner's documents live on
+    unguessable tokens, and a token in a search index is no longer unguessable.
+    """
+    from fastapi.responses import PlainTextResponse
+    return PlainTextResponse(
+        prerender.robots_txt(os.environ.get("PUBLIC_BASE_URL", "")))
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+def sitemap():
+    from fastapi.responses import Response
+    slugs = [c["slug"] for c in _catalog_data()]
+    return Response(
+        prerender.sitemap_xml(os.environ.get("PUBLIC_BASE_URL", ""), slugs),
+        media_type="application/xml")
+
+
 @app.get("/oferta")
 def public_oferta():
     """The job analyser. docs/08 calls this the acquisition asset and says it
@@ -827,7 +891,14 @@ def public_oferta():
         "title": f"Pega la oferta que quieres — {SITE_NAME}",
         "description": ("Te decimos qué pide de verdad, qué cubrimos, qué no, y "
                         "con qué documento llegar a la entrevista. Sin cuenta."),
-    }, view="oferta")
+    }, view="oferta", prerender=prerender.simple_html(
+        "Pega la oferta que quieres",
+        ["Pega el aviso de trabajo que te interesa, o escribe sólo el nombre del "
+         "puesto. En unos dos minutos sabes qué pide de verdad, qué parte de eso "
+         "cubrimos, qué no, y tu ruta: qué cursos y qué módulos, en qué orden.",
+         "Si el puesto pide algo que no enseñamos, te lo decimos y te lo listamos. "
+         "Preferimos eso a venderte un curso que no lo cubre.",
+         "No necesitas cuenta para probarlo."]))
 
 
 @app.get("/lista")
@@ -835,7 +906,12 @@ def public_lista():
     return _spa_shell("learn.html", {
         "title": f"Pide tu acceso — {SITE_NAME}",
         "description": _SITE_DESC,
-    }, view="lista")
+    }, view="lista", prerender=prerender.simple_html(
+        "Pide tu acceso",
+        ["Rumbo está en fase alfa y el acceso es por invitación. Déjanos tu "
+         "correo y qué quieres lograr, y te escribimos cuando abramos un cupo.",
+         "Mientras tanto puedes hacer una clase completa sin cuenta en la "
+         "portada, y leer el temario entero de cualquier curso."]))
 
 
 @app.get("/login")
@@ -851,18 +927,24 @@ def public_login():
         "title": f"Entrar — {SITE_NAME}",
         "description": ("Entra con tu invitación. El acceso es por invitación "
                         "mientras estamos en fase alfa."),
-    }, view="login")
+    }, view="login", prerender=prerender.simple_html(
+        "Entrar a Rumbo",
+        ["Escribe tu correo y te mandamos un enlace para entrar. No hay "
+         "contraseña que recordar.",
+         "¿Todavía no tienes invitación? Puedes hacer una clase completa sin "
+         "cuenta en la portada, o pedir tu acceso."]))
 
 
 @app.get("/cursos")
 def public_cursos():
     """The whole catalog at its own address. It used to exist only as a section
     below a full lesson on the landing, reachable by scrolling past all of it."""
+    courses = _catalog_data()
     return _spa_shell("learn.html", {
         "title": f"Todos los cursos — {SITE_NAME}",
         "description": ("14 cursos, 420 lecciones. Cada temario abierto entero: "
                         "los módulos, lo que sabrás hacer y cada lección."),
-    }, view="cursos")
+    }, view="cursos", prerender=prerender.catalog_html(courses))
 
 
 @app.get("/curso/{slug}")
@@ -870,19 +952,18 @@ def public_curso(slug: str):
     """A course temario at its own address. docs/02 calls the browsable temarios
     marketing content: 14 courses and 420 lesson objectives, all real, and until
     now invisible to search because they lived behind a fragment."""
-    from cloud import db
     meta = {"title": f"Temario — {SITE_NAME}", "description": _SITE_DESC}
-    if db.enabled():
-        try:
-            with db.connect() as conn:
-                row = conn.execute("SELECT title, description FROM courses "
-                                   "WHERE slug = %s", (slug,)).fetchone()
-            if row:
-                meta = {"title": f"{row['title']} — {SITE_NAME}",
-                        "description": row.get("description") or _SITE_DESC}
-        except Exception as exc:                 # a preview is never worth a 500
-            print(f"temario meta skipped: {exc}", file=sys.stderr)
-    return _spa_shell("learn.html", meta, view="explora", arg=slug)
+    # One fetch now serves both the meta tags and the body, where it used to
+    # serve only the meta tags: the thirty lesson titles this page is actually
+    # about were never in the HTML.
+    course = _course_data(slug)
+    body = None
+    if course:
+        meta = {"title": f"{course['title']} — {SITE_NAME}",
+                "description": course.get("description") or _SITE_DESC}
+        body = prerender.course_html(course)
+    return _spa_shell("learn.html", meta, view="explora", arg=slug,
+                      prerender=body)
 
 
 @app.get("/aprende/caso/{token}")

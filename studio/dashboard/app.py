@@ -107,22 +107,32 @@ def _https(request: Request) -> bool:
     return proto == "https" or request.url.scheme == "https"
 
 
-# Headers applied to every response. The learner app renders Markdown compiled
-# from learner submissions, so defence in depth around that sink is worth having.
-# NOTE: script-src still needs 'unsafe-inline' because both frontends are
-# single-file pages with inline <script> blocks (docs/03: no bundler, on
-# purpose). CSP therefore does not stop injected inline script on its own —
-# DOMPurify at the marked.parse sink is the actual XSS control. What this DOES
-# buy: no plugins, no <base> hijack, no framing, no third-party script origins
-# beyond the pinned CDN, and no mixed content.
+# Headers applied to every response. The app renders Markdown compiled from
+# learner submissions, so defence in depth around that sink is worth having.
+#
+# NO THIRD-PARTY SCRIPT ORIGIN, as of the Astro migration. marked, DOMPurify and
+# mermaid are bundled from node_modules instead of fetched from a CDN with an
+# SRI hash: the versions are pinned in package-lock.json, they cannot be swapped
+# under us by a compromised CDN, and a phone on mobile data opens one fewer
+# connection. `connect-src` lost the CDN with them.
+#
+# 'unsafe-inline' REMAINS, and it is worth being precise about why rather than
+# repeating that it is temporary:
+#   1. the operator dashboard (static/index.html) is still a single file with an
+#      inline <script>. It is the next thing to migrate.
+#   2. Astro emits a small inline bootstrap for each island.
+# So CSP still does not stop injected inline script on its own, and DOMPurify at
+# the render sink remains the actual XSS control. What this DOES buy: no
+# plugins, no <base> hijack, no framing, no third-party script at all, and no
+# mixed content.
 CSP = (
     "default-src 'self'; "
-    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+    "script-src 'self' 'unsafe-inline'; "
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
     "font-src 'self' https://fonts.gstatic.com data:; "
     "img-src 'self' data: blob:; "
     "media-src 'self' blob:; "
-    "connect-src 'self' https://cdn.jsdelivr.net; "
+    "connect-src 'self'; "
     "object-src 'none'; base-uri 'self'; form-action 'self'; "
     "frame-ancestors 'none'"
 )
@@ -772,7 +782,7 @@ def aprende(request: Request, learner_session: str | None = Cookie(default=None)
             return RedirectResponse(f"/login?error={quote(error)}", status_code=302)
         # Nothing to sign in with: the public site is what they came for.
         return RedirectResponse("/", status_code=302)
-    return FileResponse(Path(__file__).parent / "static" / "learn.html")
+    return FileResponse(public_site.page("/aprende"))
 
 
 def _spa_shell(template: str, meta: dict | None = None):

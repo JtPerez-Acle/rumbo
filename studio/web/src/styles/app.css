@@ -1,14 +1,13 @@
 /* El Taller Nocturno — the component layer.
  *
- * This file is learn.html's <style> block with the two :root blocks removed;
- * those live in tokens.css, which is the design system's single source of
- * truth. `css-parity.test.js` reassembles the two and asserts they reproduce
- * learn.html exactly, so during the migration the stylesheet cannot fork —
- * an edit here that is not mirrored there (or the reverse) fails the suite.
+ * One stylesheet again. It was two for the length of the migration: a
+ * byte-for-byte copy of learn.html's inline <style>, held identical by a parity
+ * test, plus a file for everything the rebuilt interface added. learn.html is
+ * gone, so the copy is not a copy of anything and the two have merged.
  *
- * When learn.html is deleted this file stops being a copy of anything, the
- * parity test is deleted with it, and this becomes the only stylesheet.
- * Until then: EDIT IN BOTH PLACES, or edit neither.
+ * tokens.css stays separate and stays the single source of truth for values.
+ * A visual change belongs there; this file consumes tokens and should not
+ * define them.
  */
 
   /* ============================================================
@@ -134,8 +133,13 @@
 
   /* ---- progress ---- */
   .prog{height:7px;border-radius:99px;background:var(--raised);overflow:hidden;border:1px solid var(--line)}
-  .prog>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--amber-deep),var(--amber-hi));
-    transition:width .8s var(--ease)}
+  /* Revealed with clip-path, not width. Animating width relayouts the page on
+     every frame and these bars sit inside cards in a scrolling column; scaleX
+     avoids that but squashes the 99px end caps into ellipses at any fill under
+     100%. clip-path does neither: the element keeps its geometry and only the
+     visible region moves. */
+  .prog>i{display:block;height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,var(--amber-deep),var(--amber-hi));
+    transition:clip-path .8s var(--ease)}
 
   .row{display:flex;align-items:center;gap:10px}
 
@@ -235,8 +239,8 @@
   .jslow{margin-top:var(--s3)}
   /* coverage read-out on the result */
   .covbar{height:8px;border-radius:99px;background:var(--raised);overflow:hidden;margin-top:var(--s2)}
-  .covbar i{display:block;height:100%;border-radius:99px;background:var(--amber);
-    transition:width .9s var(--ease)}
+  .covbar i{display:block;height:100%;width:100%;border-radius:99px;background:var(--amber);
+    transition:clip-path .9s var(--ease)}
   .gaprow{display:flex;gap:var(--s2);align-items:flex-start;padding:var(--s2) 0;
     font-size:var(--fs-sm);color:var(--dim)}
   .gaprow .gx{flex:none;color:var(--terra);margin-top:1px}
@@ -317,7 +321,7 @@
   .celebrate{text-align:center;display:flex;flex-direction:column;align-items:center;gap:var(--s2);padding-top:var(--s5)}
   .medal{width:92px;height:92px;border-radius:99px;display:flex;align-items:center;justify-content:center;
     background:radial-gradient(circle at 35% 30%,var(--amber-hi),var(--amber-deep));
-    box-shadow:0 0 54px rgba(240,164,60,.55);color:var(--amber-ink);animation:pop .55s cubic-bezier(.2,1.4,.4,1)}
+    box-shadow:0 0 54px rgba(240,164,60,.55);color:var(--amber-ink);animation:pop .55s cubic-bezier(.22,1,.36,1)}
   .medal .ic{width:40px;height:40px;stroke-width:2}
   @keyframes pop{0%{transform:scale(0) rotate(-12deg)}100%{transform:scale(1) rotate(0)}}
   .bigstreak{font-family:var(--serif);font-weight:700;font-size:var(--fd-streak);line-height:1;margin-top:var(--s2);
@@ -402,7 +406,15 @@
      tooth, not as #100D17. Two percent opacity is the whole trick — visible as
      texture, invisible as noise. */
   .grain{opacity:.55;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E")}
-  .app,.tabbar{position:relative;z-index:1}
+  .app{position:relative;z-index:1}
+  /* The tab bar is FIXED, and it took a rewrite to notice it was not.
+     `.app,.tabbar{position:relative}` sat here and quietly beat the
+     `position:fixed` forty lines above it, so the app's primary navigation
+     scrolled away with the page — on a phone, below a lesson, that is a
+     navigation you have to hunt for. The 84px of bottom padding on .app has
+     been reserving space for a fixed bar the whole time, which is the proof
+     this was a collision and not a decision. */
+  .tabbar{z-index:41}
 
   /* ---- THE GRID ----
      Three widths, one grid, sections opt in. Replaces the previous scheme of a
@@ -660,3 +672,166 @@
     .readline i{width:100%;background:var(--amber);opacity:.55}
     .jstage{opacity:1}
   }
+
+
+
+/* ---------------------------------------------------------------------------
+   The catalog accordion, as <details>/<summary>.
+   The SPA built it from a div with a click handler and a sibling it toggled
+   `.hide` on: not keyboard-operable, not announced as a disclosure, and closed
+   sections stayed invisible to browser find-in-page. The disclosure element
+   does all three for free. These rules only restore the same appearance.
+--------------------------------------------------------------------------- */
+.cluster-wrap {
+  display: block;
+}
+/* The default triangle, in both engines. */
+.cluster-wrap > summary {
+  list-style: none;
+}
+.cluster-wrap > summary::-webkit-details-marker {
+  display: none;
+}
+.cluster-wrap[open] > .cluster .chev {
+  transform: rotate(90deg);
+}
+/* .cluster-body used to be a grid child in its own right; inside <details> its
+   parent is, so the multi-column rule has to be re-established here. Same
+   breakpoint and same three columns as body.wide .cluster-body. */
+.cluster-wrap > .cluster-body {
+  margin-top: var(--s4);
+}
+@media (min-width: 900px) {
+  body.wide .cluster-wrap > .cluster-body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s4);
+    align-items: stretch;
+  }
+  body.wide .cluster-wrap > .cluster-body > * {
+    margin-bottom: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The written guide's "seguir leyendo".
+   Not a disclosure: the guide stays visible and readable at all times, and this
+   only lifts the 560px cap. `.guidewrap.open` did exactly this under the SPA's
+   click handler; the island sets the class on a wrapper instead, so the rule
+   moves one level out and nothing else about the guide changes.
+--------------------------------------------------------------------------- */
+.guide-open .guidewrap {
+  max-height: none;
+  overflow: visible;
+}
+
+/* ---------------------------------------------------------------------------
+   Islands, before they hydrate.
+   A Svelte island renders its markup at build time and becomes interactive a
+   moment later. Anything that would look broken in that window — a control
+   whose handler is not attached yet — says so instead of lying about being
+   ready. Nothing here changes size, so hydration moves no pixels.
+--------------------------------------------------------------------------- */
+.island-idle {
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Perfil's avatar. It was a 400-character inline `style` attribute inside a
+   template literal, which is where CSS goes to stop being reviewable.
+--------------------------------------------------------------------------- */
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 99px;
+  margin: 0 auto 12px;
+  background: linear-gradient(150deg, var(--amber-hi), var(--amber-deep));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: var(--fd-md);
+  font-weight: 700;
+  color: var(--amber-ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Portafolio rows, as <details>.
+   Each row hides the tutor's feedback until it is opened, which is the point of
+   the row — and it was a div with a click handler: no tab stop, no Enter key,
+   and a screen reader announcing an unlabelled block of text. The disclosure
+   element gives all three away for free, and browser find-in-page can now open
+   a closed row to reveal a match inside it.
+--------------------------------------------------------------------------- */
+.pf-row > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.pf-row > summary::-webkit-details-marker {
+  display: none;
+}
+.pf-row[open] .fb {
+  display: block;
+}
+
+/* ---------------------------------------------------------------------------
+   Rows and cards that are BUTTONS now.
+   Half this interface was built as `<div onclick>`: the temario row, the
+   catalog card, the cluster header, the quiz option, the portfolio row, the
+   route step. That is fine for a thumb and invisible to a keyboard or a switch —
+   no tab stop, no Enter, and a screen reader announcing nothing at all. A
+   MutationObserver used to stamp roles onto them as they entered the DOM, which
+   worked and was a workaround for markup that could simply be right.
+   They are real buttons now, so these rules only strip the UA styling a button
+   arrives with. The observer is gone with them.
+--------------------------------------------------------------------------- */
+button.lrow,
+button.card,
+button.course-card,
+button.req-row,
+button.back,
+.tabbar button {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+}
+button.card,
+button.course-card {
+  display: block;
+}
+button.back {
+  width: auto;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* An inline control inside a sentence. It was a <u> with a click handler in the
+   exercise's "define tu proyecto" nudge — underlined text that looked like a
+   link, was not one, and could not be reached by keyboard. */
+.linklike {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Progress toward a deliverable, as pips. Was three inline-styled spans built
+   in a template literal with the colour decided in JavaScript. */
+.pip {
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.14);
+}
+.pip.on {
+  background: var(--amber);
+}

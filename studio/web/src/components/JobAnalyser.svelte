@@ -18,6 +18,12 @@
   import { PATHS } from '../lib/icons.js';
   import { JOB_STAGES, JOB_SLOW_AT, modLabel } from '../lib/route.js';
 
+  /* `signedIn` is the app's variant of this same screen. The analysis is
+     identical — it is the CTA at the end that differs, because a learner needs
+     a DECISION (make this my goal, or keep the current one) where a stranger
+     needs the door. Two copies of a two-minute matcher would drift. */
+  let { signedIn = false } = $props();
+
   let phase = $state('form'); // form | working | result | failed
   let mode = $state('oferta'); // oferta | puesto
   let posting = $state('');
@@ -140,6 +146,28 @@
     failure = '';
   }
 
+  let claiming = $state(false);
+  let claimMsg = $state('');
+
+  /* Making it the goal is a claim against the token, the same call boot() makes
+     for a route analysed before signing up. */
+  async function makeItMyGoal() {
+    claiming = true;
+    claimMsg = 'Activando tu objetivo…';
+    const r = await fetch('/api/learn/job-target/claim', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    }).then((res) => res.json()).catch(() => null);
+    claiming = false;
+    if (r && r.ok) {
+      try { localStorage.removeItem('aprende_job_token'); } catch { /* private mode */ }
+      location.hash = '#/objetivo';
+    } else {
+      claimMsg = (r && r.detail) || 'No pudimos activarlo, intenta de nuevo.';
+    }
+  }
+
   const nucleo = $derived(analysis ? analysis.ruta.filter((r) => r.phase === 'nucleo') : []);
   const later = $derived(analysis ? analysis.ruta.filter((r) => r.phase !== 'nucleo') : []);
 </script>
@@ -155,6 +183,10 @@
     {#if r.why}<div class="jwhy">{r.why}</div>{/if}
   </div>
 {/snippet}
+
+{#if signedIn && phase !== 'working'}
+  <button class="back" onclick={() => (location.hash = '#/objetivo')}>‹ Mi objetivo</button>
+{/if}
 
 {#if phase === 'form' || phase === 'failed'}
   {#if phase === 'failed'}
@@ -296,7 +328,7 @@
       <b class="t-md">Cubrimos {analysis.coverage}% de lo que pide</b>
       <span class="faint t-sm">{analysis.competencies.length} competencias</span>
     </div>
-    <div class="covbar"><i style={`width:${coverageWidth}%`}></i></div>
+    <div class="covbar"><i style={`clip-path:inset(0 ${100 - (coverageWidth)}% 0 0)`}></i></div>
     <p class="muted t-sm" style="margin-top:10px">
       {#if analysis.ruta.length}
         Tu ruta son <b>{analysis.total_lessons} lecciones</b>. Empiezas por
@@ -306,6 +338,17 @@
       {/if}
     </p>
   </div>
+
+  {#if signedIn && progress && progress.done > 0}
+    <!-- Work already done counts toward this route: progress is per lesson, not
+         per goal. Changing objective carries your work forward — say so before
+         they decide, or switching reads as starting over. -->
+    <div class="note note-goal" style="margin-top:10px">
+      {@render icon('check')}
+      <span>Ya llevas <b>{progress.done} de {progress.total}</b> lecciones de esta
+      ruta: lo que estudiaste antes cuenta aquí. No empiezas de cero.</span>
+    </div>
+  {/if}
 
   {#if nucleo.length}
     <div class="phasehead">Empieza por aquí · {analysis.core_lessons} lecciones</div>
@@ -356,10 +399,25 @@
   {/if}
 
   <div style="display:flex;flex-direction:column;gap:8px;margin-top:18px">
-    <button class="btn btn-primary" type="button" onclick={wantRoute}>
-      {analysis.ruta.length ? 'Quiero esta ruta' : 'Avísame cuando lo cubran'}
-      {@render icon('arrow')}
-    </button>
-    <a class="btn btn-ghost" href="/login">Tengo una invitación</a>
+    {#if signedIn}
+      <!-- An existing learner needs a decision, not a signup. Switching is
+           non-destructive: completed lessons carry over to any route that
+           includes them, and the old goal keeps its document. -->
+      {#if analysis.ruta.length}
+        <button class="btn btn-primary" type="button" disabled={claiming} onclick={makeItMyGoal}>
+          Hacer este mi objetivo {@render icon('arrow')}
+        </button>
+      {/if}
+      <button class="btn btn-ghost" type="button" onclick={() => (location.hash = '#/objetivo')}>
+        {analysis.ruta.length ? 'Guardarlo y seguir con el actual' : 'Volver'}
+      </button>
+      <div class="center muted t-sm" role="status" aria-live="polite">{claimMsg}</div>
+    {:else}
+      <button class="btn btn-primary" type="button" onclick={wantRoute}>
+        {analysis.ruta.length ? 'Quiero esta ruta' : 'Avísame cuando lo cubran'}
+        {@render icon('arrow')}
+      </button>
+      <a class="btn btn-ghost" href="/login">Tengo una invitación</a>
+    {/if}
   </div>
 {/if}

@@ -93,22 +93,22 @@ says "esto no lo cubrimos" is the one people trust about what it does cover.
   at build time only; production is still one Python process serving files, with
   no second service. The migration is phased and reversible — see the plan and
   `docs/03`.
-- **A visual change still belongs in the token layer**, which is now a real file
+- **A visual change belongs in the token layer**, which is a real file
   (`studio/web/src/styles/tokens.css`) rather than a `:root` block inside a
-  3,000-line HTML file. It was true by convention before and is true by
-  construction now; `tokens.test.js` fails on drift while both copies exist.
-- **CSP still requires `'unsafe-inline'` for scripts** while the vanilla
-  frontends are the ones being served, so DOMPurify — not CSP — remains the real
-  XSS control. Untrusted Markdown renders through `renderMD()` (marked →
-  DOMPurify), never straight to `innerHTML`. CDN libraries are pinned to exact
-  versions with SRI. **The build step is what finally allows `'unsafe-inline'`
-  to be dropped, but not until the pages carrying inline script are gone** —
-  removing it earlier would break the live product to buy a header.
-- **134 assertions run under vitest** (`cd studio/web && npm test`, which builds
-  first) and assert user-facing *promises*, not layout: the landing's "cómo
-  funciona" block, the job-analysis result page, the CV screen, and the built
-  public pages as they actually ship. They exist because copy here has aged
-  silently before. Any overhaul keeps them green or changes them deliberately.
+  3,192-line HTML file. It was true by convention before and is true by
+  construction now: there is one stylesheet and one place values are defined.
+- **No third-party script origin at all.** marked, DOMPurify and mermaid are
+  bundled from the lockfile rather than fetched from a CDN with an SRI hash, so
+  `script-src` is `'self' 'unsafe-inline'` and `connect-src` is `'self'`.
+  `'unsafe-inline'` survives for exactly two reasons — the admin panel is still
+  one file with an inline script, and Astro emits a small inline bootstrap per
+  island — so DOMPurify at the render sink remains the real XSS control.
+- **128 assertions run under vitest** (`cd studio/web && npm test`, which builds
+  first) and assert user-facing *promises*, not layout: the built public pages
+  as they actually ship, the demo verdict, the job-analysis result, the CV
+  screen's proposes-but-does-not-dispose contract, and "cómo funciona". They
+  exist because copy here has aged silently before. Any overhaul keeps them
+  green or changes them deliberately.
 - **The public surface has real URLs; the app is still hash-routed.** `/`,
   `/cursos`, `/curso/<slug>`, `/oferta`, `/lista` and `/login` are built files a
   crawler and an answer engine can read. Inside the app, back button, refresh and

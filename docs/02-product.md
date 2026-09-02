@@ -8,7 +8,7 @@ darkness, one amber lamp, and the learner's work glowing paper-white — the onl
 light source that matters. The rule: *the interface is grotesk (Archivo), the
 work is serif (Fraunces)* — headlines and scores are serif; documents and case
 studies are paper-styled pages. All styling flows from a CSS token layer in
-`learn.html` (`:root`: color, 6-step type scale, spacing, radii, motion) plus
+`studio/web/src/styles/tokens.css` (color, 6-step type scale, spacing, radii, motion) plus
 component classes — a visual change is a token edit, never a hunt through
 templates. Iconography is a drawn inline-SVG set (single stroke, currentColor);
 no emoji in the chrome. The emotional moments are choreographed: staged

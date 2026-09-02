@@ -82,10 +82,12 @@ roughly seventy times faster than it learns.
     `admin_paths.py` (the admin allowlist predicate), `public_site.py` (where the
     built public pages live, who is redirected past them, robots + sitemap) —
     both are dependency-free so they can be audited under any interpreter —
-    `static/{index,learn,doc,caso,ruta}.html`.
-  - `web/` — **the Astro + Svelte frontend** and its 114 vitest assertions. Static
-    output, built in Docker stage 1, served by FastAPI; **no Node in production**.
-    `src/styles/tokens.css` is the design system's single source of truth.
+    `static/{index,doc,caso,ruta}.html` (**`index.html` is the admin panel and
+    the last vanilla page left**).
+  - `web/` — **the whole frontend**: Astro pages, Svelte components, 128 vitest
+    assertions. Built in Docker stage 1 and served by FastAPI; **no Node in
+    production**. `src/styles/tokens.css` is the design system's single source
+    of truth and `src/styles/app.css` the component layer.
   - `channels/*.toml` — course profiles. **Single source of truth** for learner copy.
   - `research/*.md` — grounding material for generation. `fixtures/` — matcher fixtures.
   - `output/`, `queue/` — rendered videos and render queue (**git-ignored**).
@@ -137,7 +139,7 @@ python studio/cloud/check_job_matcher.py    # matcher, 5 fixtures, ~15 min (real
 python studio/cloud/check_tutor.py          # tutor, 6 properties, ~5 min (real LLM)
 python studio/cloud/check_cv_matcher.py     # CV matcher; reads REAL CVs from ./cvs (git-ignored)
 python studio/cloud/check_public_surface.py [base_url]   # HTTP: public routes + every admin gate
-cd studio/web && npm test     # builds, then runs 134 assertions — before ANY frontend edit
+cd studio/web && npm test     # builds, then runs 128 assertions — before ANY frontend edit
 cd studio/web && npm run build   # Astro static build; Docker stage 1 runs this
 
 # The public pages are built from exported data, so after adding a course:
@@ -220,11 +222,16 @@ DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
 - **Every learner-authored string reaching a model goes through `writer._fenced()`**
   and the system prompt carries `UNTRUSTED_RULE`. Without it a submission could
   dictate its own grade — verified at 100/100 on garbage before the fix.
-- **Untrusted Markdown renders through `renderMD()`** (marked → DOMPurify), never
-  straight to `innerHTML`. That was a stored-XSS sink on the public paper pages.
-  On the **public** pages it is rendered at build time with markdown-it and
-  `html:false`, which never parses raw HTML at all — strictly stronger, and it
-  ships no sanitiser to a phone.
+- **Untrusted Markdown renders through `renderMarkdownUntrusted()`** (marked →
+  DOMPurify, `lib/untrusted.js`), never straight to `innerHTML`. That was a
+  stored-XSS sink on the public paper pages. On the **public** pages it is
+  rendered at BUILD time with markdown-it and `html:false`, which never parses
+  raw HTML at all — strictly stronger, and it ships no sanitiser to a phone.
+- **Nothing loads from a CDN any more.** marked, DOMPurify and mermaid are
+  bundled from `node_modules`, so their versions are pinned in the lockfile and
+  `script-src` carries no third-party origin. `'unsafe-inline'` is still there
+  for two reasons and only two: the admin panel is still a single inline-script
+  file, and Astro emits a small inline bootstrap per island.
 - **An island's props are serialized into the HTML.** Handing a Svelte island a
   whole payload ships every field of it twice, once rendered and once inside an
   `<astro-island props="…">` attribute. Pass only the fields the component

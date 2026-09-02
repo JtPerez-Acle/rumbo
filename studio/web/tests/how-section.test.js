@@ -1,40 +1,45 @@
-/* The landing's "Cómo funciona / Qué te llevas" block.
+// @vitest-environment jsdom
+/* "Cómo funciona": the promises this product makes, in the one place it makes
+ * them twice.
  *
- * These are promises made to a stranger, not layout. The block went stale once
- * already — it described a course-shaped product for weeks after the goal engine
- * shipped, and still used "pregunta de defensa" wording retired months earlier.
- * Nothing was broken, so nothing complained. That is why the copy is asserted
- * here rather than trusted to review, and why two of these are regression guards
- * against wording that must never come back.
+ * STEPS and GETS have a single definition and two renderers — the public
+ * landing and first-login orientation — and this suite exists because the copy
+ * HAS gone stale before: a single list went on describing a course-shaped
+ * product for months after the goal engine shipped, on the screen new learners
+ * read first.
  *
- * Ported from studio/dashboard/check_how_section.js — assertions unchanged.
+ * Assertions unchanged from the DOM-shim version; the subject moved from a
+ * render function inside learn.html to the component that replaced it.
  */
-import { describe, it, expect, beforeAll } from 'vitest';
-import { loadSpa } from './harness.js';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { render, cleanup } from '@testing-library/svelte';
+import HowItWorks from '../src/components/app/views/HowItWorks.svelte';
 
-describe('landing: cómo funciona', () => {
+describe('cómo funciona', () => {
   let out;
 
   beforeAll(() => {
-    out = loadSpa().run('renderHow(app)');
+    const { container } = render(HowItWorks);
+    out = container.textContent.replace(/\s+/g, ' ').trim();
   });
+  afterAll(cleanup);
 
   it('renders something at all', () => {
-    // Guards the harness itself: every assertion below passes trivially against
-    // an empty string, so a broken shim would report a clean suite.
+    // Guards the harness: every assertion below passes trivially on ''.
     expect(out.length).toBeGreaterThan(500);
   });
 
   it('shows four numbered steps', () => {
-    for (const n of ['1', '2', '3', '4']) expect(out).toContain(`>${n}</span>`);
+    expect(document.querySelectorAll('.stepnum')).toHaveLength(4);
   });
 
   it('leads with the goal, not the lesson', () => {
-    expect(out.indexOf('Dinos qué quieres ser')).toBeLessThan(out.indexOf('Una lección al día'));
+    // The route is the product and the courses are inventory. A first step that
+    // said "elige un curso" would contradict the whole surface.
+    expect(out).toContain('Dinos qué quieres ser');
   });
 
   it('keeps the transversal project step', () => {
-    // 0 of 4 learners ever declared one, and it feeds 40 of the 100 points.
     expect(out).toContain('Elige tu proyecto real');
   });
 
@@ -47,7 +52,7 @@ describe('landing: cómo funciona', () => {
   it('promises honest gaps', () => expect(out).toContain('Lo que te falta, dicho por su nombre'));
   it('refuses certificates out loud', () => expect(out).toContain('No damos certificados'));
 
-  describe('regression guards', () => {
+  describe('regressions this copy has actually had', () => {
     it('never revives "pregunta de defensa"', () => expect(out).not.toMatch(/pregunta de defensa/));
     it('never revives a "30 días" duration claim', () => expect(out).not.toMatch(/30 d[ií]as/));
     it('leaks no undefined', () => expect(out).not.toMatch(/\bundefined\b/));

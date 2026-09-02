@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "fraunces",
+        "createdAt": "2026-09-02T21:40:28.995Z",
+        "reason": "user confirmed: DESIGN.md's load-bearing rule is 'the interface is grotesk (Archivo), the work is serif (Fraunces)'; PRODUCT.md lists El Taller Nocturno as a binding identity to be refined and not replaced, and the user's frontend spec put palette/type redesign on the explicit Not-doing list"
+      }
+    ]
+  }
+}

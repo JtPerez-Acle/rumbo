@@ -54,7 +54,7 @@ studio/
     app.py                  ← FastAPI app, token gate, admin API, page routes
     learn_routes.py         ← the entire learner API (/api/learn/*)
     static/index.html       ← admin dashboard (single file, vanilla JS)
-    static/learn.html       ← learner app (single file, vanilla JS SPA + design tokens)
+    static/index.html       ← operator dashboard (the last vanilla page)
     static/doc.html         ← public project-document page (paper, print-ready)
     static/caso.html        ← public case-study page (paper)
   generate_batch.py         ← queue/pending/*.json → MoneyPrinterTurbo → output/
@@ -198,53 +198,66 @@ JS. `/aprende/doc/{token}` serves **both** per-course and goal documents
 
 ## Frontend
 
-Both UIs are still **single vanilla-JS files**, and both are being replaced.
-**There is a build step as of 2026-09-02** — Astro emitting static files from
-`studio/web/`, run in Docker stage 1, copied into the image. Node exists at build
-time only; production is the same single Python process it always was. The cause
-was a bug, not a preference: hand-written server-side prerendering produced a
-visible seam between the served document and the hydrated one, because the two
-were never the same document, and four fixes did not close it. See PRODUCT.md for
-the decision and its cost, and the phased plan for what has actually moved.
-Phase 1 (the scaffold) ships the pipeline and **moves no route**.
+**The frontend is built** (Astro + Svelte, `studio/web/`), compiled in Docker
+stage 1 and served by FastAPI. Node exists at build time only; production is the
+same single Python process it always was.
 
-`learn.html` is the learner SPA: a **CSS token layer** (`:root` — colors, a
-six-step type scale, spacing, radii, motion) plus component classes, an inline
-**SVG icon set** (`PATHS` + `I()`), and a **hash router**
-(`#/hoy`, `#/cursos`, `#/curso/{slug}`, `#/leccion/{id}[/{explica|quiz|ejercicio}]`,
-`#/reto/{id}`, `#/objetivo`, `#/portafolio`, `#/documento/{slug}`,
-`#/caso-view/{slug}`, `#/perfil`, plus public `#/`, `#/explora/{slug}`,
-`#/lista`, `#/login`). **`#/oferta` is routed in BOTH branches** — a logged-in
-learner who finds a new offer must be able to analyse it; it lived only in the
-public branch at first, which made the "Pega tu oferta" button inside
-`#/objetivo` a dead end. Visual changes belong in the token block, never in
-element styles.
+The cause was a bug, not a preference. The public URLs used to be the learner SPA
+with a hand-written body injected into it, and the served document and the
+hydrated one were never the same markup — a visitor watched one page become a
+different page. Four fixes attacked the transition. The transition was not the
+problem; there being two documents was. See PRODUCT.md for the decision and its
+cost.
 
-The tests live in `studio/web/tests/` and run under vitest — **134 assertions**,
-`cd studio/web && npm test`, which builds first so the suite always reads current
-output. Four kinds:
+**Two surfaces, two shapes, and the difference is deliberate:**
 
-- **The built public pages** (`landing.test.js`) — reads `dist/*/index.html`, the
-  bytes a visitor is served. It strips `<astro-island props="…">` before
-  asserting: an island's props are serialized into the markup, so a needle can
-  otherwise be found in a page that never renders it. That is not hypothetical —
-  the key-points assertion passed with the key points deleted until this was
-  fixed.
-- **The one live island** (`demo-verdict.test.js`) — mounts DemoAsk under jsdom
-  with a stubbed `fetch` and drives a real click. It must never reach the real
-  evaluator: that costs money, spends the visitor rate limit, and writes a row
-  into `demo_attempts`, which exists to record what strangers write.
-- **The vanilla SPA** (`how-section`, `job-render`, `cv-render`) — extracts its
-  script block and runs it against a shared DOM shim (`harness.js`). The shim
-  asserts its own substitution succeeded; a silently-empty harness once reported
-  a clean pass, which is the failure mode `docs/07` warns about.
-- **Drift guards** (`tokens`, `css-parity`) — `learn.html` still carries the
-  whole stylesheet inline, so these prove `tokens.css` + `app.css` reassemble it.
-  Both are deleted with `learn.html`.
+- **The public site is static HTML.** `/`, `/cursos`, `/curso/<slug>`, `/oferta`,
+  `/lista`, `/login` are files, generated from `src/data/*.json` (written by
+  `export_web.py`). `/cursos` and the fourteen temarios ship **zero JavaScript**;
+  the landing ships ~51KB for the one part that has to be alive, the question and
+  the verdict. A learner holding a session is redirected into the app rather than
+  shown these, so no public page ever has to discover auth state after load —
+  which is what made the header flicker in the first place.
+- **The app is a client-only island.** `/aprende` is `<App client:only="svelte">`:
+  every screen is per-learner, the app is behind a session, and robots.txt
+  excludes it. There is nothing honest to prerender, so it does not pretend to.
+
+`App.svelte` owns the session and the route; each view is a component that
+fetches its own data. **Still a hash router** (`#/hoy`, `#/cursos`,
+`#/curso/{slug}`, `#/leccion/{id}[/{explica|quiz|ejercicio}]`, `#/reto/{id}`,
+`#/objetivo`, `#/cv`, `#/oferta`, `#/portafolio`, `#/documento/{slug}`,
+`#/caso-view/{slug}`, `#/perfil`) — real paths would buy crawlability and
+per-route rendering, neither of which applies to a session-gated app, and would
+cost every deep link already sitting in a learner's inbox.
 
 The lesson **step deep-links exist for a reason**: a pending conversation shown
 on Hoy must land exactly on the step where it can be answered. Without them,
 completed lessons skipped the explain step and the conversation was unreachable.
+
+**Values live in `src/styles/tokens.css`** and nowhere else; `app.css` is the
+component layer and consumes them.
+
+### The tests
+
+`cd studio/web && npm test` — **128 assertions**, and it builds first so the
+suite always reads current output. Three kinds:
+
+- **The built pages** (`landing.test.js`) — reads `dist/*/index.html`, the bytes
+  a visitor is served. It strips `<astro-island props="…">` before asserting: an
+  island's props are serialized into the markup, so a needle can otherwise be
+  found in a page that never renders it. Not hypothetical — the key-points
+  assertion passed with the key points deleted until this was fixed.
+- **Components under jsdom** (`demo-verdict`, `job-render`, `cv-render`,
+  `how-section`) — real renders, real clicks, stubbed `fetch`. They must never
+  reach the real evaluator: that costs money, spends the visitor rate limit, and
+  writes a row into `demo_attempts`, which exists to record what strangers write.
+- **The public-surface audit** (`check_public_surface.py`) — HTTP plus the build
+  output, including that `learn.html` has not come back and that no CDN script
+  origin has.
+
+Every suite was verified to FAIL on a real regression before being trusted. That
+is not ceremony: the shim these replaced could pass while the page a visitor
+received was eleven characters of "Cargando…", and it did.
 
 ## Request flows worth knowing
 

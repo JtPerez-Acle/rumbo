@@ -1,0 +1,40 @@
+---
+/* The learner app.
+ *
+ * `client:only` and not `client:load`, because there is genuinely nothing to
+ * server-render: every screen is per-learner, the app is behind a session, and
+ * robots.txt excludes it on purpose. Prerendering it would mean inventing a
+ * page for a learner we have not identified yet — which is exactly the "two
+ * documents" mistake the public surface just stopped making, in a place where
+ * it would be even harder to see.
+ *
+ * So: one document, one owner, and a short honest wait for the one request that
+ * decides what the screen says.
+ */
+import '../styles/tokens.css';
+import '../styles/app.css';
+import App from '../components/app/App.svelte';
+---
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Rumbo</title>
+  {/* A learner's workspace is not for crawlers, and their documents live on
+      unguessable tokens — a token in a search index is no longer unguessable. */}
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#100D17" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <main class="app" id="app">
+    <App client:only="svelte" />
+  </main>
+</body>
+</html>

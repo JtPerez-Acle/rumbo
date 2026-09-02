@@ -77,8 +77,6 @@ export const GETS = [
   ['target', 'Lo que te falta, dicho por su nombre', 'Si el puesto pide algo que no enseñamos, te lo decimos y te lo listamos. Preferimos eso a venderte un curso que no lo cubre.'],
 ];
 
-export const VERDICT_WORD = {
-  lo_tienes: 'Lo tienes',
-  casi: 'Casi',
-  todavia_no: 'Todavía no',
-};
+/* Re-exported so the public landing and the app cannot disagree about what a
+   verdict is called. It was defined twice under two names before. */
+export { VERDICT as VERDICT_WORD } from './verdicts.js';

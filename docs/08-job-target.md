@@ -240,7 +240,7 @@ DATABASE_URL=… OPENROUTER_API_KEY=… LLM_MODEL=… \
 
 # the result page renders (fast, no network — DOM shim per docs/07)
 cd studio/web && npm test    # job-render.test.js \
-  studio/dashboard/static/learn.html \
+  studio/web/src/components/JobAnalyser.svelte \
   studio/fixtures/job-postings/sample-analysis.json
 ```
 

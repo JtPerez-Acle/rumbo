@@ -147,26 +147,34 @@ def main(argv: list[str]) -> int:
         print("=" * 68)
         return 2
 
-    # ---- the learner app, read from the file -------------------------------
-    # Not over HTTP: /aprende is behind a session and answers a cookie-less
-    # request with a redirect to the public site.
+    # ---- the frontend is built, and nothing ships from a CDN ---------------
+    # /aprende is behind a session and answers a cookie-less request with a
+    # redirect, so what is asserted here is the BUILD OUTPUT rather than a
+    # response. learn.html — the 3,192-line file both frontends used to live in —
+    # is gone; if it comes back, so does the bug that ended it.
     from pathlib import Path as _Path
-    learn = (_Path(__file__).resolve().parents[2] / "studio" / "dashboard" /
-             "static" / "learn.html").read_text(encoding="utf-8")
-    check("the app is branded Rumbo",
-          "Rumbo" in learn and "Aprende IA" not in learn)
-    # Mermaid used to be an eager import in <head>: ~215 KB over 19 requests on
-    # every page load, from a floating major tag, for a landing whose lesson has
-    # no diagram at all.
-    check("mermaid is not eagerly imported", "import mermaid from" not in learn,
-          "back on the critical path — 215 KB on every page load")
-    check("mermaid is pinned to an exact version", "mermaid@11.4.1" in learn,
-          "a floating tag lets a bad release arrive on its own")
-    # The public branch was deleted when the public site became built HTML. If
-    # any of it comes back, the two-documents bug comes back with it.
-    for gone in ("renderLanding", "renderDemoLesson", "publicShell", "__BOOT__"):
-        check(f"the app carries no public view ({gone})", gone not in learn,
-              "the public surface is built HTML; a second copy here will drift")
+    dist = _Path(__file__).resolve().parents[1] / "web" / "dist"
+    legacy = _Path(__file__).resolve().parents[1] / "dashboard" / "static" / "learn.html"
+    check("the vanilla SPA is gone", not legacy.exists(),
+          "learn.html is back; the public surface and the app would drift again")
+    check("the app was built", (dist / "aprende" / "index.html").is_file(),
+          "run: cd studio/web && npm ci && npm run build")
+    if (dist / "aprende" / "index.html").is_file():
+        app_html = (dist / "aprende" / "index.html").read_text(encoding="utf-8")
+        check("the app is branded Rumbo",
+              "Rumbo" in app_html and "Aprende IA" not in app_html)
+        # A learner's workspace must never enter a search index: their documents
+        # live on unguessable tokens, and an indexed token is not unguessable.
+        check("the app tells crawlers to stay out", "noindex" in app_html)
+        # marked, DOMPurify and mermaid are bundled now. A CDN reappearing here
+        # is a third party back on the critical path of a page that carries a
+        # session cookie and a portfolio.
+        for page, label in ((dist / "index.html", "the landing"),
+                            (dist / "aprende" / "index.html", "the app")):
+            if page.is_file():
+                check(f"{label} loads no CDN script",
+                      "cdn.jsdelivr.net" not in page.read_text(encoding="utf-8"),
+                      "a third-party script origin is back")
 
     # Preflight. Without this, an unreachable base means every HTTP assertion
     # below waits out its own timeout and the run takes minutes to tell you the

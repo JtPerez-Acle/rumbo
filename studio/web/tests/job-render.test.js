@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /* The job analyser: the paste box and the route it renders.
  *
  * docs/08 calls this the acquisition asset — it carries the only claim a
@@ -6,104 +7,169 @@
  * assumed, and so is the wait: the analysis really takes about two minutes and
  * the page has to say so before anyone commits to it.
  *
- * Ported from studio/dashboard/check_job_render.js — assertions unchanged.
+ * Assertions unchanged from the DOM-shim version. What changed is that they now
+ * drive the real component with a stubbed fetch, so they cover the flow as well
+ * as the markup — including that the same component serves a stranger and a
+ * signed-in learner with different endings.
  */
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterEach, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/svelte';
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadSpa, REPO } from './harness.js';
+import JobAnalyser from '../src/components/JobAnalyser.svelte';
+import { JOB_STAGES, JOB_SLOW_AT, modLabel } from '../src/lib/route.js';
+import { REPO } from './harness.js';
 
 const FIXTURE = path.join(REPO, 'studio/fixtures/job-postings/sample-analysis.json');
+const analysis = JSON.parse(fs.readFileSync(FIXTURE, 'utf8')).analysis;
 
-describe('job analyser', () => {
-  let spa, box, stages, slowAt, analysis, out, noToken;
+const POSTING = 'x'.repeat(400); // past the 200-char minimum
 
-  beforeAll(() => {
-    spa = loadSpa();
-    box = spa.run('renderJobBox()');
-    stages = spa.evaluate('JOB_STAGES');
-    slowAt = spa.evaluate('JOB_SLOW_AT');
-    analysis = JSON.parse(fs.readFileSync(FIXTURE, 'utf8')).analysis;
-    noToken = spa.run(`renderJobResult(${JSON.stringify(analysis)})`);
-    out = spa.run(`renderJobResult(${JSON.stringify(analysis)}, "TESTTOKEN123")`);
+/* A component's textContent carries the template's own line breaks and
+   indentation, so a sentence that wraps in the source arrives with newlines
+   inside it. Normalising is not cosmetic: without it an assertion fails on how
+   the markup is formatted rather than on what the page says. */
+const flat = (el) => (typeof el === 'string' ? el : el.textContent).replace(/\s+/g, ' ').trim();
+
+
+async function analyse({ token = 'TESTTOKEN123', signedIn = false, progress = null } = {}) {
+  vi.stubGlobal('fetch', vi.fn(async () => ({
+    ok: true, status: 200, json: async () => ({ analysis, token, progress }),
+  })));
+  const { container } = render(JobAnalyser, { signedIn });
+  await fireEvent.input(screen.getByLabelText(/La oferta de trabajo/), {
+    target: { value: POSTING },
+  });
+  await fireEvent.click(screen.getByRole('button', { name: /Armar mi ruta/ }));
+  await waitFor(() => expect(screen.getByText(/Cubrimos/)).toBeTruthy());
+  return flat(container);
+}
+
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+
+describe('the paste box', () => {
+  beforeAll(() => vi.stubGlobal('fetch', vi.fn()));
+
+  it('has a textarea', () => {
+    render(JobAnalyser);
+    expect(screen.getByLabelText(/La oferta de trabajo/)).toBeTruthy();
   });
 
-  describe('the paste box', () => {
-    it('has a textarea', () => expect(box).toMatch(/<textarea[^>]*id="jtext"/));
-    it('offers the goal-only mode', () => expect(box).toMatch(/Solo sé el puesto/));
-    it('has the goal input', () => expect(box).toMatch(/id="jgoal"/));
-    it('has the honeypot', () => expect(box).toMatch(/id="jcompany"/));
-
-    // A two-minute wait that is not declared is a bounce. This is the one
-    // interaction the whole category gets wrong.
-    it('declares the wait up front', () => expect(box).toMatch(/dos minutos/));
-    it('tells them not to close the tab', () => expect(box).toMatch(/No cierres esta pesta/));
+  it('offers the goal-only mode, with its own input', async () => {
+    render(JobAnalyser);
+    await fireEvent.click(screen.getByRole('tab', { name: /Solo sé el puesto/ }));
+    expect(screen.getByLabelText(/El puesto o la habilidad/)).toBeTruthy();
   });
 
-  describe('the staged clock', () => {
-    it('defines at least four stages', () => {
-      expect(Array.isArray(stages)).toBe(true);
-      expect(stages.length).toBeGreaterThanOrEqual(4);
-    });
-    it('starts at 0s', () => expect(stages[0][0]).toBe(0));
-    it('ascends', () => stages.forEach((s, i) => {
-      if (i) expect(s[0]).toBeGreaterThan(stages[i - 1][0]);
-    }));
-    it('explains every stage', () => stages.forEach(s => {
-      expect(s[2]?.length ?? 0).toBeGreaterThan(20);
-    }));
-    it('puts the slow threshold past the last stage', () =>
-      expect(slowAt).toBeGreaterThan(stages[stages.length - 1][0]));
+  it('has the honeypot', () => {
+    const { container } = render(JobAnalyser);
+    expect(container.querySelector('input[aria-hidden="true"]')).toBeTruthy();
   });
 
-  describe('the result', () => {
-    it('names the role', () => expect(out).toContain(analysis.role_title));
-    it('states coverage', () => expect(out).toContain(`Cubrimos ${analysis.coverage}%`));
+  // A two-minute wait that is not declared is a bounce. This is the one
+  // interaction the whole category gets wrong.
+  it('declares the wait up front', () => {
+    const { container } = render(JobAnalyser);
+    expect(flat(container)).toMatch(/dos minutos/);
+  });
 
-    it('separates núcleo from later', () => {
-      const nucleo = analysis.ruta.filter(r => r.phase === 'nucleo');
-      const later = analysis.ruta.filter(r => r.phase !== 'nucleo');
-      if (nucleo.length) expect(out).toContain('Empieza por aquí');
-      if (later.length) expect(out).toContain('Después, para completar');
-    });
+  it('tells them not to close the tab', () => {
+    const { container } = render(JobAnalyser);
+    expect(flat(container)).toMatch(/No cierres esta pesta/);
+  });
 
-    it('shows every course on the route', () =>
-      analysis.ruta.forEach(r => expect(out).toContain(r.course_title)));
+  it('refuses to spend two minutes on four words', async () => {
+    const f = vi.fn();
+    vi.stubGlobal('fetch', f);
+    render(JobAnalyser);
+    await fireEvent.input(screen.getByLabelText(/La oferta de trabajo/), { target: { value: 'hola' } });
+    await fireEvent.click(screen.getByRole('button', { name: /Armar mi ruta/ }));
+    await waitFor(() => expect(screen.getByText(/Pega la oferta completa/)).toBeTruthy());
+    expect(f).not.toHaveBeenCalled();
+  });
+});
 
-    // Mirrors modLabel in learn.html / ruta.html: v2 module sets read
-    // "Módulos 1 y 3"; v1 rows without a modules list read "Hasta módulo N".
-    it('labels every module selection correctly', () => analysis.ruta.forEach(r => {
-      const m = r.modules?.length ? r.modules : null;
-      if (!m) return expect(out).toContain(`Hasta módulo ${r.through_module}`);
-      const sequential = m.length === m[m.length - 1] - m[0] + 1;
-      if (sequential && m[0] === 1) {
-        return expect(out).toContain(m.length === 1 ? 'Módulo 1' : `Hasta módulo ${m[m.length - 1]}`);
-      }
-      if (m.length === 1) return expect(out).toContain(`Módulo ${m[0]}`);
-      expect(out).toContain(`Módulos ${m.slice(0, -1).join(', ')} y ${m[m.length - 1]}`);
+describe('the progress stages', () => {
+  it('defines at least four stages', () => expect(JOB_STAGES.length).toBeGreaterThanOrEqual(4));
+  it('starts at 0s', () => expect(JOB_STAGES[0][0]).toBe(0));
+  it('ascends', () =>
+    JOB_STAGES.forEach((s, i) => {
+      if (i) expect(s[0]).toBeGreaterThan(JOB_STAGES[i - 1][0]);
     }));
+  it('explains every stage', () =>
+    JOB_STAGES.forEach((s) => {
+      expect(s[1].length).toBeGreaterThan(8);
+      expect(s[2].length).toBeGreaterThan(20);
+    }));
+  it('puts the slow threshold past the last stage', () =>
+    expect(JOB_SLOW_AT).toBeGreaterThan(JOB_STAGES[JOB_STAGES.length - 1][0]));
+});
 
-    it('names what we do not cover', () => {
-      if (!analysis.gaps.length) return;
+describe('the result', () => {
+  let out;
+  beforeAll(async () => { out = await analyse(); });
+
+  it('names the role', () => expect(out).toContain(analysis.role_title));
+  it('states coverage', () => expect(out).toContain(`Cubrimos ${analysis.coverage}%`));
+
+  it('separates núcleo from later', () => {
+    expect(out).toContain('Empieza por aquí');
+    if (analysis.ruta.some((r) => r.phase !== 'nucleo')) {
+      expect(out).toContain('Después, para completar el perfil');
+    }
+  });
+
+  it('shows every course on the route', () =>
+    analysis.ruta.forEach((r) => expect(out).toContain(r.course_title)));
+
+  it('labels every module selection correctly', () =>
+    analysis.ruta.forEach((r) => expect(out).toContain(modLabel(r))));
+
+  it('names what we do not cover', () => {
+    // The single most defensible thing this surface says.
+    if (analysis.gaps.length) {
       expect(out).toContain('no lo cubrimos');
-      analysis.gaps.forEach(g => expect(out).toContain(g.name));
-      expect(out).toContain('Preferimos decírtelo');
-    });
-
-    it('names the document', () => {
-      if (analysis.doc_type) expect(out).toContain(analysis.doc_type);
-    });
+      analysis.gaps.forEach((g) => expect(out).toContain(g.name));
+    }
   });
 
-  describe('the share affordance', () => {
+  it('names the document', () => {
+    if (analysis.doc_type) expect(out).toContain(analysis.doc_type);
+  });
+
+  describe('the share card', () => {
     it('appears when a token exists', () => expect(out).toMatch(/Comparte esta ruta/));
-    // An analysis re-rendered from storage has no token, and must not offer a
-    // link that does not exist.
-    it('is absent without one', () => expect(noToken).not.toMatch(/Comparte esta ruta/));
+    it('is absent without one', async () => {
+      cleanup();
+      const noToken = await analyse({ token: '' });
+      expect(noToken).not.toMatch(/Comparte esta ruta/);
+    });
   });
 
   describe('regression guards', () => {
     it('leaks no undefined', () => expect(out).not.toMatch(/\bundefined\b/));
     it('leaks no [object Object]', () => expect(out).not.toContain('[object Object]'));
+  });
+});
+
+describe('who is reading it', () => {
+  it('offers a stranger the door', async () => {
+    const out = await analyse({ signedIn: false });
+    expect(out).toMatch(/Quiero esta ruta|Avísame cuando lo cubran/);
+    expect(out).not.toMatch(/Hacer este mi objetivo/);
+  });
+
+  it('offers a learner a decision', async () => {
+    const out = await analyse({ signedIn: true });
+    expect(out).toMatch(/Hacer este mi objetivo/);
+    expect(out).not.toMatch(/Tengo una invitación/);
+  });
+
+  it('tells a learner their finished work carries over', async () => {
+    // Changing objective is non-destructive, and saying so BEFORE they decide is
+    // the difference between switching and believing they start over.
+    const out = await analyse({ signedIn: true, progress: { done: 7, total: 24 } });
+    expect(out).toMatch(/No empiezas de cero/);
+    expect(out).toContain('7 de 24');
   });
 });

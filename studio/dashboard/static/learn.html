@@ -936,16 +936,19 @@ async function boot(){
 /* ---------- login ---------- */
 function renderLogin(err){
   tabbar.classList.add('hide'); app.innerHTML='';
+  // publicShell already supplies the brand, the nav and the lamp. This view used
+  // to build its own brandrow and back link, so adding the shell gave /login TWO
+  // brand blocks — and the one it built carried "Aprende haciendo, con tutora
+  // IA", the category cliché the rest of this pass removed.
   if(!AUTH)publicShell('');
-  const back=$(`<div class="back" style="margin-bottom:10px">‹ Conocer Rumbo</div>`);
-  // nav2 so the URL ends up at / rather than /login#/ — the address bar should
-  // agree with the page.
-  back.onclick=()=>nav2(''); app.append(back);
-  app.append($(`<div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Aprende haciendo, con tutora IA</small></div></div>`));
+  else{
+    const back=$(`<div class="back" style="margin-bottom:10px">‹ Conocer Rumbo</div>`);
+    back.onclick=()=>nav2(''); app.append(back);   // nav2: the URL should agree
+  }
   const box=$(`<div style="margin:auto 0;display:flex;flex-direction:column;gap:15px">
     <div><div class="eyebrow">Tu clase de hoy te espera</div>
-    <h1 style="margin-top:10px">Aprende haciendo, un día a la vez.</h1>
-    <p class="muted" style="margin-top:10px">Entra con tu código de invitación. Cada día: un video corto, algo real que hacer, y feedback de tu tutora IA. Terminas con un portafolio, no con un certificado.</p></div>
+    <h1 style="margin-top:10px">Entra y sigue donde lo dejaste.</h1>
+    <p class="muted" style="margin-top:10px">Entra con tu código de invitación. Cada día: un video corto, algo real que hacer, y ${TUTOR} leyendo lo que escribiste. Terminas con trabajo tuyo que mostrar, no con un certificado.</p></div>
     ${err?`<div class="card" style="border-color:var(--terra);color:var(--terra);font-size:var(--fs-sm)">El enlace no es válido o expiró. Pide uno nuevo.</div>`:''}
     <div><label>Tu nombre</label><input id="name" placeholder="Ana"></div>
     <div><label>Tu correo</label><input id="email" type="email" placeholder="tu@correo.com" autocomplete="email"></div>

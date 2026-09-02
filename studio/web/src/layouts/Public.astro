@@ -1,0 +1,71 @@
+---
+/* The shell every public page shares.
+ *
+ * WHAT THIS REPLACES. Until now this document was assembled twice: once by
+ * prerender.py using hand-written inline styles, and again by learn.html's SPA
+ * after hydration. They were never the same markup — the served page had three
+ * top-level elements and the hydrated one had ten — so a visitor watched one
+ * page become a different page. Four fixes attacked the transition. The
+ * transition was not the problem; there being two documents was. There is now
+ * one document, and this is it.
+ *
+ * THE GRID IS ON `.app` ITSELF. `body.wide .app` is a named-line grid and its
+ * DIRECT children take `text`, `u-wide` or `u-full` columns. So the header and
+ * every section are direct children of this element — wrapping them in a div
+ * would silently drop every one of them into a single `text` column, which is
+ * the rule collision that already cost this codebase a day.
+ *
+ * `body.wide` is in the markup, not set by script. It carries the entire
+ * desktop composition, and while only JS set it the first paint of every page
+ * was the phone layout.
+ *
+ * There is deliberately no footer: the public surface has never had one, and
+ * adding it here would smuggle a design change into a migration.
+ */
+import '../styles/tokens.css';
+import '../styles/app.css';
+import '../styles/public.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import { SITE_NAME, SITE_DESC } from '../lib/site.js';
+
+const {
+  title,
+  description = SITE_DESC,
+  here = '',
+} = Astro.props;
+---
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+
+  {/* website, not article: these are product surfaces, not posts. */}
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:site_name" content={SITE_NAME} />
+
+  <meta name="theme-color" content="#100D17" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body class="wide">
+  {/* The one lamp, and the grain over it. Decorative: hidden from the
+      accessibility tree, never focusable, and `body.wide` is what turns them
+      on — which is why it is on the element above and not added later. */}
+  <div class="lamp" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <main class="app" id="app">
+    <SiteHeader here={here} />
+    <slot />
+  </main>
+</body>
+</html>

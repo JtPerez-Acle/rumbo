@@ -162,22 +162,33 @@ def main(argv: list[str]) -> int:
         return 1 if offline_bad else 0
 
     # ---- public surfaces answer, and carry real metadata -------------------
-    for path, want_view in (("/oferta", '"oferta"'), ("/lista", '"lista"'),
-                            ("/cursos", '"cursos"'), ("/login", '"login"')):
+    # Each of these is now its own built HTML file, so a page either IS its view
+    # or it is the wrong file. There is no `window.__VIEW__` to assert any more:
+    # the server used to hand the SPA a starting view because all six URLs were
+    # the same document, which is the arrangement this whole migration removed.
+    for path, headline in (("/oferta", "Dinos qué quieres"),
+                           ("/lista", "Te avisamos cuando se abra tu cupo"),
+                           ("/cursos", "Todo lo que puedes estudiar"),
+                           ("/login", "Entra y sigue donde lo dejaste")):
         code, body = fetch(base + path)
         check(f"{path} serves", code == 200, f"got {code}")
-        check(f"{path} names its view", want_view in body)
+        check(f"{path} is its own page", headline in _strip_scripts(body),
+              "served a different page's HTML, or an empty shell")
         check(f"{path} has a real <title>", "<title>" in body and "Rumbo" in body)
         check(f"{path} has an og:description", 'property="og:description"' in body)
 
     code, body = fetch(f"{base}/curso/{DEMO_SLUG}")
     check("/curso/<slug> serves", code == 200, f"got {code}")
     check("/curso/<slug> titles the real course", "Meta Ads" in body)
-    check("/curso/<slug> passes the slug", f'"{DEMO_SLUG}"' in body)
+    check("/curso/<slug> names its deliverable", "Plan de campaña" in _strip_scripts(body),
+          "the page argues the document first; without it this is a table of contents")
 
-    # An unknown slug is a visitor's typo, never a 500.
-    code, _ = fetch(f"{base}/curso/no-existe-este-curso")
+    # An unknown slug is a visitor's typo, never a 500 and never a dead end: it
+    # redirects to the catalog, which urllib follows.
+    code, body = fetch(f"{base}/curso/no-existe-este-curso")
     check("/curso/<unknown> does not error", code == 200, f"got {code}")
+    check("/curso/<unknown> lands on the catalog",
+          "Todo lo que puedes estudiar" in _strip_scripts(body))
 
     # ---- the pages carry their CONTENT, not just their metadata ------------
     # Every public page used to serve exactly eleven characters of body text —
@@ -186,9 +197,12 @@ def main(argv: list[str]) -> int:
     # metadata was never the thing that was missing.
     for path, needle, why, markup in (
         ("/", "tutora", "the landing's argument", False),
-        ("/cursos", '<a href="/curso/', "links a crawler can walk to the temarios", True),
+        # Attribute order, not the link, is what an `<a href=` needle actually
+        # tests — and it changed the moment these became components.
+        ("/cursos", 'href="/curso/', "links a crawler can walk to the temarios", True),
         (f"/curso/{DEMO_SLUG}", "Módulo 1", "the modules", False),
-        ("/oferta", "aviso de trabajo", "what the analyser does", False),
+        ("/oferta", "oferta de trabajo que te interesa", "what the analyser does", False),
+        ("/", "SMART", "the real lesson, not a description of one", False),
     ):
         _, body = fetch(base + path)
         hay = _no_scripts(body) if markup else _strip_scripts(body)
@@ -217,12 +231,22 @@ def main(argv: list[str]) -> int:
     # ---- mermaid is off the critical path ----------------------------------
     # It used to be an eager import in <head>: ~215 KB over 19 requests on every
     # page load, from a floating major tag, for a landing whose lesson has no
-    # diagram at all.
-    _, body = fetch(base + "/")
+    # diagram at all. Asserted against /aprende, which is where it now lives —
+    # the public pages are static and load no CDN library at all.
+    _, body = fetch(base + "/aprende")
     check("mermaid is not eagerly imported", "import mermaid from" not in body,
           "back on the critical path — 215 KB on every page load")
     check("mermaid is pinned to an exact version", "mermaid@11.4.1" in body,
           "a floating tag lets a bad release arrive on its own")
+
+    # ---- the public site ships no CDN dependency at all --------------------
+    # Static pages have no runtime library to fetch. A CDN <script> reappearing
+    # here means a component reached for one, and that is a third party on the
+    # critical path of the page strangers arrive on.
+    for path in ("/", "/cursos", "/oferta"):
+        _, body = fetch(base + path)
+        check(f"{path} loads no CDN script", "cdn.jsdelivr.net" not in body,
+              "a third-party script on the public critical path")
 
     # ---- the app still serves ---------------------------------------------
     code, body = fetch(base + "/aprende")

@@ -1,0 +1,144 @@
+{
+  "courses": [
+    {
+      "available": true,
+      "category": "Marketing y contenido",
+      "description": "De cero a una estrategia de marketing real hecha con IA: investigación, copy, contenido y campañas",
+      "doc_type": "Estrategia de marketing digital",
+      "modules": 5,
+      "slug": "curso-marketing-ia",
+      "title": "Marketing con IA",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Publicidad digital",
+      "description": "De cero a campañas rentables en Facebook e Instagram: píxel, públicos, creatividades y escalado",
+      "doc_type": "Plan de campaña en Meta Ads",
+      "modules": 5,
+      "slug": "curso-meta-ads",
+      "title": "Meta Ads",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Publicidad digital",
+      "description": "De cero a anuncios que venden en TikTok: creatividades nativas, pujas, Smart+ y escalado",
+      "doc_type": "Plan de campaña en TikTok Ads",
+      "modules": 5,
+      "slug": "curso-tiktok-ads",
+      "title": "TikTok Ads",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Publicidad digital",
+      "description": "De cero a campañas que convierten en Google: Search, Performance Max, Demand Gen y Shopping",
+      "doc_type": "Plan de campaña en Google Ads",
+      "modules": 5,
+      "slug": "curso-google-ads",
+      "title": "Google Ads",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Marketing y contenido",
+      "description": "Aparece en Google y en las respuestas de la IA (ChatGPT, Perplexity): SEO y AEO con método y sin humo",
+      "doc_type": "Auditoría SEO + AEO",
+      "modules": 5,
+      "slug": "curso-seo-aeo",
+      "title": "SEO + AEO",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Analítica y automatización",
+      "description": "Automatiza tu marketing con Make, Zapier o n8n: flujos reales, costos reales, sin saber programar",
+      "doc_type": "Plan de automatización con IA",
+      "modules": 5,
+      "slug": "curso-automatizacion-ia",
+      "title": "Automatización con IA",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Marketing y contenido",
+      "description": "Monta el email de tu tienda: flujos automatizados, entregabilidad y campañas que venden",
+      "doc_type": "Programa de email marketing",
+      "modules": 5,
+      "slug": "curso-email-marketing",
+      "title": "Email marketing",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Ciencias sociales",
+      "description": "Modela fenómenos culturales como redes: construye el grafo, interpreta las métricas y reconoce sus límites",
+      "doc_type": "Análisis de redes de un fenómeno cultural",
+      "modules": 5,
+      "slug": "curso-grafos-cultura",
+      "title": "Grafos y sistemas complejos",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Ciencias sociales",
+      "description": "Autores, corrientes y tensiones del debate sobre lo latinoamericano, y cómo abordar su cultura con criterio",
+      "doc_type": "Marco de abordaje cultural",
+      "modules": 5,
+      "slug": "curso-cultura-latam",
+      "title": "Cultura latinoamericana",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Deporte",
+      "description": "De un club real a un proyecto formulado y postulable: diagnóstico, presupuesto, marco lógico y patrocinio",
+      "doc_type": "Proyecto deportivo formulado",
+      "modules": 5,
+      "slug": "curso-gestion-deportiva",
+      "title": "Gestión deportiva",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Deporte",
+      "description": "Sistemas, scouting y dirección de equipos en alto rendimiento internacional, con tu plan de temporada al final",
+      "doc_type": "Plan técnico de temporada",
+      "modules": 5,
+      "slug": "curso-voleibol",
+      "title": "Vóleibol de alto rendimiento",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Redes y creadores",
+      "description": "Audita creadores a mano, negocia tarifas y contratos, y mide una campaña sin depender de herramientas de pago",
+      "doc_type": "Plan de campaña de creadores",
+      "modules": 5,
+      "slug": "curso-influencer-marketing",
+      "title": "Influencer marketing y PR digital",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Redes y creadores",
+      "description": "Lleva cuentas como en agencia: parrilla, comunidad, crisis y un reporte mensual que defiende resultados",
+      "doc_type": "Plan de social media",
+      "modules": 5,
+      "slug": "curso-social-media",
+      "title": "Social media management",
+      "total": 30
+    },
+    {
+      "available": true,
+      "category": "Analítica y automatización",
+      "description": "CTR, CAC, LTV y ROAS bien calculados, GA4 y un tablero en Looker Studio que sí sirve para decidir",
+      "doc_type": "Plan de medición y tablero",
+      "modules": 5,
+      "slug": "curso-analitica-marketing",
+      "title": "Analítica y métricas de marketing",
+      "total": 30
+    }
+  ]
+}

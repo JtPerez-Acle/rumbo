@@ -1,0 +1,91 @@
+---
+/* One course temario, at its own address. Fourteen of these.
+ *
+ * This is the SEO surface (docs/11): somebody searching "curso de Meta Ads en
+ * español" lands here, and they are most of the strangers this product will
+ * ever get. So the page keeps the course word in its title, slug and content —
+ * that word is what they searched, and calling a syllabus a syllabus is
+ * accurate.
+ *
+ * What it ARGUES is the part that changed. It used to be a thirty-row table of
+ * contents ending in "Quiero tomar este curso" — the marketplace's verb,
+ * contradicting "the module, not the course, is the unit" in the same click.
+ * Now: the deliverable first, the modules named as loose parts, and the exit is
+ * the route. Rank for the course, convert to the route.
+ *
+ * Built at build time from studio/web/src/data/courses/*.json, which
+ * `python studio/cloud/export_web.py` writes from the same endpoint function
+ * the SPA calls. A new course therefore goes live on deploy, not on the
+ * database write — see that file for why that trade is close to free here.
+ */
+import Public from '../../layouts/Public.astro';
+import Icon from '../../components/Icon.astro';
+import { SITE_NAME, SITE_DESC } from '../../lib/site.js';
+import catalog from '../../data/catalog.json';
+
+export async function getStaticPaths() {
+  const { courses } = await import('../../data/catalog.json');
+  const files = import.meta.glob('../../data/courses/*.json', { eager: true });
+  return courses.map((c) => {
+    const mod = files[`../../data/courses/${c.slug}.json`];
+    return { params: { slug: c.slug }, props: { course: mod.default ?? mod } };
+  });
+}
+
+const { course } = Astro.props;
+---
+<Public
+  here="cursos"
+  title={`${course.title} — ${SITE_NAME}`}
+  description={course.description || SITE_DESC}
+>
+  {/* This page had NO h1 at all — it opened at h2 — which was an accessibility
+      defect and a wasted signal on the one surface that has to rank. */}
+  <div class="outlinehead" style="margin-top:6px">
+    <div class="eyebrow">Temario completo</div>
+    <h1 style="margin-top:var(--s2)">{course.title}</h1>
+    {course.description && (
+      <p class="muted" style="margin-top:var(--s3)">{course.description}</p>
+    )}
+  </div>
+
+  {course.doc_type && (
+    <div class="card card-paper deliverable">
+      <div class="microlabel" style="color:var(--paper-dim)">Terminas con</div>
+      <p class="delivername">{course.doc_type}</p>
+      <p class="delivernote">
+        Hecho con tu propio trabajo, con tu nombre. No un certificado: el
+        documento que un cliente habría pagado.
+      </p>
+    </div>
+  )}
+
+  <p class="muted t-sm" style="margin-top:var(--s4)">
+    Estos {course.modules.length} módulos existen sueltos. Tu ruta toma los que
+    tu puesto pide y deja el resto — por eso el orden de abajo es el del curso,
+    no necesariamente el tuyo.
+  </p>
+
+  {course.modules.map((m) => (
+    <>
+      <h2 class="modhead">Módulo {m.module_no} · {m.module_title}</h2>
+      {m.module_description && (
+        <p class="muted t-sm" style="margin:-2px 0 10px">{m.module_description}</p>
+      )}
+      {m.lessons.map((l) => (
+        <div class="lrow" style="flex-wrap:wrap">
+          <div class="num">{l.position}</div>
+          <div class="lt">{l.title}</div>
+          {l.objectives && <div class="obj">Al terminar podrás: {l.objectives}</div>}
+        </div>
+      ))}
+    </>
+  ))}
+
+  <div class="doors" style="margin-top:var(--s5)">
+    <a class="btn btn-primary" href="/oferta">
+      Ver si esto está en tu ruta <Icon name="arrow" class="ic ic-s" />
+    </a>
+    <a class="doorlink" href="/">o haz una clase ahora</a>
+  </div>
+</Public>

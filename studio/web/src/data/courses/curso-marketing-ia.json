@@ -1,0 +1,194 @@
+{
+  "description": "De cero a una estrategia de marketing real hecha con IA: investigación, copy, contenido y campañas",
+  "doc_type": "Estrategia de marketing digital",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Seleccionar un negocio, producto o servicio propio como caso transversal y redactar su meta de marketing principal con criterios SMART.",
+          "position": 1,
+          "title": "Elige tu proyecto real y define el objetivo"
+        },
+        {
+          "objectives": "Escribir prompts efectivos usando el marco contexto + tarea + formato, y ajustar tono y estilo para tareas de marketing.",
+          "position": 2,
+          "title": "Estructura básica de prompts para marketing"
+        },
+        {
+          "objectives": "Crear prompts que extraigan de la IA datos demográficos, psicográficos y comportamientos de un segmento de audiencia.",
+          "position": 3,
+          "title": "Prompts para investigar a tu audiencia ideal"
+        },
+        {
+          "objectives": "Producir headlines, descripciones y llamadas a la acción persuasivos mediante prompts iterativos con retroalimentación.",
+          "position": 4,
+          "title": "Prompts para generar copy de alto impacto"
+        },
+        {
+          "objectives": "Diseñar prompts que generen ideas para campañas, formatos y ganchos emocionales mediante pensamiento lateral.",
+          "position": 5,
+          "title": "Explotar la creatividad con prompts divergentes"
+        },
+        {
+          "objectives": "Organizar y refinar una colección de prompts reutilizables categorizados por tarea de marketing y guardarlos en un sistema accesible.",
+          "position": 6,
+          "title": "Construye tu biblioteca personal de prompts de marketing"
+        }
+      ],
+      "module_description": "Sabrás pedirle a la IA exactamente lo que necesitas para tu proyecto real: desde investigar a tu audiencia hasta escribir headlines que venden y generar ideas de campaña. Tendrás tu propia biblioteca de prompts lista para reutilizar.",
+      "module_no": 1,
+      "module_title": "Fundamentos y dominio del prompt para marketing"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Generar un perfil de cliente ideal completo (dolores, deseos, objeciones) usando prompts avanzados y validarlos con datos reales.",
+          "position": 7,
+          "title": "Crea buyer personas con IA en minutos"
+        },
+        {
+          "objectives": "Identificar competidores clave y extraer sus estrategias de contenido, mensajes y gaps de mercado con ayuda de IA.",
+          "position": 8,
+          "title": "Análisis competitivo potenciado por IA"
+        },
+        {
+          "objectives": "Usar IA para analizar conversaciones en redes sociales y foros, identificando quejas, deseos y tendencias emergentes.",
+          "position": 9,
+          "title": "Escucha social y minado de insights con IA"
+        },
+        {
+          "objectives": "Extraer y priorizar los principales problemas y aspiraciones de tu audiencia utilizando análisis de lenguaje natural.",
+          "position": 10,
+          "title": "Mapeo de dolores y deseos con IA"
+        },
+        {
+          "objectives": "Construir un mapa de viaje del cliente con puntos de contacto, emociones y preguntas clave en cada etapa, usando IA para hipótesis.",
+          "position": 11,
+          "title": "Mapeo del customer journey asistido por IA"
+        },
+        {
+          "objectives": "Sintetizar toda la investigación en un brief de una página que guíe la creatividad y la ejecución táctica.",
+          "position": 12,
+          "title": "Brief creativo estratégico desde la investigación IA"
+        }
+      ],
+      "module_description": "Tendrás un perfil detallado de tu cliente ideal, un mapa de sus dolores y deseos, y un análisis de tu competencia. Con esto armarás un brief creativo de una página que guíe tus acciones.",
+      "module_no": 2,
+      "module_title": "Investigación de audiencia y mercado potenciada por IA"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Generar, probar y seleccionar los titulares más efectivos para cualquier pieza de contenido usando criterios de persuasión.",
+          "position": 13,
+          "title": "Titulares y hooks magnéticos con IA"
+        },
+        {
+          "objectives": "Escribir textos publicitarios para Facebook, Google y LinkedIn optimizados para conversiones usando fórmulas comprobadas vía IA.",
+          "position": 14,
+          "title": "Copy para anuncios que convierten"
+        },
+        {
+          "objectives": "Redactar borradores completos de artículos de blog, guías o ebooks, y luego humanizarlos para que suenen a tu marca.",
+          "position": 15,
+          "title": "Contenidos de formato largo con IA (sin perder autenticidad)"
+        },
+        {
+          "objectives": "Crear una tanda de posts para diferentes redes, adaptando tono, longitud y elementos visuales automáticamente con IA.",
+          "position": 16,
+          "title": "Publicaciones para redes sociales con tono de marca"
+        },
+        {
+          "objectives": "Diseñar una serie de correos de bienvenida y de ventas utilizando IA para cada etapa del funnel de conversión.",
+          "position": 17,
+          "title": "Secuencias de email marketing que nutren"
+        },
+        {
+          "objectives": "Construir un calendario de contenidos de 30 días con temas, formatos y copys listos para publicar, basado en la estrategia.",
+          "position": 18,
+          "title": "Planifica tu mes de contenido con IA"
+        }
+      ],
+      "module_description": "Crearás titulares, anuncios, artículos largos, posts para redes y secuencias de email que suenan a tu marca, no a un robot. Planificarás un mes entero de contenido listo para publicar.",
+      "module_no": 3,
+      "module_title": "Copywriting y contenido con IA"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Generar imágenes y videos cortos para anuncios usando herramientas como DALL·E, Midjourney o Canva AI a partir de un brief.",
+          "position": 19,
+          "title": "Crea imágenes y videos publicitarios con IA generativa"
+        },
+        {
+          "objectives": "Producir múltiples versiones de copy publicitario con diferentes ángulos y emociones para pruebas A/B estructuradas.",
+          "position": 20,
+          "title": "Variaciones de copy para A/B testing masivo"
+        },
+        {
+          "objectives": "Utilizar IA para definir segmentos de audiencia detallados y crear públicos personalizados en plataformas de anuncios.",
+          "position": 21,
+          "title": "Segmentación de audiencias con asistentes IA"
+        },
+        {
+          "objectives": "Diseñar un experimento A/B estructurado y obtener hipótesis ganadoras previas usando IA para priorizar variaciones.",
+          "position": 22,
+          "title": "Configura y lanza tests A/B con hipótesis IA"
+        },
+        {
+          "objectives": "Crear una campaña de email completa (asunto, preheader, cuerpo, personalización) optimizada por IA para altas tasas de apertura y clics.",
+          "position": 23,
+          "title": "Campañas de email avanzadas con IA"
+        },
+        {
+          "objectives": "Conectar herramientas de IA con CRMs y plataformas de envío para automatizar respuestas y publicación de campañas.",
+          "position": 24,
+          "title": "Automatiza flujos de marketing con IA y Zapier"
+        }
+      ],
+      "module_description": "Lanzarás campañas de anuncios con imágenes y videos generados por IA, probarás variaciones de copy para A/B testing y automatizarás flujos de email que se disparan según el comportamiento del usuario.",
+      "module_no": 4,
+      "module_title": "Campañas pagadas y email marketing automatizado con IA"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Seleccionar las métricas clave para tu campaña y crear un dashboard conceptual con KPIs priorizados usando asistencia IA.",
+          "position": 25,
+          "title": "Define KPIs inteligentes con ayuda de IA"
+        },
+        {
+          "objectives": "Subir datos de campaña a una IA y obtener un resumen ejecutivo con insights y visualizaciones descriptivas.",
+          "position": 26,
+          "title": "Analiza reportes de campaña con lenguaje natural"
+        },
+        {
+          "objectives": "Recibir recomendaciones accionables de la IA sobre ajustes de puja, creativos y audiencias, y priorizarlas por impacto.",
+          "position": 27,
+          "title": "Optimización de campañas con sugerencias de IA"
+        },
+        {
+          "objectives": "Aplicar análisis de sentimiento a comentarios y reseñas para ajustar mensajes y detectar crisis de reputación.",
+          "position": 28,
+          "title": "Análisis de sentimiento y feedback con IA"
+        },
+        {
+          "objectives": "Diseñar secuencias de anuncios de retargeting basadas en el comportamiento, usando creatividades adaptadas generadas por IA.",
+          "position": 29,
+          "title": "Remarketing inteligente con IA"
+        },
+        {
+          "objectives": "Compilar todo el trabajo en un playbook de marketing IA para tu proyecto y establecer un roadmap de mejora continua.",
+          "position": 30,
+          "title": "Sintetiza tu estrategia de marketing IA y próximos pasos"
+        }
+      ],
+      "module_description": "Medirás lo que importa, pedirás a la IA que te explique los resultados de tus campañas en lenguaje claro y recibirás recomendaciones concretas para ajustar pujas, creativos y remarketing.",
+      "module_no": 5,
+      "module_title": "Medición, análisis y optimización continua con IA"
+    }
+  ],
+  "slug": "curso-marketing-ia",
+  "title": "Marketing con IA",
+  "total": 30
+}

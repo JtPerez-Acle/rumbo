@@ -1,0 +1,44 @@
+---
+/* One real exchange: what someone wrote, and what the evaluator answered.
+ *
+ * Every word of tutor output here came back from the real endpoint and was
+ * kept exactly. The whole argument of this surface is that the evaluation is
+ * real; an invented one would be the single most damaging thing on the page.
+ * See EXCHANGES in lib/site.js for why both shown answers are wrong.
+ */
+import Icon from './Icon.astro';
+import { EXCHANGES, TUTOR } from '../lib/site.js';
+
+const { key, class: extra = '' } = Astro.props;
+const x = EXCHANGES[key];
+---
+<figure class={`tutorpanel ${extra}`}>
+  <figcaption class="microlabel">
+    Ejemplo real · una respuesta y lo que {TUTOR} contestó
+  </figcaption>
+  <div class="tp-said">
+    <span class="tp-who">Alguien escribió</span>
+    <p>“{x.said}”</p>
+  </div>
+  <div class="tp-verdict">
+    <span class="tp-badge">{x.badge}</span>
+    <span class="tp-who">{TUTOR} respondió</span>
+  </div>
+  {/* The evaluator's own feedback carries a <b> for the emphasised phrase.
+      It is our fixture, not learner input, so it is the one string on this
+      surface that may be set as HTML. */}
+  <p class="tp-fb" set:html={x.fb}></p>
+  {x.misconception && (
+    <div class="tp-misc">
+      <Icon name="spark" class="ic ic-s" />
+      <span>{x.misconception}</span>
+    </div>
+  )}
+  <div class="tp-gaps">
+    <span class="microlabel">Lo que te falta</span>
+    {x.gaps.map((g) => (
+      <div class="tp-gap"><Icon name="arrow" class="ic ic-s" /><span>{g}</span></div>
+    ))}
+  </div>
+  <p class="tp-foot">Reintentas sin límite. Se queda tu mejor intento.</p>
+</figure>

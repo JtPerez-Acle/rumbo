@@ -1,0 +1,71 @@
+/* What the static public pages add on top of the inherited stylesheet.
+ *
+ * app.css is a byte-for-byte copy of learn.html's <style> block and is held
+ * that way by css-parity.test.js, so anything NEW belongs here. When learn.html
+ * is deleted the parity test goes with it and these two files merge.
+ *
+ * Everything below exists because a page that used to need JavaScript no longer
+ * does. That is the point of the migration, not a side effect of it.
+ */
+
+/* ---------------------------------------------------------------------------
+   The catalog accordion, as <details>/<summary>.
+   The SPA built it from a div with a click handler and a sibling it toggled
+   `.hide` on: not keyboard-operable, not announced as a disclosure, and closed
+   sections stayed invisible to browser find-in-page. The disclosure element
+   does all three for free. These rules only restore the same appearance.
+--------------------------------------------------------------------------- */
+.cluster-wrap {
+  display: block;
+}
+/* The default triangle, in both engines. */
+.cluster-wrap > summary {
+  list-style: none;
+}
+.cluster-wrap > summary::-webkit-details-marker {
+  display: none;
+}
+.cluster-wrap[open] > .cluster .chev {
+  transform: rotate(90deg);
+}
+/* .cluster-body used to be a grid child in its own right; inside <details> its
+   parent is, so the multi-column rule has to be re-established here. Same
+   breakpoint and same three columns as body.wide .cluster-body. */
+.cluster-wrap > .cluster-body {
+  margin-top: var(--s4);
+}
+@media (min-width: 900px) {
+  body.wide .cluster-wrap > .cluster-body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s4);
+    align-items: stretch;
+  }
+  body.wide .cluster-wrap > .cluster-body > * {
+    margin-bottom: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The written guide's "seguir leyendo".
+   Not a disclosure: the guide stays visible and readable at all times, and this
+   only lifts the 560px cap. `.guidewrap.open` did exactly this under the SPA's
+   click handler; the island sets the class on a wrapper instead, so the rule
+   moves one level out and nothing else about the guide changes.
+--------------------------------------------------------------------------- */
+.guide-open .guidewrap {
+  max-height: none;
+  overflow: visible;
+}
+
+/* ---------------------------------------------------------------------------
+   Islands, before they hydrate.
+   A Svelte island renders its markup at build time and becomes interactive a
+   moment later. Anything that would look broken in that window — a control
+   whose handler is not attached yet — says so instead of lying about being
+   ready. Nothing here changes size, so hydration moves no pixels.
+--------------------------------------------------------------------------- */
+.island-idle {
+  opacity: 0.75;
+  pointer-events: none;
+}

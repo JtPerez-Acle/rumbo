@@ -1,0 +1,27 @@
+{
+  "course_slug": "curso-marketing-ia",
+  "course_title": "Marketing con IA",
+  "doc_type": "Estrategia de marketing digital",
+  "exercise": {
+    "deliverable": "",
+    "instruction": "Elige tu proyecto real (negocio, producto, servicio o marca personal) y redacta un objetivo SMART de marketing para los próximos 1-3 meses. Anótalo en un documento o nota. Luego usa el prompt inicial para refinarlo con ayuda de la IA."
+  },
+  "explain_prompt": "¿Qué significa que un objetivo sea SMART y por qué es clave para no malgastar dinero en tu proyecto?",
+  "has_video": true,
+  "key_points": [
+    "Determina el resultado específico que quieres lograr antes de empezar a trabajar con inteligencia artificial.",
+    "Utiliza la metodología SMART para plantear tu objetivo: que sea específico, medible, alcanzable, relevante y acotado en el tiempo.",
+    "Redacta tu objetivo como una meta cuantificable con un plazo, como incrementar ventas un 20% en tres meses mediante anuncios dirigidos.",
+    "Un objetivo bien definido desde el inicio evita campañas sin foco y optimiza el uso de tu presupuesto."
+  ],
+  "module_no": 1,
+  "module_title": "Fundamentos y dominio del prompt para marketing",
+  "objectives": "Seleccionar un negocio, producto o servicio propio como caso transversal y redactar su meta de marketing principal con criterios SMART.",
+  "reto": {
+    "scenario": "Tu clienta es Ana, dueña de 'Abya Yala', tienda en línea de joyería artesanal indígena de Ecuador. Vende collares y pulseras a mujeres de 25 a 45 años interesadas en moda ética. Su presencia digital: 300 seguidores en Instagram y un sitio web básico. Ana quiere lanzar una campaña para San Valentín con solo $200 USD de presupuesto y 14 días de plazo. Exige que la campaña refleje autenticidad y compita con marcas masivas sin perder la historia de los artesanos. Tu misión: entregar un brief de campaña de una página que guíe la ejecución inmediata.",
+    "title": "Reto: campaña de San Valentín para Abya Yala con solo $200"
+  },
+  "title": "Elige tu proyecto real y define el objetivo",
+  "transcript": "Tu primer paso no es hablar con la IA. Es decidir exactamente qué quieres lograr. Porque tener un proyecto real y un objetivo claro te ahorra campañas sin rumbo y dinero mal gastado. Hoy aprenderás a definir tu meta con los criterios SMART. Específica, medible, alcanzable, relevante y con plazo. Imagina que tienes una pastelería y decides vender más en internet. Un objetivo SMART sería: aumentar las ventas online de pasteles en un 20 por ciento durante tres meses con anuncios en Instagram para clientes de tu ciudad. Específico: ventas online. Medible: 20 por ciento. Alcanzable: con anuncios locales. Relevante: tu negocio. Con plazo: tres meses. Así de concreto. Con tu proyecto real y un objetivo SMART, cada lección conectará con lo que necesitas. Ahora hazlo tú: la lección continúa en tu ejercicio.",
+  "written": "### Pasos para definir tu objetivo SMART\n\n1. **Elige un proyecto que te importe.** Puede ser tu negocio actual, un producto que vendes, un servicio freelance, un perfil en redes que monetizas... lo que sea. Lo importante es que sea real y que te permita medir resultados. Si todavía no tienes nada, piensa en algo que puedas lanzar en las próximas semanas. Nada de casos imaginarios.\n2. **Escribe tu meta de marketing en una sola frase.** Empieza con lo que quieres conseguir: vender más, conseguir clientes, aumentar suscriptores, etc. No la redactes todavía como SMART; primero saca la idea general.\n3. **Aplica cada letra de SMART a tu meta.** Revisa que cumpla cada criterio. Usa esta tabla para chequearte:\n\n| Criterio | Pregunta clave | Ejemplo malo | Ejemplo bueno |\n|----------|----------------|--------------|---------------|\n| Específica | ¿Qué quieres lograr exactamente? ¿Con qué producto o servicio? ¿Para quién? | \"Quiero vender más\" | \"Aumentar las ventas online de pasteles personalizados a clientes de mi ciudad\" |\n| Medible | ¿Cómo sabrás que lo lograste? Indica un número o porcentaje. | \"Vender bastante\" | \"Incrementar las ventas un 20% respecto al mes anterior\" |\n| Alcanzable | ¿Tienes los recursos (tiempo, dinero, conocimientos) para lograrlo? Que sea ambicioso pero posible. | \"Multiplicar las ventas por 10 en una semana\" | \"Lograr un 20% más con anuncios locales en Instagram, un canal que ya uso\" |\n| Relevante | ¿Esta meta es importante para tu negocio ahora? ¿Encaja con tu estrategia? | \"Conseguir 500 seguidores en TikTok cuando mi negocio es un taller mecánico local\" (a menos que tenga sentido) | \"Captar clientes de mi zona, porque mi pastelería solo hace envíos locales\" |\n| Con plazo | ¿En cuánto tiempo lo harás? Pon una fecha límite concreta. | \"En unos meses\" | \"En tres meses, del 1 de abril al 30 de junio\" |\n\n4. **Redacta la versión final.** Junta todo en una sola frase limpia. Por ejemplo: \"Aumentar las ventas online de pasteles personalizados en un 20% durante tres meses (abril-junio) mediante anuncios en Instagram dirigidos a personas de mi ciudad.\"\n5. **Verifica que te motive.** Léela en voz alta. Si sientes que es una tarea aburrida o imposible, ajústala. La meta debe darte un norte claro sin agobiarte.\n6. **Guárdala a la vista.** Tendrás que volver a ella en cada lección para que la IA te ayude a ejecutarla. Si no está definida, perderás tiempo dándole vueltas."
+}

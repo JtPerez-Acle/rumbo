@@ -1,0 +1,20 @@
+---
+/* The job analyser. docs/08 calls this the acquisition asset and says it ships
+ * standalone — it could not be linked to at all before this route existed.
+ *
+ * The whole page is one island because the whole page is one flow: form,
+ * two minutes of work, result. What surrounds it — the header and the meta
+ * tags a share preview reads — is static, which is what matters for a link
+ * somebody pastes into WhatsApp.
+ */
+import Public from '../layouts/Public.astro';
+import JobAnalyser from '../components/JobAnalyser.svelte';
+import { SITE_NAME } from '../lib/site.js';
+---
+<Public
+  here="oferta"
+  title={`Pega la oferta que quieres — ${SITE_NAME}`}
+  description="Te decimos qué pide de verdad, qué cubrimos, qué no, y con qué documento llegar a la entrevista. Sin cuenta."
+>
+  <JobAnalyser client:load />
+</Public>

@@ -1,0 +1,21 @@
+---
+/* The doors, in one place.
+ *
+ * `lit` gives the goal engine the primary treatment — used once, where intent
+ * is highest. `ghost` is the quiet copy at the tail of a page and after any
+ * failure, so a visitor who does not want to write an answer still has
+ * somewhere to go.
+ *
+ * Both are anchors now. The SPA built the primary as a <button> with a click
+ * handler, so the page's most important action could not be middle-clicked,
+ * opened in a tab, or seen by a crawler.
+ */
+import Icon from './Icon.astro';
+const { kind = 'ghost', style } = Astro.props;
+---
+<div class="doors" style={style ?? 'margin-top:var(--s5)'}>
+  <a class={`btn ${kind === 'lit' ? 'btn-primary' : 'btn-ghost'}`} href="/oferta">
+    Dinos qué quieres ser <Icon name="arrow" class="ic ic-s" />
+  </a>
+  <a class="doorlink" href="/lista">o pide tu acceso</a>
+</div>

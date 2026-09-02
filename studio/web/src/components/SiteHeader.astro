@@ -1,0 +1,40 @@
+---
+/* One header for every public page.
+ *
+ * Every link carries a real href and nothing else. In the SPA these were
+ * anchors with only a data-go attribute and a click handler, which made all
+ * five UNFOCUSABLE — an anchor without href is not a tab stop — so "La clase",
+ * "Qué enseñamos", "Tu ruta" and "Tengo una invitación" could not be reached
+ * by keyboard on any public page, and a crawler saw a document with six
+ * anchors of which five had no destination. Static pages make that failure
+ * impossible rather than fixed: there is no handler to forget.
+ *
+ * There is no signed-in variant. A learner with a session never reaches these
+ * pages — the server sends them into the app instead — so this header does not
+ * have to guess at auth state, and cannot flicker between two versions of
+ * itself while it finds out. That flicker was the original bug.
+ *
+ * "Cursos" is "Qué enseñamos": the route is the product and the courses are
+ * inventory (confirmed 2026-09-02). A nav offering "Cursos" as a primary
+ * destination tells a visitor the opposite, and visitors believe the
+ * navigation over the copy.
+ */
+const { here = '' } = Astro.props;
+const on = (name) => (here === name ? 'on' : undefined);
+const current = (name) => (here === name ? 'page' : undefined);
+---
+<header class="sitenav u-wide">
+  <a class="brandrow" href="/">
+    <div class="brandmark"></div>
+    <div class="brandname">Rumbo<small>Dinos qué quieres ser</small></div>
+  </a>
+  <nav class="navlinks" aria-label="Principal">
+    <a href="/" class={on('clase')} aria-current={current('clase')}>La clase</a>
+    <a href="/oferta" class={on('oferta')} aria-current={current('oferta')}>Tu ruta</a>
+    <a href="/cursos" class={on('cursos')} aria-current={current('cursos')}>Qué enseñamos</a>
+  </nav>
+  <span class="navcta">
+    <a class="navlink-quiet" href="/login">Tengo una invitación</a>
+    <a class="btn btn-primary btn-sm" href="/oferta">Dinos qué quieres ser</a>
+  </span>
+</header>

@@ -1,0 +1,194 @@
+{
+  "description": "CTR, CAC, LTV y ROAS bien calculados, GA4 y un tablero en Looker Studio que sí sirve para decidir",
+  "doc_type": "Plan de medición y tablero",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Elegirás un negocio o marca real que será tu laboratorio transversal. Definirás la decisión de marketing que quieres responder y escribirás la especificación completa de una métrica: numerador, denominador, población, ventana temporal y fuente.",
+          "position": 1,
+          "title": "Contrato de medición, elección de tu marca y anatomía de una métrica"
+        },
+        {
+          "objectives": "Extraerás impresiones y alcance de plataformas publicitarias y calcularás frecuencia y CPM. Distinguirás por qué alcance no es aditivo y por qué una frecuencia promedio no describe individuos.",
+          "position": 2,
+          "title": "Exposición: impresiones, alcance, frecuencia y CPM"
+        },
+        {
+          "objectives": "Identificarás qué tipo de clic estás pagando; calcularás CTR y CPC con el denominador correcto. Leerás el CTR sin confundir 'all clicks' con tráfico real y el CPC sin asumir que bajo coste significa rentabilidad.",
+          "position": 3,
+          "title": "Respuesta: clics de destino, CTR y CPC"
+        },
+        {
+          "objectives": "Definirás una conversión concreta de tu proyecto, elegirás el denominador obligatorio y calcularás CPA y ROAS. Distinguirás rápidamente por qué ROAS atribuido no es margen y por qué CPA no es CAC.",
+          "position": 4,
+          "title": "Resultado: tasa de conversión, CPA y ROAS"
+        },
+        {
+          "objectives": "Calcularás la tasa de apertura rastreada y la tasa de clic de correo electrónico con los entregados reales. Explicarás el quiebre que produjo Apple Mail Privacy Protection y elegirás señales posteriores (clics, compras) para decidir.",
+          "position": 5,
+          "title": "Métricas de email y por qué la tasa de apertura ya no es una señal confiable"
+        },
+        {
+          "objectives": "Recopilarás métricas de redes con su denominador explícito y compararás engagement rate basado en alcance, en vistas o en impresiones. Documentarás el diccionario único de métricas de tu proyecto, con definición, fórmula y fuente.",
+          "position": 6,
+          "title": "Engagement rate y construcción del diccionario oficial de tu marca"
+        }
+      ],
+      "module_description": "Sabrás leer cualquier reporte sin confundir exposición, respuesta, resultado y economía. Reconstruirás cada KPI desde sus datos y rechazarás una métrica cuyo denominador no esté declarado.",
+      "module_no": 1,
+      "module_title": "El diccionario canónico: anatomía de una métrica"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Listarás los costes reales de adquisición de tu marca (media, creatividad, equipo, promociones) y calcularás el CAC blended y, si tus datos lo permiten, el CAC pagado. Separarás CPA de compra, CPA de lead y CAC como métricas distintas.",
+          "position": 7,
+          "title": "CAC: qué costes entran y por qué un CPA no es un cliente"
+        },
+        {
+          "objectives": "Construirás el margen bruto de tu producto o servicio y aislarás los costes variables que afectan la contribución. Documentarás qué va en el numerador económico de tus métricas y por qué revenue × 'lifetime' no es un LTV económico.",
+          "position": 8,
+          "title": "Margen bruto, contribución y por qué el ingreso no paga el CAC"
+        },
+        {
+          "objectives": "Construirás una tabla de contribución acumulada para una cohorte de clientes real. Reportarás LTV observado a N meses y separarás lo proyectado de lo ya realizado.",
+          "position": 9,
+          "title": "LTV observado por cohortes: solo con lo que ya ocurrió"
+        },
+        {
+          "objectives": "Proyectarás contribuciones futuras con supuestos explícitos (retención, frecuencia, margen) y construirás una tabla de flujos descontados. Distinguirás un negocio contractual de uno no contractual para no forzar fórmulas de suscripción.",
+          "position": 10,
+          "title": "LTV estimado cuando faltan meses, churn o datos perfectos"
+        },
+        {
+          "objectives": "Calcularás el mes en que la contribución acumulada iguala el CAC de una cohorte. Identificarás cuándo el atajo 'CAC / contribución mensual' es válido y cuándo rompe.",
+          "position": 11,
+          "title": "Payback y flujo acumulado: cuándo el cliente realmente se paga"
+        },
+        {
+          "objectives": "Calcularás la ratio LTV:CAC de tu proyecto y documentarás la procedencia y las limitaciones de la heurística 3:1. Identificarás al menos tres formas de inflar artificialmente el cociente en tu propio caso y propondrás un rango honesto.",
+          "position": 12,
+          "title": "LTV:CAC, la regla 3:1 y sus trampas"
+        }
+      ],
+      "module_description": "Estimarás CAC, margen, LTV y payback aunque te falten meses o datos limpios. Mostrarás qué parte es observada y qué parte es una hipótesis, y decidirás si escalar adquisición parece sostenible.",
+      "module_no": 2,
+      "module_title": "Economía unitaria con datos imperfectos"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Explicarás la arquitectura event-based de GA4 y la diferencia actual entre evento, evento clave y conversión de Google Ads. Identificarás las dimensiones de tráfico y los límites de colección reales de la versión gratuita.",
+          "position": 13,
+          "title": "Modelo de datos de GA4: usuario, sesión, evento, parámetro y evento clave"
+        },
+        {
+          "objectives": "Dibujarás el funnel de tu proyecto y mapearás cada etapa a un evento recomendado por Google, con parámetros, estados de key event y dueño. Diseñarás el plan sin abrir GTM todavía.",
+          "position": 14,
+          "title": "Mapa de eventos y plan de medición: de la decisión al trigger"
+        },
+        {
+          "objectives": "Usarás Preview de GTM y DebugView de GA4 para validar disparos, parámetros y ausencia de duplicados en rutas críticas. Completarás una checklist de 20 puntos para implementar sin romper.",
+          "position": 15,
+          "title": "Google Tag Manager, Preview/Debug y la checklist de QA que evita desastres"
+        },
+        {
+          "objectives": "Documentarás qué comportamientos se observan con y sin consentimiento en tu propiedad. Calcularás el impacto potencial de la pérdida de señal sobre eventos clave y distinguirás una caída de medición de una caída de negocio.",
+          "position": 16,
+          "title": "Consentimiento y pérdida de señal: lo que el dato ya no te cuenta"
+        },
+        {
+          "objectives": "Crearás una convención de UTMs estricta con vocabularios controlados, sin espacios ni PII, y construirás cinco URLs reales para campañas de tu proyecto. Probarás si source, medium y campaign se mantienen coherentes en los informes.",
+          "position": 17,
+          "title": "UTMs y taxonomía compartida: una URL que no se rompa"
+        },
+        {
+          "objectives": "Compararás una campaña real entre su plataforma y GA4 y enumerarás al menos cinco razones estructurales que producen diferencias. Establecerás un rango de tolerancia y qué hacer cuando la discrepancia es anómala.",
+          "position": 18,
+          "title": "Por qué las cifras de la plataforma nunca cuadran con GA4 (y no pasa nada)"
+        }
+      ],
+      "module_description": "Montarás una medición web básica y auditable con GA4 + GTM. Probarás eventos, etiquetarás campañas con UTMs, documentarás el efecto del consentimiento y construirás datos utilizables para análisis y tableros.",
+      "module_no": 3,
+      "module_title": "Medición técnica sin pagar nada"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Explicarás con un caso real de tu proyecto por qué el último clic distribuye crédito pero no responde contrafactuales. Identificarás los sesgos que el último clic amplifica y cuándo sigue siendo útil para operar.",
+          "position": 19,
+          "title": "Último clic: su utilidad descriptiva y su mentira causal"
+        },
+        {
+          "objectives": "Explorarás data-driven attribution y los modelos disponibles en GA4. Modificarás ventanas de conversión y verás cómo el ROAS cambia mientras el gasto sigue igual. Documentarás qué modelo usas en tu reporte.",
+          "position": 20,
+          "title": "Modelos y ventanas de atribución: qué cambia y qué no"
+        },
+        {
+          "objectives": "Calcularás el ROAS de una misma inversión según la plataforma, según GA4 y según un diseño experimental. Distinguirás cuándo cada cifra es la correcta para la pregunta que haces.",
+          "position": 21,
+          "title": "Plataforma, GA4 y experimento: tres respuestas a tres preguntas distintas"
+        },
+        {
+          "objectives": "Definirás el contrafactual de una campaña tuya y formularás una hipótesis de incremento. Identificarás qué tipo de diseño experimental se ajusta a tu presupuesto y tus restricciones, y por qué sin él no puedes separar correlación de causalidad.",
+          "position": 22,
+          "title": "Incrementalidad y contrafactual: lo que no sucedió pero importa"
+        },
+        {
+          "objectives": "Escribirás una hipótesis única con outcome primario, tratamiento claro y criterio para declarar 'inconcluso'. Identificarás qué interferencias podrían hacer que el experimento no se pueda interpretar.",
+          "position": 23,
+          "title": "Cómo diseñar una prueba honesta con presupuesto limitado"
+        },
+        {
+          "objectives": "Analizarás cinco casos documentados (eBay, Adidas, P&G, Airbnb, Meta) y extraerás la regla de afirmación que aplica a tu proyecto. Listarás al menos dos ocasiones en las que tus propios datos no justificarían una conclusión causal.",
+          "position": 24,
+          "title": "Límites de afirmación y cinco casos reales que corrigen el instinto"
+        }
+      ],
+      "module_description": "Distinguirás 'se atribuyó a' de 'fue causado por'. Elegirás un modelo y una ventana para reportar, y diseñarás un experimento pequeño pero honesto que ponga límites a tus conclusiones.",
+      "module_no": 4,
+      "module_title": "Atribución y causalidad: de la creencia a la evidencia"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Clasificarás cada métrica de tu proyecto en north star, outcome, driver, diagnóstica u observación. Definirás una north star que represente valor generado, no solo lo que la herramienta muestra primero.",
+          "position": 25,
+          "title": "Jerarquía de métricas: north star, outcomes, drivers y vanidad"
+        },
+        {
+          "objectives": "Diseñarás la estructura de cinco páginas de tablero (executive, adquisición, funnel, economía unitaria, calidad de medición) y definirás el grano mínimo de tu hoja de marketing para unir fuentes sin errores.",
+          "position": 26,
+          "title": "Arquitectura del dashboard y grano de los datos"
+        },
+        {
+          "objectives": "Construirás un tablero mínimo conectando propiedad de GA4 y hoja de gastos. Identificarás los límites de muestreo, cuotas y frescura del conector, y documentarás cómo afectan a tu reporte.",
+          "position": 27,
+          "title": "Looker Studio conectado a GA4 y Sheets: lo que puedes y lo que no"
+        },
+        {
+          "objectives": "Completarás la plantilla canónica con resultado en una frase, KPIs principales, qué pasó, qué sabes y qué no sabes, hipótesis y decisión. Cada afirmación llevará su fuente y su certeza.",
+          "position": 28,
+          "title": "Reporte ejecutivo de una página: lo que el negocio realmente necesita ver"
+        },
+        {
+          "objectives": "Escribirás un informe de mal rendimiento que no cambie el denominador, no acorte la ventana para borrar una cohorte y no reemplace outcome con métricas de vanidad. Separarás hecho, hipótesis y acción.",
+          "position": 29,
+          "title": "Diagnóstico y presentación de malos resultados sin maquillar"
+        },
+        {
+          "objectives": "Establecerás un calendario de revisión de métricas, definirás un dueño por KPI y dejarás documentado el histórico de cambios de medición. Integrarás todos los artefactos del curso y presentarás la decisión final que tu proyecto exige.",
+          "position": 30,
+          "title": "Ritmo de operación, calidad de datos y la decisión final del curso"
+        }
+      ],
+      "module_description": "Transformarás GA4 + Sheets en un tablero de Looker Studio. Separarás métricas de dirección de métricas de vanidad y producirás un reporte ejecutivo de una página que diga qué decidir hoy.",
+      "module_no": 5,
+      "module_title": "Reportería que termina en una decisión"
+    }
+  ],
+  "slug": "curso-analitica-marketing",
+  "title": "Analítica y métricas de marketing",
+  "total": 30
+}

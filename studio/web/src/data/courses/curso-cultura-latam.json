@@ -1,0 +1,194 @@
+{
+  "description": "Autores, corrientes y tensiones del debate sobre lo latinoamericano, y cómo abordar su cultura con criterio",
+  "doc_type": "Marco de abordaje cultural",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Seleccionar un fenómeno cultural concreto y real para todo el curso; escribir una primera descripción sin usar “América Latina” y comparar qué cambia al añadir la categoría.",
+          "position": 1,
+          "title": "Elige tu fenómeno y sitúalo en el campo de batalla conceptual"
+        },
+        {
+          "objectives": "Explicar por qué “América Latina” no es ni un invento francés ni una identidad natural, citando fuentes de 1856, 1862 y 2013.",
+          "position": 2,
+          "title": "El nombre en disputa: de Bilbao a Gobat pasando por Walker"
+        },
+        {
+          "objectives": "Leer “Nuestra América” contra su posteridad acaramelada: mostrar qué excluye la fórmula “sin razas” y por qué Martí habla de pueblos y no de naciones.",
+          "position": 3,
+          "title": "Martí y “Nuestra América”: el proyecto que no es identidad armónica"
+        },
+        {
+          "objectives": "Identificar la cita apócrifa sobre EE.UU., reconstruir el proyecto espiritual-elitista de Ariel y conectarlo con la crítica de Retamar en 1971.",
+          "position": 4,
+          "title": "Rodó: el arielismo como ideología de la minoría letrada"
+        },
+        {
+          "objectives": "Diferenciar la tesis económica del problema del indio de la atribución que lo vuelve receta identitaria, y exponer el doble fuego que recibe (Comintern y Reinaga).",
+          "position": 5,
+          "title": "Mariátegui y el socialismo indoamericano: ni calco ni copia"
+        },
+        {
+          "objectives": "Leer La raza cósmica sin el filtro celebratorio oficial, detectar su eugenesia estética y rastrear hasta qué punto la SEP y el muralismo ejecutaron ese proyecto.",
+          "position": 6,
+          "title": "Vasconcelos: la raza cósmica como programa de desaparición asimilativa"
+        }
+      ],
+      "module_description": "Identificarás los proyectos políticos que dieron forma a “América Latina” y distinguirás qué dice cada autor de lo que se le atribuye.",
+      "module_no": 1,
+      "module_title": "La invención de la categoría"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Explicar la diferencia entre aculturación y transculturación en el Contrapunteo de 1940 y analizar qué implicancias tiene usar el ajiaco como imagen de la cubanidad.",
+          "position": 7,
+          "title": "Ortiz: la transculturación frente a la aculturación, y el riesgo de la metáfora culinaria"
+        },
+        {
+          "objectives": "Localizar la expresión “democracia racial” fuera de Casa-grande & senzala, contrastar la tesis del equilibrio de antagonismos con los datos de Fernandes y Nascimento, y mostrar qué violencia renarra como intimidad.",
+          "position": 8,
+          "title": "Freyre y el mito de la democracia racial: un caso de manual de atribución falsa"
+        },
+        {
+          "objectives": "Aplicar el esquema de plasticidad cultural a una obra literaria y contraponerlo con la advertencia de La ciudad letrada sobre el letrado como administrador del poder.",
+          "position": 9,
+          "title": "Rama: transculturación narrativa y el poder del mediador letrado"
+        },
+        {
+          "objectives": "Distinguir cultura autónoma, apropiada, enajenada e impuesta en tu fenómeno, y discutir la objeción de Bartra y Lomnitz sobre el dualismo esencialista.",
+          "position": 10,
+          "title": "Bonfil Batalla: el México profundo y la cuadrícula del control cultural"
+        },
+        {
+          "objectives": "Leer la introducción de 2001 de Culturas híbridas para captar la autocrítica sobre la hibridación no fusional, y contrastar con la crítica de Cornejo Polar y Beverley.",
+          "position": 11,
+          "title": "García Canclini: hibridación contra dicotomías, y qué no se deja hibridar"
+        },
+        {
+          "objectives": "Redactar dos versiones de tu fenómeno, una como mestizaje/hibridación y otra como heterogeneidad, y decidir cuál deja más residuo sin explicar.",
+          "position": 12,
+          "title": "Cornejo Polar: heterogeneidad y totalidad contradictoria como contracategoría"
+        }
+      ],
+      "module_description": "Compararás seis conceptos rivales sobre el contacto cultural desigual, señalando qué resuelve cada uno y qué borra en tu propio fenómeno.",
+      "module_no": 2,
+      "module_title": "Mestizaje, transculturación e hibridación"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Explicar el desacuerdo económico entre superexplotación y desarrollo asociado, y conectar a González Casanova y Stavenhagen como antecedentes directos de la colonialidad que el decolonialismo omite.",
+          "position": 13,
+          "title": "La dependencia como disputa (Marini vs. Cardoso) y el eslabón perdido del colonialismo interno"
+        },
+        {
+          "objectives": "Distinguir colonialismo de colonialidad, ubicar la cita de “¡Qué tal raza!” y evaluar la objeción historiográfica de Rappaport sobre el anacronismo de proyectar raza hacia el siglo XVI.",
+          "position": 14,
+          "title": "Quijano: la colonialidad del poder y el debate sobre la raza como invento de 1492"
+        },
+        {
+          "objectives": "Conectar el ego conquiro con el ego cogito, exponer la propuesta de transmodernidad y discutir la crítica de Schutte: ¿quién habla por quién cuando el filósofo enuncia al Otro?",
+          "position": 15,
+          "title": "Dussel: el mito de la modernidad y el otro encubierto"
+        },
+        {
+          "objectives": "Aplicar el argumento de La idea de América Latina a tu fenómeno: ¿a quién excluye la categoría? Y ensayar una crítica a Mignolo usando a Rivera Cusicanqui.",
+          "position": 16,
+          "title": "Mignolo: la idea de América Latina como proyecto criollo y la desobediencia epistémica"
+        },
+        {
+          "objectives": "Describir cómo el discurso del desarrollo construye al Tercer Mundo como objeto de intervención, y ponderar la crítica materialista de Kiely: ¿el posdesarrollo romantiza lo local y deja sin respuesta demandas de agua, salud y renta?",
+          "position": 17,
+          "title": "Escobar: la invención del desarrollo y el sentipensar con la tierra"
+        },
+        {
+          "objectives": "Leer La colonialidad del saber como artefacto de red académica, identificar el programa común del grupo modernidad/colonialidad y discutir qué costo tiene esa institucionalización según Rivera Cusicanqui.",
+          "position": 18,
+          "title": "Lander y el volumen-manifiesto: cómo se institucionaliza una corriente"
+        }
+      ],
+      "module_description": "Reconstruirás la genealogía de la colonialidad del poder desde la dependencia y el colonialismo interno, y evaluarás qué critica de los bloques anteriores y qué borra.",
+      "module_no": 3,
+      "module_title": "El giro decolonial y sus antecedentes"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Diferenciar ch’ixi de hibridación con un elemento de tu fenómeno donde dos sistemas coexistan sin fundirse, y redactar la acusación de Rivera a Mignolo con nombres propios.",
+          "position": 19,
+          "title": "Rivera Cusicanqui: lo ch’ixi contra el mestizaje y contra el extractivismo académico decolonial"
+        },
+        {
+          "objectives": "Formular la pregunta empírica que en tu fenómeno decidiría entre la tesis de Lugones (el género es colonial) y la de Segato (hubo patriarcado de baja intensidad), e incorporar al feminismo comunitario de Paredes y Guzmán como tercera posición.",
+          "position": 20,
+          "title": "Segato vs. Lugones: el desacuerdo sobre el género como imposición colonial o intensificación"
+        },
+        {
+          "objectives": "Analizar por qué “América Latina” borra lo afrodescendiente de un modo específico, distinto del borramiento indígena, y trazar la genealogía de la categoría amefricanidade y del quilombismo.",
+          "position": 21,
+          "title": "Gonzalez y Nascimento: Améfrica Ladina y el genocidio enmascarado"
+        },
+        {
+          "objectives": "Distinguir la impugnación indianista a Mariátegui y al mestizaje de la propuesta de comunalidad de Díaz y Martínez Luna, y discutir si “cultura” como categoría externa ya deforma lo que estudia.",
+          "position": 22,
+          "title": "Reinaga y la comunalidad oaxaqueña: el indio habla por sí mismo"
+        },
+        {
+          "objectives": "Aplicar el esquema de mediaciones a un consumo cultural masivo de tu fenómeno y después cruzar ese análisis con un dato de propiedad del medio: ¿resignificación o estructura concentrada?",
+          "position": 23,
+          "title": "Martín-Barbero: perder el objeto para ganar el proceso de las mediaciones"
+        },
+        {
+          "objectives": "Escribir un díptico que defienda tu fenómeno con Monsiváis y lo impugne con Sarlo, y decidir qué posición asumiría un ministerio de cultura real que lo gestione.",
+          "position": 24,
+          "title": "Sarlo y Monsiváis: la disputa por la cultura popular-masiva y sus consecuencias para la política cultural"
+        }
+      ],
+      "module_description": "Manejarás las críticas indígenas, afrodescendientes, de género y de la comunicación que disputan todos los marcos anteriores, incluido el decolonial.",
+      "module_no": 4,
+      "module_title": "Impugnaciones desde adentro"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Definir extractivismo cognitivo con su genealogía completa (Simpson 2013, Rivera 2010, Grosfoguel 2016) y aplicar la distinción entre usar saberes ajenos y capitalizarlos sin retorno a un caso académico real sobre tu fenómeno.",
+          "position": 25,
+          "title": "Extractivismo epistémico: de Simpson y Rivera Cusicanqui a Grosfoguel, y la disputa sobre si toda cita transcultural es extractiva"
+        },
+        {
+          "objectives": "Identificar los instrumentos vinculantes (OIT 169, DNUDPI, Saramaka, Sarayaku, CARE) que rigen la investigación, y buscar si tu fenómeno ya tiene un protocolo comunitario propio.",
+          "position": 26,
+          "title": "Convenio 169, CLPI y protocolos autonómicos: lo que hay que saber antes del diseño de campo"
+        },
+        {
+          "objectives": "Extraer lecciones de los dos casos para tu fenómeno: demostrar que los objetos no eran “piezas de colección” sino cuerpos de autoridad política, y que la restitución no es un gesto único sino un proceso que desorganiza y recompone comunidades.",
+          "position": 27,
+          "title": "Restitución como proceso político largo: los textiles de Coroma y los restos de Inakayal"
+        },
+        {
+          "objectives": "Aplicar la tabla de criterios del documento fuente a tu fenómeno: decidir qué concepto (hibridación, heterogeneidad, ch’ixi, control cultural, etc.) es pertinente y con qué contrapeso crítico obligatorio.",
+          "position": 28,
+          "title": "Cómo elegir marco según el fenómeno: una guía de decisión con frenos"
+        },
+        {
+          "objectives": "Someter tu fenómeno al cuestionario completo (quién formuló el problema, consentimiento, lengua, autoría, destino de los datos, revisión previa) y detectar en un texto ajeno tres señales de imposición categorial.",
+          "position": 29,
+          "title": "Ocho preguntas obligatorias antes de investigar una comunidad, y señales de que tu interpretación impone categorías externas"
+        },
+        {
+          "objectives": "Confeccionar el protocolo ético completo para un trabajo de campo de dos semanas sobre tu fenómeno, usando el checklist del documento fuente y dejando por escrito qué sucede si los resultados perjudican a la comunidad.",
+          "position": 30,
+          "title": "Checklist de pertinencia ética antes, durante y después: del consentimiento al retorno"
+        }
+      ],
+      "module_description": "Diseñarás un protocolo ético para investigar tu fenómeno con comunidades, usando consentimiento previo, coautoría y restitución, y sabrás detectar extractivismo epistémico.",
+      "module_no": 5,
+      "module_title": "Ética y pertinencia en la práctica"
+    }
+  ],
+  "slug": "curso-cultura-latam",
+  "title": "Cultura latinoamericana",
+  "total": 30
+}

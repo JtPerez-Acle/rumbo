@@ -1,0 +1,194 @@
+{
+  "description": "Sistemas, scouting y dirección de equipos en alto rendimiento internacional, con tu plan de temporada al final",
+  "doc_type": "Plan técnico de temporada",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Elegirás el equipo real sobre el que trabajarás durante el curso, verificarás su sistema de juego actual y justificarás la decisión 5-1 o 6-2 con los criterios de plantilla y calendario del curso.",
+          "position": 1,
+          "title": "Tu equipo, tu proyecto de 30 días"
+        },
+        {
+          "objectives": "Dibujarás tus tres rotaciones de máxima artillería con formación de recepción, primera opción de side-out con recepción A y B, y el ajuste preacordado si encajas dos breaks seguidos.",
+          "position": 2,
+          "title": "Rotaciones de fortaleza (K1, K6, K5)"
+        },
+        {
+          "objectives": "Identificarás el agujero estructural de tus tres rotaciones con colocador delantero, establecerás tu plan de protección (doble cambio, switch defensivo, prioridad de ataque) y dejarás por escrito la regla de reversión por marcador.",
+          "position": 3,
+          "title": "Rotaciones vulnerables (K4, K3, K2) y cómo protegerlas"
+        },
+        {
+          "objectives": "Asignarás formación de recepción por cada sacador del próximo rival, estableciendo la regla de reversión inmediata si el rival encuentra a tu receptor escondido.",
+          "position": 4,
+          "title": "Recepción con 2 o con 3 según el sacador"
+        },
+        {
+          "objectives": "Diseñarás un apilamiento legal para tu rotación de penetración más larga y un protocolo de verificación de formación para tu cuerpo técnico que elimine las faltas posicionales.",
+          "position": 5,
+          "title": "Solapamientos: de infracción a ventaja táctica"
+        },
+        {
+          "objectives": "Determinarás las condiciones exactas de marcador, rival y rotación bajo las cuales tu equipo pasará de 5-1 a doble cambio o a un 6-2 parcial, y las condiciones de retorno.",
+          "position": 6,
+          "title": "Ajuste estructural: cuándo cambiar el sistema"
+        }
+      ],
+      "module_description": "Podrás tomar la decisión 5-1 vs 6-2 con criterios de plantilla y calendario, dibujar tus seis rotaciones con sus ajustes por rival y diseñar recepciones y solapamientos que sumen en lugar de restar.",
+      "module_no": 1,
+      "module_title": "La base estructural: tu sistema contra el rival"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Compararás la distribución real de tu colocador en el último partido (por calidad de recepción) contra la tabla objetivo de élite y establecerás la corrección prioritaria para el próximo partido.",
+          "position": 7,
+          "title": "Distribución del colocador: criterios, no repertorio"
+        },
+        {
+          "objectives": "Medirás el porcentaje de commit del central de tu próximo rival sobre tu primer tiempo y decidirás con datos si activas el bic o mantienes el pipe estándar.",
+          "position": 8,
+          "title": "Tempos de ataque y la decisión pipe vs bic"
+        },
+        {
+          "objectives": "Escribirás tus cuatro reglas de riesgo de saque (colchón, 20 iguales, tras tiempo muerto rival, dos errores seguidos) y las asignarás por nombre a cada sacador de tu equipo.",
+          "position": 9,
+          "title": "El saque como inversión táctica, no como rifa"
+        },
+        {
+          "objectives": "Elegirás el sistema de bloqueo (lectura, commit o release) para cada atacante del próximo rival basándote en su frecuencia de primer tiempo y en quién concentra el side-out bajo presión.",
+          "position": 10,
+          "title": "Sistema de bloqueo: lectura, commit y release contra quién"
+        },
+        {
+          "objectives": "Asignarás defensa perimetral o rotacional por atacante rival según su mapa de dispersión de tiros, y establecerás quién canta el sistema en cancha para que el cambio sea automático.",
+          "position": 11,
+          "title": "Defensa asociada: la coherencia que el rival no ve"
+        },
+        {
+          "objectives": "Establecerás la jerarquía de segundo balón en defensa para tu equipo, el menú reducido de ataque en transición y los criterios de primer tiempo de contraataque con defensa no perfecta.",
+          "position": 12,
+          "title": "Transición: la cadena que define el break point"
+        }
+      ],
+      "module_description": "Podrás establecer los criterios de distribución de tu colocador, decidir cuándo acelerar al pipe o al bic, manejar el riesgo de saque como inversión táctica y elegir sistema de bloqueo y defensa por atacante rival.",
+      "module_no": 2,
+      "module_title": "Side-out y break point: ganar el punto que importa"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Filmarás 10 saques de un sacador propio bajo fatiga simulada de cierre de set y redactarás la tarea de corrección para su desviación principal (lanzamiento, carrera o dirección única).",
+          "position": 13,
+          "title": "Saque en salto potencia cuando el partido pesa"
+        },
+        {
+          "objectives": "Establecerás el protocolo de entrenamiento de flotante con zona cantada y verificarás la disposición de pantalla de tu equipo según la regla FIVB endurecida de este ciclo.",
+          "position": 14,
+          "title": "Flotante táctico: zona, profundidad y nueva legalidad"
+        },
+        {
+          "objectives": "Identificarás en video lateral de un atacante propio la aparición de codo bajo, ataque sin lectura de bloqueo o abuso de fuerza contra triple bloqueo, y redactarás la tarea de corrección.",
+          "position": 15,
+          "title": "Mecánica del brazo de ataque cuando el hombro se cansa"
+        },
+        {
+          "objectives": "Diseñarás una sesión de recepción contra flotante y contra potencia donde la recepción B al punto acordado cuente como éxito, y tu objetivo sea positividad, no perfección.",
+          "position": 16,
+          "title": "Ángulos de plataforma: dirigir, no solo aguantar"
+        },
+        {
+          "objectives": "Entrenarás explícitamente la defensa alta con dedos sobre balones tensos a la cara aprovechando la interpretación actual del doble contacto, y verificarás asignaciones defensivas con video de tu último partido.",
+          "position": 17,
+          "title": "Defensa baja y el nuevo valor de las manos altas"
+        },
+        {
+          "objectives": "Etiquetarás los errores de tu equipo en un partido reciente por contexto de marcador y extraerás el patrón de al menos un jugador, con la rutina de reinicio atencional que usará para corregirlo.",
+          "position": 18,
+          "title": "Mapa de errores propios bajo presión internacional"
+        }
+      ],
+      "module_description": "Podrás identificar los errores técnicos específicos que tus jugadores cometen en cierres de set, tras error propio y en semanas de gira, y aplicar correcciones con nombre, tarea y contexto.",
+      "module_no": 3,
+      "module_title": "Técnica bajo presión: lo que se degrada cuando el marcador aprieta"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Dibujarás el organigrama de tu banco para partido asignando dueño a cada información (rotaciones, bloqueo-defensa rival, challenge, carga física, banca) y eliminando voces redundantes en el tiempo muerto.",
+          "position": 19,
+          "title": "Estructura del cuerpo técnico con dueño único por dato"
+        },
+        {
+          "objectives": "Identificarás quién ejerce cada uno de los tres liderazgos reales en tu plantel —institucional, técnico y emocional— y redactarás cómo usas al líder técnico para que los mensajes del tiempo muerto se sostengan en cancha.",
+          "position": 20,
+          "title": "Capitán, líder técnico y líder emocional"
+        },
+        {
+          "objectives": "Establecerás los cantos obligatorios de recepción, bloqueo y reset de tu equipo, y fijarás la métrica de control que tu analista usará para medir rallies con conflicto de responsabilidad.",
+          "position": 21,
+          "title": "Cantos de cancha: la comunicación que se entrena"
+        },
+        {
+          "objectives": "Redactarás el protocolo de manejo para un conflicto real o plausible de tu plantel (de rol, de rendimiento o interpersonal), y la regla escrita de conducta de banca que se aplica primero a tus referentes.",
+          "position": 22,
+          "title": "Conflicto, banca y cultura: lo que se tolera al referente"
+        },
+        {
+          "objectives": "Escribirás el protocolo completo de tiempo muerto de tu banco (5-15-10 segundos con mensajes máximos), los criterios de cuándo pedirlo, y la regla de gasto de challenge con la nueva norma FIVB de revisión a final de jugada.",
+          "position": 23,
+          "title": "Tiempo muerto, cambios y challenge: protocolo de 30 segundos"
+        },
+        {
+          "objectives": "Diseñarás el protocolo de gira para tu equipo incluyendo rooming, días sin vóleibol reales, gestión de husos horarios y la señal de alerta temprana que tu asistente observará en comedores y calentamientos.",
+          "position": 24,
+          "title": "Convivencia en gira larga: la VNL como prueba de estrés"
+        }
+      ],
+      "module_description": "Podrás repartir roles en tu cuerpo técnico con dueños únicos por información, manejar los tres liderazgos de tu plantel, redactar protocolos de conflicto y de tiempo muerto, y gestionar la convivencia en gira larga.",
+      "module_no": 4,
+      "module_title": "Dirección del grupo: las decisiones que la pizarra no resuelve"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Arma el plan de temporada macro de tu equipo alineado a los picos reales del ciclo (continental 2026 como plaza olímpica, World Cup 2027, ranking VNL 2028) y toma la decisión de ruta olímpica temprana o tardía.",
+          "position": 25,
+          "title": "Plan anual con calendario FIVB 2025-2028 y ruta a LA28"
+        },
+        {
+          "objectives": "Establecerás el diálogo técnico-físico para tu próxima ventana de competencia, los tres indicadores mínimos de control de carga y la tabla de criterios de convocatoria que comunicarás individualmente a los jugadores cortados.",
+          "position": 26,
+          "title": "Periodización, control de carga y criterios de selección"
+        },
+        {
+          "objectives": "Definirás tu diccionario de codificación estable de recepción A/B/C y ataque para toda la temporada, y calibrarás los rangos de referencia de side-out, break point y eficiencia contra la estadística oficial de la VNL/WC vigente.",
+          "position": 27,
+          "title": "Scouting: las métricas que se usan de verdad"
+        },
+        {
+          "objectives": "Producirás el informe de scouting completo de tu próximo rival (2 partidos de video) usando la plantilla de 7 secciones del curso, y lo condensarás en un plan de partido de una página que tu equipo pueda ejecutar.",
+          "position": 28,
+          "title": "Informe de scouting y plan de partido de una página"
+        },
+        {
+          "objectives": "Diseñarás la sesión del día -2 al partido para la ventana en curso: bloques con duración, contenido específico anclado al scouting del rival y criterios de éxito medibles en la sesión.",
+          "position": 29,
+          "title": "Sesión tipo de entrenamiento en fase competitiva"
+        },
+        {
+          "objectives": "Cerrarás el curso recorriendo el ciclo completo con tu equipo real: scouting, plan, gestión en vivo y revisión post-partido, dejando instalado el estándar de que ninguna decisión táctica se toma sin dato que la respalde.",
+          "position": 30,
+          "title": "Del dato a la decisión: tu ciclo completo de partido"
+        }
+      ],
+      "module_description": "Podrás planificar tu temporada alineada al ciclo olímpico 2028, manejar la carga y la convocatoria con criterios explícitos, producir un scouting rival completo y cerrar el ciclo de dato a decisión con el plan del próximo partido.",
+      "module_no": 5,
+      "module_title": "Administrar el alto rendimiento: tu temporada, tus datos, tu decisión"
+    }
+  ],
+  "slug": "curso-voleibol",
+  "title": "Vóleibol de alto rendimiento",
+  "total": 30
+}

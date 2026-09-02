@@ -1,0 +1,194 @@
+{
+  "description": "Lleva cuentas como en agencia: parrilla, comunidad, crisis y un reporte mensual que defiende resultados",
+  "doc_type": "Plan de social media",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Elegir una marca real como proyecto del curso y completar una auditoría preliminar de sus canales activos con datos observables.",
+          "position": 1,
+          "title": "Elige tu marca y diagnostica antes de mover nada"
+        },
+        {
+          "objectives": "Explicar para qué sirve y para qué no sirve cada red social en función de los objetivos de negocio, sin mitos ni generalizaciones.",
+          "position": 2,
+          "title": "Qué hace bien y mal cada plataforma"
+        },
+        {
+          "objectives": "Puntuar cada canal en seis variables de ajuste estratégico y viabilidad operativa para decidir si es primario, secundario, de mantenimiento o no se opera.",
+          "position": 3,
+          "title": "Decide en cuáles canales estar con método, no con intuición"
+        },
+        {
+          "objectives": "Definir un máximo de tres objetivos de canal que especifiquen qué cambio busca producir en la audiencia y qué métrica de resultado lo refleja.",
+          "position": 4,
+          "title": "Objetivos que no sean 'ganar seguidores'"
+        },
+        {
+          "objectives": "Construir una voz de marca estable y una matriz de adaptación de tono para cada plataforma que mantenga la personalidad reconocible.",
+          "position": 5,
+          "title": "Arquetipo y tono por canal sin perder la marca"
+        },
+        {
+          "objectives": "Producir un documento de estrategia por canal que responda qué perdería el negocio si la cuenta cerrara mañana.",
+          "position": 6,
+          "title": "El documento de estrategia que cabe en una página"
+        }
+      ],
+      "module_description": "Podrás decidir en qué plataformas debe estar una marca y qué papel cumple cada una, con objetivos claros que van más allá de los seguidores.",
+      "module_no": 1,
+      "module_title": "Estrategia de canal"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Definir entre tres y cinco pilares de contenido que conecten una necesidad de la audiencia con un trabajo concreto para la marca.",
+          "position": 7,
+          "title": "Pilares que sirven para decidir, no para decorar"
+        },
+        {
+          "objectives": "Etiquetar cada publicación por pilar, objetivo, formato e hipótesis para identificar qué combinaciones funcionan.",
+          "position": 8,
+          "title": "Convierte los pilares en un sistema que puedas medir"
+        },
+        {
+          "objectives": "Calcular una cadencia de publicación basada en la capacidad real de producción, no en supersticiones de algoritmo.",
+          "position": 9,
+          "title": "Calendario mensual realista, sin el mito de la frecuencia mágica"
+        },
+        {
+          "objectives": "Producir assets con las especificaciones técnicas documentadas de cada plataforma, separando el master de producción del límite de upload.",
+          "position": 10,
+          "title": "Formatos y especificaciones que sí importan"
+        },
+        {
+          "objectives": "Transformar una misma idea en piezas autosuficientes para tres plataformas distintas, respetando el contexto y la promesa de cada una.",
+          "position": 11,
+          "title": "Adapta una idea a tres canales sin copiar y pegar"
+        },
+        {
+          "objectives": "Diseñar un RACI y un flujo de estados con fechas límite, responsable único de aprobación en el cliente y carpeta de assets finales bloqueados.",
+          "position": 12,
+          "title": "Flujo de aprobación de agencia que no te trabe semanas"
+        }
+      ],
+      "module_description": "Podrás transformar una estrategia en parrillas mensuales producibles, con pilares claros, formatos adaptados y un flujo de aprobación que funcione.",
+      "module_no": 2,
+      "module_title": "Parrilla y producción"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Describir el proceso real de recuperación, predicción y ranking con el que las plataformas distribuyen contenido, sin reducirlo a una sola fórmula secreta.",
+          "position": 13,
+          "title": "El modelo mental que reemplaza 'al algoritmo le gusta...'"
+        },
+        {
+          "objectives": "Identificar las señales y políticas que Meta ha documentado para Feed, Reels, Stories y recomendaciones, incluyendo los cambios de 2025 y 2026.",
+          "position": 14,
+          "title": "Meta: qué dice la propia empresa, no lo que se repite"
+        },
+        {
+          "objectives": "Distinguir entre los factores que TikTok menciona para For You y la búsqueda, y los mitos sobre seguidores, horarios y hashtags mágicos.",
+          "position": 15,
+          "title": "TikTok: las señales que la plataforma sí reconoce"
+        },
+        {
+          "objectives": "Leer métricas como CTR, impresiones y retención en contexto, y aplicar lo que YouTube dice sobre frecuencia, pausas y duración del video.",
+          "position": 16,
+          "title": "YouTube: por qué CTR alto no siempre es buena noticia"
+        },
+        {
+          "objectives": "Explicar los componentes del nuevo sistema de ranking de Feed de LinkedIn basado en LLM y señales profesionales, y descartar los atajos de engagement bait.",
+          "position": 17,
+          "title": "LinkedIn: lo que cambió en 2026 y cómo se rankea ahora"
+        },
+        {
+          "objectives": "Diagnosticar la performance de un contenido usando métricas nativas y calificar las explicaciones como documentadas, verificadas o mito sin respaldo.",
+          "position": 18,
+          "title": "Analíticas nativas y la máquina del folclore"
+        }
+      ],
+      "module_description": "Podrás explicar qué se sabe y qué es mito sobre la distribución en Meta, TikTok, YouTube y LinkedIn, usando solo documentación oficial y datos fechados.",
+      "module_no": 3,
+      "module_title": "Algoritmos y distribución con evidencia"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Construir una política de moderación que defina qué se mantiene, qué se responde, qué se oculta y qué se escala, según la clase de comentario.",
+          "position": 19,
+          "title": "Moderar no es contestar todo: criterios para proteger a las personas y a la marca"
+        },
+        {
+          "objectives": "Categorizar comentarios y mensajes en tipos operativos (pregunta, reclamo, crítica, desinformación, riesgo) y asignar una acción pública y una interna.",
+          "position": 20,
+          "title": "Taxonomía de comentarios: clasifica antes de reaccionar"
+        },
+        {
+          "objectives": "Aplicar la secuencia escuchar, reconocer, verificar y responder sin caer en fórmulas vacías como 'lamentamos que te sientas así'.",
+          "position": 21,
+          "title": "El tono cuando hay conflicto: escucha, reconoce y no te defiendas"
+        },
+        {
+          "objectives": "Definir niveles de severidad P0 a P3, sus owners y un árbol de decisión que conecte el comentario con la acción de escalamiento correspondiente.",
+          "position": 22,
+          "title": "Árbol de escalamiento: quién responde qué y cuándo se activa la alerta"
+        },
+        {
+          "objectives": "Extraer de la comunidad preguntas recurrentes, lenguaje real, objeciones e ideas de contenido que alimenten la parrilla y lleguen a producto.",
+          "position": 23,
+          "title": "La comunidad es un activo, no un buzón de quejas"
+        },
+        {
+          "objectives": "Operar un protocolo con SLA por fase (detección, clasificación, vocería, respuesta y postmortem) que proteja la precisión cuando hay riesgo legal o de seguridad.",
+          "position": 24,
+          "title": "Protocolo de crisis: tiempos reales para no correr sin saber adónde"
+        }
+      ],
+      "module_description": "Podrás diseñar una política de moderación, clasificar y escalar conversaciones, y operar un protocolo de crisis con roles y tiempos claros.",
+      "module_no": 4,
+      "module_title": "Comunidad y crisis"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Emparejar cada objetivo de canal con su métrica principal de resultado y otra de diagnóstico para leer el dato sin autoengaño.",
+          "position": 25,
+          "title": "La métrica depende de la pregunta, no del dashboard"
+        },
+        {
+          "objectives": "Aplicar reglas de higiene métrica como no sumar views de plataformas distintas y usar siempre un denominador (reach, impresiones o piezas) al reportar tasas.",
+          "position": 26,
+          "title": "Higiene métrica: lo que nunca debes sumar ni promediar"
+        },
+        {
+          "objectives": "Producir un reporte de siete capas con resumen ejecutivo, resultados, diagnóstico, comunidad y decisiones, usando la plantilla de planilla única del curso.",
+          "position": 27,
+          "title": "Construye el reporte mensual que defiende tu trabajo"
+        },
+        {
+          "objectives": "Aplicar reglas prácticas para distinguir una señal real de una variación puntual usando medianas, baselines móviles y comparables por objetivo y formato.",
+          "position": 28,
+          "title": "Tendencia versus ruido: cuándo puedes confiar en un patrón"
+        },
+        {
+          "objectives": "Traducir la obsesión por seguidores a una jerarquía de resultado de negocio, comportamiento de audiencia y KPI de canal con ejemplos concretos.",
+          "position": 29,
+          "title": "Cómo defender resultados ante un cliente que solo mira seguidores"
+        },
+        {
+          "objectives": "Cerrar cada ciclo de reporte con tres decisiones concretas (seguir, probar y detener) y mantener viva la planilla maestra de seis pestañas como sistema operativo.",
+          "position": 30,
+          "title": "El ciclo mensual de mejora: seguir, probar y detener"
+        }
+      ],
+      "module_description": "Podrás construir un reporte mensual que conecte métricas con objetivos, diferencie tendencia de ruido y defienda resultados ante un cliente que solo mira seguidores.",
+      "module_no": 5,
+      "module_title": "Medición y reportería de agencia"
+    }
+  ],
+  "slug": "curso-social-media",
+  "title": "Social media management",
+  "total": 30
+}

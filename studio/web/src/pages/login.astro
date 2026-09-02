@@ -1,0 +1,34 @@
+---
+/* Sign-in.
+ *
+ * This was a 404 while the public header linked to it — the header was wired to
+ * a real URL that had never been created, so the primary way into the product
+ * from every public page was a dead end for anyone logged out.
+ *
+ * It is a real URL rather than a fragment for the same reason as the others: it
+ * has to be linkable. "Ve a ponrumbo.com/login" is a sentence someone says out
+ * loud.
+ */
+import Public from '../layouts/Public.astro';
+import LoginForm from '../components/LoginForm.svelte';
+import { SITE_NAME, TUTOR } from '../lib/site.js';
+---
+<Public
+  title={`Entrar — ${SITE_NAME}`}
+  description="Entra con tu invitación. El acceso es por invitación mientras estamos en fase alfa."
+>
+  <div>
+    <div class="eyebrow">Tu clase de hoy te espera</div>
+    <h1 style="margin-top:10px">Entra y sigue donde lo dejaste.</h1>
+    <p class="muted" style="margin-top:10px">
+      Entra con tu código de invitación. Cada día: un video corto, algo real que
+      hacer, y {TUTOR} leyendo lo que escribiste. Terminas con trabajo tuyo que
+      mostrar, no con un certificado.
+    </p>
+  </div>
+
+  {/* client:load, not client:visible: this island IS the page, it is above the
+      fold on every device, and a form that appears a beat after the words
+      around it is the flicker this migration exists to remove. */}
+  <LoginForm client:load />
+</Public>

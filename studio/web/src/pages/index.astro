@@ -1,0 +1,178 @@
+---
+/* THE LANDING IS THE LESSON.
+ *
+ * A stranger cannot try this product — access is invite-gated — and its value,
+ * verified work rather than video, is invisible from outside. Every competitor
+ * in the category claims an AI tutor, so a claim buys nothing here. This page
+ * does not describe the loop: it runs one real lesson, takes one real answer,
+ * and returns one real verdict from the same evaluator a logged-in learner
+ * gets, before asking for anything. The wall arrives after the value.
+ *
+ * The lesson itself is now in the HTML — title, video plate, written guide, key
+ * points, and the question. It used to arrive after a fetch, which is why the
+ * page visibly assembled itself in front of the reader.
+ */
+import Public from '../layouts/Public.astro';
+import Icon from '../components/Icon.astro';
+import TutorPanel from '../components/TutorPanel.astro';
+import FounderNote from '../components/FounderNote.astro';
+import Doors from '../components/Doors.astro';
+import DemoAsk from '../components/DemoAsk.svelte';
+import VideoPlate from '../components/VideoPlate.svelte';
+import GuideToggle from '../components/GuideToggle.svelte';
+import { SITE_NAME, TUTOR, STEPS, GETS } from '../lib/site.js';
+import { renderMarkdown, assertNoMermaid } from '../lib/markdown.js';
+import lesson from '../data/demo.json';
+
+const guideSource = lesson.written || lesson.transcript || '';
+assertNoMermaid(guideSource, 'the landing demo lesson');
+const guideHtml = renderMarkdown(guideSource);
+---
+<Public
+  here="clase"
+  title={`${SITE_NAME} — aprende haciendo, con tutora IA`}
+  description="Haz una clase real ahora mismo, sin cuenta: mira el video, lee la guía y explícalo con tus palabras. Tu tutora te responde de verdad."
+>
+  {/* The first viewport issues an imperative — "haz una clase" — and used to
+      offer no way to obey it: the box was 2,837px down, 3.4 phone screens for a
+      reader who studies in stolen time. The hero carries the question itself,
+      so the page's verb and the page's affordance agree. */}
+  <section class="u-full band-hi hero">
+    <div class="u-wide herogrid">
+      <div>
+        <div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
+        <h1>No te contamos cómo funciona. Haz una clase.</h1>
+        <p class="muted lede">
+          Primera lección del curso de {lesson.course_title}, entera. Explícala
+          con tus palabras y {TUTOR} te contesta de verdad — antes de pedirte
+          nada, y sin cuenta.
+        </p>
+      </div>
+      <div><DemoAsk lesson={lesson} client:load /></div>
+    </div>
+  </section>
+
+  <div class="lessonsplit u-wide" style="margin-top:var(--s4)">
+    <div>
+      <div class="microlabel">{lesson.course_title} · lección 1</div>
+      <h2 class="lessontitle" style="margin:6px 0 10px">{lesson.title}</h2>
+      {lesson.has_video && <VideoPlate client:visible />}
+    </div>
+    <div>
+      <div class="ai-tag" style="margin-bottom:8px"><span class="dot"></span> La guía escrita</div>
+      {/* The guide is rendered at build time with raw HTML escaped, which is
+          a stronger control than the runtime sanitiser it replaces — see
+          lib/markdown.js. It is slotted into the island, so it ships in the
+          HTML once and is never serialized into the island's props. */}
+      <GuideToggle client:visible>
+        <div class="guidewrap card card-paper written" set:html={guideHtml}></div>
+      </GuideToggle>
+    </div>
+  </div>
+
+  {/* Key points sit BELOW the split, not in the left column. The guide starts
+      collapsed, so the right column is shorter than the video column and this
+      card used to leave a large dead field beside it on a wide screen. */}
+  {lesson.key_points?.length > 0 && (
+    <div class="card keypoints u-wide" style="margin-top:var(--s4)">
+      <div class="microlabel">Lo que te llevas</div>
+      <div class="kpgrid" style="margin-top:var(--s2)">
+        {lesson.key_points.map((p) => (
+          <div class="gaprow">
+            <span class="gx" style="color:var(--amber)"><Icon name="check" class="ic ic-s" /></span>
+            <span>{p}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* One worked example, after the lesson, never beside the box. There used to
+      be two — the same component with the same caption 2,800px apart, which read
+      as a repeat. And on a phone the first thing under the headline was a
+      stranger's answer: a product that promises to read YOUR work opening with
+      someone else's, in the exact anatomy of a testimonial, on a site that has
+      correctly refused to have testimonials.
+      Deliberately still a WRONG answer, and the one carrying a misconception —
+      that is the mechanic nothing else in the category has. */}
+  <div class="u-wide afterq">
+    <TutorPanel key="todavia" class="tp-inline" />
+    <div class="afterq-note">
+      <p class="muted t-sm">
+        Esto es lo que recibe cualquiera que escriba algo arriba: un veredicto,
+        el error de fondo si lo hay, y qué le falta — no una nota. La misma
+        {TUTOR} que lee el trabajo de quienes ya están dentro.
+      </p>
+    </div>
+  </div>
+
+  {/* Cómo funciona, on two axes, because those are the two questions a stranger
+      actually has: QUÉ HAGO (numbered steps, in order) and QUÉ RECIBO. */}
+  <section class="u-full band-lo">
+    <div class="microlabel">Cómo funciona · cuatro pasos</div>
+    <div class="u-wide steps" style="margin-top:var(--s4)">
+      {STEPS.map(([title, text], i) => (
+        <div class="card">
+          <div class="stephead">
+            <span class="stepnum">{i + 1}</span>
+            <b class="t-md">{title}</b>
+          </div>
+          <p class="muted t-sm" style="margin-top:8px">{text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="u-wide" style="margin-top:var(--s6)">
+    <div class="microlabel">Qué te llevas</div>
+    <div class="takeaways" style="margin-top:var(--s4)">
+      {GETS.map(([ic, title, text]) => (
+        <div class="card">
+          <div class="row" style="gap:10px;color:var(--amber)">
+            <Icon name={ic} />
+            <b class="t-md" style="color:var(--text)">{title}</b>
+          </div>
+          <p class="muted t-sm" style="margin-top:8px">{text}</p>
+        </div>
+      ))}
+    </div>
+    <p class="faint t-sm" style="margin:var(--s4) 2px 0">
+      No damos certificados: nadie contrata por uno nuestro. Damos el trabajo que
+      hiciste, con tu nombre.
+    </p>
+  </section>
+
+  {/* El umbral, and it comes BEFORE the library on purpose. The peak of this
+      page is a machine quoting a stranger's own words back at them. That peak
+      used to be followed by an explainer and a course grid, so the last thing
+      read before the decision was an inventory — which is mechanically why the
+      best demo in the category was remembered as a marketplace. */}
+  <section class="u-full band-deep threshold">
+    <div>
+      <div class="eyebrow" style="color:var(--amber)">Fase alfa</div>
+      <h2 style="margin-top:var(--s3)">Ahora la parte que no se ve desde afuera.</h2>
+      <p class="muted" style="margin-top:var(--s4)">
+        Eso fue una lección. Lo que de verdad hace el sistema es lo otro: dinos
+        qué quieres ser y te armamos la ruta — qué módulos, en qué orden — y te
+        decimos con nombre y apellido <b>lo que ese puesto pide y nosotros no
+        enseñamos</b>. Casi nadie te dice eso.
+      </p>
+      <p class="muted" style="margin-top:var(--s4)">
+        Cada persona que entra escribe trabajo real y {TUTOR} lo lee de verdad.
+        Eso no escala de golpe, así que abrimos por invitación y de a pocos.
+      </p>
+    </div>
+    <FounderNote />
+    <Doors kind="lit" />
+  </section>
+
+  {/* The library, as inventory and nothing more: one sentence and a quiet link,
+      AFTER the decision. It used to be a first-class section whose fourteen
+      course names were fourteen of the page's seventeen h3s — so the document
+      outline of this homepage literally was a course catalog. */}
+  <p class="muted t-sm center" style="margin:var(--s6) 0 var(--s2)">
+    Detrás de esto hay <b>70 módulos</b> en 14 cursos. Tu ruta los ordena según
+    lo que tu puesto pide, no según el índice de un curso.
+    <a class="doorlink" href="/cursos">Ver qué enseñamos</a>
+  </p>
+</Public>

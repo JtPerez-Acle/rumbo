@@ -72,8 +72,8 @@ def _nav() -> str:
     return (
         f'<p style="{_SMALL}">'
         f'<a href="/" style="{_LINK}">Rumbo</a> · '
-        f'<a href="/cursos" style="{_LINK}">Cursos</a> · '
-        f'<a href="/oferta" style="{_LINK}">Tu ruta</a>'
+        f'<a href="/oferta" style="{_LINK}">Tu ruta</a> · '
+        f'<a href="/cursos" style="{_LINK}">Qué enseñamos</a>'
         f'</p>'
     )
 
@@ -120,8 +120,8 @@ def landing_html(courses: list[dict] | None = None,
                if items else "")
     return f"""<div style="{_WRAP}">
 {_nav()}
-<h1 style="{_H1}">Aprende haciendo, con tutora IA</h1>
-<p style="{_P}">Dinos qué quieres ser: pega la oferta de trabajo que te interesa, o solo el nombre del puesto. Te armamos la ruta — qué módulos, en qué orden — y te decimos con nombre y apellido lo que ese puesto pide y nosotros no enseñamos.</p>
+<h1 style="{_H1}">Dinos qué quieres ser y te decimos qué te falta</h1>
+<p style="{_P}">Pega la oferta de trabajo que te interesa, o solo el nombre del puesto. Te armamos la ruta — qué módulos, en qué orden — y te decimos con nombre y apellido <b>lo que ese puesto pide y nosotros no enseñamos</b>. Casi nadie te dice eso.</p>
 <p style="{_P}">Cada lección es un video corto con el porqué, una guía escrita con el cómo, y un ejercicio donde pegas el trabajo que hiciste de verdad. Tu tutora lo lee, te puntúa, te dice qué te falta para llegar a 100 y te hace una pregunta que solo puede contestar quien hizo el trabajo. Reintentas sin límite y siempre se queda tu mejor intento.</p>
 <p style="{_P}">No damos certificados. Damos el trabajo que hiciste, con tu nombre: una estrategia, un plan de campaña, una auditoría — con enlace para compartir y PDF para imprimir.</p>
 <h2 style="{_H2}">Haz una clase ahora, sin cuenta</h2>

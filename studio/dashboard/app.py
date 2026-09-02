@@ -866,8 +866,13 @@ def _share_page(template: str, meta: dict | None):
 # old links keep working and nothing about the app changed.
 
 SITE_NAME = "Rumbo"
-_SITE_DESC = ("Aprende haciendo, con tutora IA. Termina con trabajo real que "
-              "mostrar, no con un certificado.")
+# The default og:description on every public page. "Aprende haciendo, con
+# tutora IA" was the category's generic self-description — every competitor
+# makes that claim, so it positioned us as one of them in the one string that
+# travels furthest.
+_SITE_DESC = ("Dinos qué quieres ser y te armamos la ruta — incluido lo que ese "
+              "puesto pide y nosotros no enseñamos. Terminas con trabajo real "
+              "que mostrar, no con un certificado.")
 
 
 def _catalog_data() -> list[dict]:
@@ -987,8 +992,12 @@ def public_cursos():
     courses = _catalog_data()
     return _spa_shell("learn.html", {
         "title": f"Todos los cursos — {SITE_NAME}",
-        "description": ("14 cursos, 420 lecciones. Cada temario abierto entero: "
-                        "los módulos, lo que sabrás hacer y cada lección."),
+        # NOT "14 cursos, 420 lecciones": an inventory count is the
+        # marketplace's own positioning, it is the one number a competitor beats
+        # trivially, and this string is what every WhatsApp share of the catalog
+        # previews as.
+        "description": ("Los módulos que tu ruta puede tomar, con el temario "
+                        "abierto entero y el documento con el que termina cada uno."),
     }, view="cursos", prerender=prerender.catalog_html(courses), wide=True,
        boot={"catalog": courses})
 

@@ -19,10 +19,13 @@
     --ink:#100D17; --panel:#191521; --raised:#221D2E;
     --line:#2F2839; --line-strong:#453B54;
     /* text */
-    /* --faint was #7E7589 = 4.39:1 on the workshop background, just under
-       WCAG AA's 4.5 for the 11px labels that use it (microlabel, .faint).
-       Nudged up to clear AA without touching the palette's character. */
-    --text:#F2EFE9; --dim:#B2AABB; --faint:#8B8296;
+    /* --faint has now been raised twice for the same reason. #7E7589 was
+       4.39:1 on the workshop ground; #8B8296 fixed that but still measured
+       4.47:1 against the RAISED surface (#221D2E) that cards use — 0.03 short,
+       on ".. CURSOS" counts and the privacy line under the textarea. #948B9F
+       clears AA on both grounds. Measure against the surface the text actually
+       sits on, not the page background. */
+    --text:#F2EFE9; --dim:#B2AABB; --faint:#948B9F;
     /* la lámpara (brand) */
     --amber:#F0A43C; --amber-hi:#FFC670; --amber-deep:#AD7423; --amber-ink:#241603;
     /* el papel (the work) */
@@ -161,7 +164,7 @@
   /* ---- catalog clusters: tap to expand; the relevant one starts open ---- */
   .cluster{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);cursor:pointer;
     background:var(--raised);border:1px solid var(--line);border-radius:var(--r-md);color:var(--amber)}
-  .cluster .ct{flex:1;font-weight:800;font-size:var(--fs-md);letter-spacing:-.01em;color:var(--text)}
+  .cluster .ct{flex:1;font-weight:800;font-size:var(--fs-md);letter-spacing:-.01em;color:var(--text);margin:0}
   .cluster .cn{font-size:var(--fs-xs);color:var(--faint);font-weight:700;letter-spacing:.06em}
   .cluster .chev{display:flex;color:var(--faint);transition:transform .25s var(--ease)}
   .cluster.open .chev{transform:rotate(90deg)}
@@ -350,7 +353,7 @@
      were only reachable from the doors at the very bottom. */
   .sitenav{display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap;
     padding-bottom:var(--s3);border-bottom:1px solid var(--line)}
-  .sitenav .brandrow{margin-right:auto}
+  .sitenav .brandrow{margin-right:auto;min-height:44px;text-decoration:none;color:inherit}
   .sitenav a{color:var(--dim);font-weight:700;font-size:var(--fs-sm);text-decoration:none;cursor:pointer;
     padding:6px 2px;border-bottom:2px solid transparent;transition:color .18s var(--ease)}
   .sitenav a:hover{color:var(--text)}
@@ -463,8 +466,12 @@
       margin-top:var(--s5);color:var(--dim)}
     body.wide .hero .eyebrow{color:var(--amber)}
     /* Headline left, the product's own voice right. */
-    body.wide .herogrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);
+    body.wide .herogrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,480px);
       gap:var(--s6);align-items:center}
+    /* The hero's right column is now the visitor's own box, not a specimen of
+       someone else's. It carries the lit treatment because it IS the action. */
+    body.wide #heroask .demoq{margin:0}
+    body.wide #heroask h3{font-size:var(--fs-lg);line-height:1.25}
 
     /* The bench. Equal-height columns so the guide and the video finish level. */
     body.wide .lessonsplit{grid-template-columns:minmax(0,440px) minmax(0,1fr);
@@ -497,6 +504,9 @@
     text-decoration:underline;text-underline-offset:4px;cursor:pointer}
   .doorlink:hover{color:var(--text)}
 
+  h2.askq{font-size:var(--fs-lg);line-height:1.3;letter-spacing:-.01em}
+  h2.lessontitle{font-size:var(--fs-lg);line-height:1.25;letter-spacing:-.01em}
+
   /* ---- the tutor panel: the product's own voice, shown not described ---- */
   .tutorpanel{border:1px solid var(--line-strong);border-radius:var(--r-md);
     background:linear-gradient(180deg,#1B1626,#171320);padding:var(--s5);margin:0;
@@ -528,6 +538,20 @@
   }
   .afterq{margin-top:var(--s5)}
   .afterq-note p{max-width:46ch}
+
+  /* The deliverable, on paper: in this system paper is reserved for the
+     learner's own work, which is exactly what this card is promising. */
+  .deliverable{margin-top:var(--s4)}
+  .delivername{font-family:var(--serif);font-weight:600;font-size:var(--fs-xl);
+    line-height:1.15;color:var(--paper-ink);margin-top:var(--s2)}
+  .delivernote{font-size:var(--fs-sm);line-height:1.5;color:var(--paper-ink);
+    opacity:.72;margin-top:var(--s2)}
+  h2.modhead{font-size:var(--fs-md);font-weight:700;font-family:var(--sans)}
+  @media(min-width:900px){
+    body.wide .outlinehead h1{font-size:clamp(32px,3.4vw,46px);line-height:1.06;
+      letter-spacing:-.025em}
+    body.wide .deliverable{max-width:none}
+  }
 
   /* ---- founder note ---- */
   .founder{display:flex;gap:var(--s4);align-items:flex-start;margin-top:var(--s5);
@@ -686,7 +710,7 @@
  FORM: "La lección, en vivo" — index 4 of 7, the dealt lead.
  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 -->
-<div class="app" id="app"><div class="center muted" style="margin-top:40px">Cargando…</div></div>
+<main class="app" id="app"><div class="center muted" style="margin-top:40px">Cargando…</div></main>
 <div class="tabbar hide" id="tabbar"></div>
 
 <script>
@@ -806,7 +830,7 @@ function clusterize(courses){
 function renderClusters(cats, openCat, renderCourse){
   cats.forEach(([cat,items])=>{
     const open=cat===openCat;
-    const head=$(`<div class="cluster u-wide ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<span class="ct">${esc(cat)}</span><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
+    const head=$(`<div class="cluster u-wide ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<h2 class="ct">${esc(cat)}</h2><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
     const body=$(`<div class="cluster-body u-wide ${open?'':'hide'}"></div>`);
     items.forEach(c=>body.append(renderCourse(c)));
     head.onclick=()=>{head.classList.toggle('open');body.classList.toggle('hide');};
@@ -912,6 +936,7 @@ async function boot(){
 /* ---------- login ---------- */
 function renderLogin(err){
   tabbar.classList.add('hide'); app.innerHTML='';
+  if(!AUTH)publicShell('');
   const back=$(`<div class="back" style="margin-bottom:10px">‹ Conocer Rumbo</div>`);
   // nav2 so the URL ends up at / rather than /login#/ — the address bar should
   // agree with the page.
@@ -998,7 +1023,6 @@ function renderHow(target){
    gets, before asking for anything. The wall arrives after the value. */
 async function renderLanding(preview){
   tabbar.classList.add('hide'); app.innerHTML='';
-  document.body.classList.add('wide');
   if(preview){
     // Say plainly that this is the stranger's view, and give a way back. Without
     // it the doors below lead to #/login, which is nonsense for someone who is
@@ -1009,47 +1033,52 @@ async function renderLanding(preview){
     bar.querySelector('#pvback').onclick=()=>nav('#/hoy');
     app.append(bar);
   }
-  lightTheLamp();
-  app.append(publicHeader('clase'));
+  publicShell('clase');
 
-  /* The hero states the offer on the left and PROVES it on the right. The panel
-     is not an illustration: it is a real exchange, produced by the same
-     evaluator this page runs, and labelled as an example rather than as
-     somebody's coursework — docs/06 records what happened the last time seeded
-     data was captioned "documento real de una alumna". */
+  /* The first viewport issues an imperative — "haz una clase" — and used to
+     offer no way to obey it: the box was 2,837px down, 3.4 phone screens for a
+     reader who studies in stolen time, and the first thing under the lede on a
+     phone was a canned exchange from a stranger. The hero now carries the
+     question and the textarea themselves. The page's verb and the page's
+     affordance finally agree. */
   const hero=$(`<section class="u-full band-hi hero"></section>`);
   hero.append($(`<div class="u-wide herogrid">
     <div>
       <div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
       <h1>No te contamos cómo funciona. Haz una clase.</h1>
-      <p class="muted lede">Esta es la primera lección del curso de Marketing con IA, entera. Mira el video, lee la guía y explícala con tus palabras: ${TUTOR}, tu tutora, te responde de verdad, aquí mismo, antes de pedirte nada.</p>
+      <p class="muted lede">Primera lección del curso de Marketing con IA, entera. Explícala con tus palabras y ${TUTOR} te contesta de verdad — antes de pedirte nada, y sin cuenta.</p>
     </div>
-    ${tutorPanel('casi')}
+    <div id="heroask"></div>
   </div>`));
   app.append(hero);
 
   await renderDemoLesson(app);
   renderHow(app);
 
-  const cat=$(`<section class="u-wide" style="margin-top:var(--s6)"></section>`);
-  cat.append($(`<div class="microlabel">Las áreas · toca una para ver sus cursos y temarios</div>`));
-  app.append(cat);
-  await renderCatalogInto(app, false);
-  app.append($(`<p class="muted t-sm center" style="margin:14px 0 0">¿Tu tema no está? Dentro de la plataforma puedes <b>pedir tu curso</b> y lo construimos.</p>`));
-
-  /* El umbral. This was three ghost buttons and a line of small print — the
-     weakest moment on the page sitting exactly where a stranger decides. The
-     scarcity named here is real and checkable: access IS invite-gated in alpha,
-     which is why it can be said plainly instead of manufactured. */
+  /* El umbral, and it comes BEFORE the library on purpose.
+     The peak of this page is a machine quoting a stranger's own words back at
+     them. That peak used to be followed by an explainer and a course grid, so
+     the last thing read before the decision was an inventory — which is
+     mechanically why the best demo in the category was remembered as a
+     marketplace. The doors now follow the verdict, and the catalog is demoted
+     to one sentence below them. */
   const th=$(`<section class="u-full band-deep threshold"></section>`);
   th.append($(`<div>
     <div class="eyebrow" style="color:var(--amber)">Fase alfa</div>
-    <h2 style="margin-top:var(--s3)">Entramos de a poco, y a propósito.</h2>
-    <p class="muted" style="margin-top:var(--s4)">Cada persona que entra escribe trabajo real y ${TUTOR} lo lee de verdad. Eso no escala de golpe, así que abrimos por invitación y de a pocos. Si quieres uno de los cupos, dinos qué quieres ser: es la forma más rápida de que sepamos qué construirte.</p>
+    <h2 style="margin-top:var(--s3)">Ahora la parte que no se ve desde afuera.</h2>
+    <p class="muted" style="margin-top:var(--s4)">Eso fue una lección. Lo que de verdad hace el sistema es lo otro: dinos qué quieres ser y te armamos la ruta — qué módulos, en qué orden — y te decimos con nombre y apellido <b>lo que ese puesto pide y nosotros no enseñamos</b>. Casi nadie te dice eso.</p>
+    <p class="muted" style="margin-top:var(--s4)">Cada persona que entra escribe trabajo real y ${TUTOR} lo lee de verdad. Eso no escala de golpe, así que abrimos por invitación y de a pocos.</p>
   </div>`));
   th.append(founderNote());
   th.append(landingDoors('lit'));
   app.append(th);
+
+  /* The library, as inventory and nothing more: one sentence and a quiet link,
+     AFTER the decision. It used to be a first-class section whose fourteen
+     course names were fourteen of the page's seventeen h3s — so the document
+     outline of this homepage literally was a course catalog. */
+  app.append($(`<p class="muted t-sm center" style="margin:var(--s6) 0 var(--s2)">Detrás de esto hay <b>70 módulos</b> en 14 cursos. Tu ruta los ordena según lo que tu puesto pide, no según el índice de un curso. <a class="doorlink" href="/cursos" data-go="cursos">Ver qué enseñamos</a></p>`));
+  app.querySelector('[data-go="cursos"]').onclick=e=>{e.preventDefault();nav2('cursos');};
 }
 
 /* The tutor has a name. "Tu tutora" is a product with no identity, and this
@@ -1126,12 +1155,28 @@ function founderNote(){
   </div>`);
 }
 
-/* One lamp per page, and only on the public surface. Idempotent: renderLanding
-   and renderPublicCatalog both call it, and hydration can run twice. */
+/* One lamp per page, and only on the public surface. Idempotent: several views
+   call it, and hydration can run twice. */
 function lightTheLamp(){
   if(document.querySelector('.lamp'))return;
   document.body.prepend($(`<div class="grain" aria-hidden="true"></div>`));
   document.body.prepend($(`<div class="lamp" aria-hidden="true"></div>`));
+}
+
+/* ONE setup for every public view.
+   The lamp, the header and the wide grid were wired per-view, so they drifted:
+   the lamp burned on / and /cursos and was dark on /curso/<slug>, /oferta,
+   /lista and /login — present exactly where a visitor BROWSES and absent
+   exactly where they DECIDE. /oferta carries the only claim a competitor
+   cannot truthfully make and rendered as an unbranded 560px form.
+
+   It is also where the landmarks live. The public surface had no <header>,
+   <nav>, <main> or <footer> at all, on any page: a screen-reader user got one
+   undifferentiated run of text with no way to skip to content. */
+function publicShell(here){
+  document.body.classList.add('wide');
+  lightTheLamp();
+  app.append(publicHeader(here));
 }
 
 /* One header for every public view. Brand goes home; the three links are the
@@ -1139,22 +1184,37 @@ function lightTheLamp(){
    see it work, browse what exists, get a route for their own job. `here` marks
    the current one so the nav says where you are, not just where you can go. */
 function publicHeader(here){
-  const nav=$(`<div class="sitenav u-wide">
-    <div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Aprende haciendo, con tutora IA</small></div></div>
-    <div class="navlinks">
-      <a data-go="" class="${here==='clase'?'on':''}">La clase</a>
-      <a data-go="cursos" class="${here==='cursos'?'on':''}">Cursos</a>
-      <a data-go="oferta" class="${here==='oferta'?'on':''}">Tu ruta</a>
-    </div>
+  /* Every link here carries a real href.
+     They were <a> with only a data-go attribute and a JS click handler, which
+     made all five UNFOCUSABLE — an anchor without href is not a tab stop, so
+     "La clase", "Cursos", "Tu ruta" and "Tengo una invitación" could not be
+     reached by keyboard on any public page. The keyboard shim below did not
+     catch them either: it deliberately skips A and BUTTON on the assumption
+     that anchors are natively focusable, which is exactly the assumption an
+     href-less anchor breaks. The href also gives a crawler its link graph back
+     — after hydration this document had six anchors and five had no href.
+     The click handler stays as an enhancement so in-SPA preview still works.
+
+     "Cursos" is now "Qué enseñamos". The route is the product and the courses
+     are inventory (confirmed 2026-09-02); a nav that offers "Cursos" as a
+     primary destination tells the visitor the opposite, and the visitor
+     believes the navigation over the copy. */
+  const nav=$(`<header class="sitenav u-wide">
+    <a class="brandrow" href="/"><div class="brandmark"></div><div class="brandname">Rumbo<small>Dinos qué quieres ser</small></div></a>
+    <nav class="navlinks" aria-label="Principal">
+      <a href="/" data-go="" class="${here==='clase'?'on':''}"${here==='clase'?' aria-current="page"':''}>La clase</a>
+      <a href="/oferta" data-go="oferta" class="${here==='oferta'?'on':''}"${here==='oferta'?' aria-current="page"':''}>Tu ruta</a>
+      <a href="/cursos" data-go="cursos" class="${here==='cursos'?'on':''}"${here==='cursos'?' aria-current="page"':''}>Qué enseñamos</a>
+    </nav>
     ${AUTH
       ? `<button class="btn btn-ghost btn-sm" data-go="hoy">Volver a la app</button>`
-      : `<span class="navcta"><a class="navlink-quiet" data-go="login">Tengo una invitación</a>`
-        + `<button class="btn btn-primary btn-sm" data-go="oferta">Dinos qué quieres ser</button></span>`}</div>`);
+      : `<span class="navcta"><a class="navlink-quiet" href="/login" data-go="login">Tengo una invitación</a>`
+        + `<a class="btn btn-primary btn-sm" href="/oferta" data-go="oferta">Dinos qué quieres ser</a></span>`}</header>`);
   nav.querySelectorAll('[data-go]').forEach(el=>{
-    el.onclick=()=>nav2(el.dataset.go);
+    el.onclick=e=>{ if(e.metaKey||e.ctrlKey||e.shiftKey)return; e.preventDefault(); nav2(el.dataset.go); };
   });
-  nav.querySelector('.brandrow').onclick=()=>nav2('');
-  nav.querySelector('.brandrow').style.cursor='pointer';
+  const brand=nav.querySelector('.brandrow');
+  brand.onclick=e=>{ if(e.metaKey||e.ctrlKey||e.shiftKey)return; e.preventDefault(); nav2(''); };
   return nav;
 }
 // Public navigation keeps the real URLs the server hands out (/, /cursos,
@@ -1170,12 +1230,25 @@ function nav2(seg){
 // Named for its surface: viewCatalog and renderJobResult each declare their
 // own local courseCard, and a shared bare name across three of them is a trap.
 function publicCourseCard(c){
-  const card=$(`<div class="card course-card">
+  /* A real <a href>, not a div with onclick. Two reasons: hydration used to
+     replace the prerender's fourteen crawlable links with divs, so a crawler
+     that runs JS saw no internal link graph at all; and an anchor is a tab stop
+     and a middle-clickable link for free.
+     The meta line leads with the DELIVERABLE, not "30 lecciones · 5 módulos".
+     Volume-as-value is the marketplace's signature move and it was on this card
+     fourteen times per page — while being the one number any competitor beats
+     trivially. The lesson count stays, demoted, because it is still a fair
+     thing to want to know. */
+  const card=$(`<a class="card course-card" href="/curso/${esc(c.slug)}">
     <h3 style="padding-right:10px">${esc(c.title)}</h3>
     ${c.description?`<p class="desc">${esc(c.description)}</p>`:''}
-    ${c.doc_type?`<p class="delivers">${I('doc','ic ic-s')} Termina con: ${esc(c.doc_type)}</p>`:''}
-    <div class="meta"><span>${c.total} lecciones · ${c.modules} módulos</span>${I('arrow','ic ic-s')}</div></div>`);
-  card.onclick=()=>{ if(AUTH)nav('#/explora/'+c.slug); else location.href='/curso/'+c.slug; };
+    ${c.doc_type?`<p class="delivers">${I('doc','ic ic-s')} Terminas con: ${esc(c.doc_type)}</p>`:''}
+    <div class="meta"><span>${c.modules} módulos · ${c.total} lecciones</span>${I('arrow','ic ic-s')}</div></a>`);
+  card.onclick=e=>{
+    if(e.metaKey||e.ctrlKey||e.shiftKey)return;      // let the browser open it
+    e.preventDefault();
+    if(AUTH)nav('#/explora/'+c.slug); else location.href='/curso/'+c.slug;
+  };
   return card;
 }
 async function renderCatalogInto(target, openAll){
@@ -1186,7 +1259,7 @@ async function renderCatalogInto(target, openAll){
   const cats=clusterize(d.courses||[]);
   cats.forEach(([cat,items],i)=>{
     const open=openAll||i===0;
-    const head=$(`<div class="cluster u-wide ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<span class="ct">${esc(cat)}</span><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
+    const head=$(`<div class="cluster u-wide ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<h2 class="ct">${esc(cat)}</h2><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
     const body=$(`<div class="cluster-body u-wide ${open?'':'hide'}"></div>`);
     items.forEach(c=>body.append(publicCourseCard(c)));
     head.onclick=()=>{head.classList.toggle('open');body.classList.toggle('hide');};
@@ -1197,11 +1270,9 @@ async function renderCatalogInto(target, openAll){
 
 async function renderPublicCatalog(){
   tabbar.classList.add('hide'); app.innerHTML='';
-  document.body.classList.add('wide');
-  lightTheLamp();
-  app.append(publicHeader('cursos'));
+  publicShell('cursos');
   app.append($(`<div class="demohead hero">
-    <div class="eyebrow">El catálogo completo</div>
+    <div class="eyebrow">La biblioteca</div>
     <h1>Todo lo que puedes estudiar aquí.</h1>
     <p class="muted" style="margin-top:10px">Cada curso abre su temario entero: los módulos, lo que sabrás hacer al terminar cada uno, y las lecciones una por una. Nada está escondido detrás del registro.</p></div>`));
   const n=await renderCatalogInto(app, true);
@@ -1216,8 +1287,9 @@ async function renderPublicCatalog(){
 function landingDoors(kind){
   const el=$(`<div class="doors" style="margin-top:var(--s5)">
     <button class="btn ${kind==='lit'?'btn-primary':'btn-ghost'}" data-go="oferta">Dinos qué quieres ser ${I('arrow','ic ic-s')}</button>
-    <a class="doorlink" data-go="lista">o pide tu acceso</a></div>`);
-  el.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>nav('#/'+b.dataset.go));
+    <a class="doorlink" href="/lista" data-go="lista">o pide tu acceso</a></div>`);
+  el.querySelectorAll('[data-go]').forEach(b=>b.onclick=e=>{
+    if(e.metaKey||e.ctrlKey||e.shiftKey)return; e.preventDefault(); nav('#/'+b.dataset.go);});
   return el;
 }
 /* The free lesson, whole. Video, guide, and the question — then a real verdict
@@ -1237,7 +1309,7 @@ async function renderDemoLesson(target){
   split.append(left); split.append(right); target.append(split);
 
   left.append($(`<div class="microlabel">${esc(d.course_title)} · lección 1</div>`));
-  left.append($(`<h3 style="margin:6px 0 10px">${esc(d.title)}</h3>`));
+  left.append($(`<h2 class="lessontitle" style="margin:6px 0 10px">${esc(d.title)}</h2>`));
   if(d.has_video){
     // The plate, not a <video>: a real frame from the lesson with our own play
     // affordance over it. The element is created on click, so nobody who does
@@ -1290,7 +1362,7 @@ async function renderDemoLesson(target){
   /* The question. This is the surface's whole argument, so it is the lit card. */
   const q=$(`<div class="demoq" style="margin-top:var(--s5)">
     <div class="eyebrow">Ahora tú</div>
-    <h3 id="dqq" style="margin:8px 0 4px">${esc(d.explain_prompt||'Explícalo en tus palabras.')}</h3>
+    <h2 id="dqq" class="askq" style="margin:8px 0 4px">${esc(d.explain_prompt||'Explícalo en tus palabras.')}</h2>
     <p class="muted t-sm" style="margin-top:6px">Con tus palabras, como se lo explicarías a alguien. No hay nota: esto se responde con <b>Lo tienes</b>, <b>Casi</b> o <b>Todavía no</b>, y con lo que te falta.</p>
     <label for="dq" class="hide">Tu explicación</label>
     <textarea id="dq" maxlength="4000" aria-labelledby="dqq" placeholder="Escribe aquí tu explicación…"></textarea>
@@ -1298,13 +1370,24 @@ async function renderDemoLesson(target){
     <input id="dqc" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
     <button class="btn btn-primary" id="dqgo" style="margin-top:var(--s3)">Que la tutora lo lea ${I('arrow','ic ic-s')}</button>
     <div id="dqmsg" class="center muted t-sm" style="margin-top:8px"></div></div>`);
-  target.append(q);
-  /* What happens after you press send, shown as a real exchange rather than
-     promised. Deliberately a WRONG answer: this sits beside the textarea, and a
-     model answer here would be copied straight into it. */
+  /* The question goes in the HERO when there is a slot for it, so the first
+     screen carries the box instead of a promise about one. On any surface that
+     does not build a hero (the logged-in preview), it falls back to the flow. */
+  const askSlot=document.getElementById('heroask');
+  if(askSlot)askSlot.append(q); else target.append(q);
+
+  /* One worked example, after the lesson, never beside the box.
+     There used to be two — the same component with the same caption 2,800px
+     apart, which read as a repeat and cost the visitor a re-read to discover it
+     was not. And on a phone the first thing under the headline was a stranger's
+     answer: a product that promises to read YOUR work opening with someone
+     else's, in the exact anatomy of a testimonial, on a site that has correctly
+     refused to have testimonials.
+     Deliberately still a WRONG answer, and the one carrying a misconception —
+     that is the mechanic nothing else in the category has. */
   target.append($(`<div class="u-wide afterq">${tutorPanel('todavia','tp-inline')}
     <div class="afterq-note">
-      <p class="muted t-sm">Esto es lo que recibe cualquiera que escriba algo aquí: un veredicto, el error de fondo si lo hay, y qué le falta — no una nota. La misma ${TUTOR} que lee el trabajo de quienes ya están dentro.</p>
+      <p class="muted t-sm">Esto es lo que recibe cualquiera que escriba algo arriba: un veredicto, el error de fondo si lo hay, y qué le falta — no una nota. La misma ${TUTOR} que lee el trabajo de quienes ya están dentro.</p>
     </div></div>`));
   const ta=q.querySelector('#dq');
   attachDraft(ta,'demo',0);
@@ -1319,7 +1402,20 @@ async function renderDemoLesson(target){
       {content,company:q.querySelector('#dqc').value},EVAL_TIMEOUT_MS);
     rc.remove(); btn.disabled=false;
     if(!r.res||!r.res.ok){
-      msg.textContent=(r.data&&r.data.detail)||'No pudimos evaluarla ahora. Intenta en un momento.';
+      /* This was a dead end. The failure branch set msg.textContent and stopped,
+         so a visitor who did exactly what the page asked and hit the four-per-
+         hour cap got a lowercase server fragment in 12.5px muted text under a
+         re-enabled button, with nowhere to go. The doors are appended on the
+         LOAD-failure path and were missing from this one — the path a motivated
+         visitor actually reaches.
+         The 429 gets its own sentence because "demasiadas peticiones" describes
+         our rate limiter, not their situation, and the door that is still open
+         is the one this whole page is trying to point at anyway. */
+      const capped=r.res&&r.res.status===429;
+      msg.textContent=capped
+        ? `Ya evaluamos varias respuestas desde aquí en la última hora: es una alfa y ${TUTOR} corre de a poco. Vuelve en un rato — o dinos qué quieres ser y te armamos la ruta ahora, que eso sí está abierto.`
+        : ((r.data&&r.data.detail)||'No pudimos evaluarla ahora. Intenta en un momento.');
+      if(!q.querySelector('.doors'))q.append(landingDoors('ghost'));
       btn.focus();                 // disabling a focused button loses their place
       return;
     }
@@ -1375,27 +1471,54 @@ function renderDemoVerdict(target, ev, d){
 }
 async function renderPublicOutline(slug){
   tabbar.classList.add('hide'); app.innerHTML='';
-  document.body.classList.add('wide');
   const d=await apiBoot('course','/public/course/'+slug);
   if(d.detail){nav2('cursos');return;}
-  app.append(publicHeader('cursos'));
-  app.append($(`<div style="margin-top:6px"><h2>${esc(d.title)}</h2>
-    ${d.description?`<p class="muted t-sm" style="margin-top:8px">${esc(d.description)}</p>`:''}
-    ${d.doc_type?`<p class="delivers" style="margin-top:8px">${I('doc','ic ic-s')} Termina con: ${esc(d.doc_type)}</p>`:''}</div>`));
+  publicShell('cursos');
+  /* These fourteen pages are the SEO surface (docs/11): somebody searching
+     "curso de Meta Ads en español" lands here, and they are most of the
+     strangers this product will ever get. So the page keeps the course word in
+     its title, slug and content — that word is what they searched, and calling
+     a syllabus a syllabus is accurate.
+     What changes is what it ARGUES. It used to be a thirty-row table of
+     contents ending in "Quiero tomar este curso" — Udemy's IA and Udemy's verb,
+     contradicting "the module, not the course, is the unit" in the same click.
+     Now: the deliverable first, the modules named as loose parts, and the exit
+     is the route. Rank for the course, convert to the route.
+
+     The <h1> is also new. This page had NO h1 at all — it opened at h2 — which
+     was both an accessibility defect and a wasted signal on the one surface
+     that has to rank. */
+  app.append($(`<div class="outlinehead" style="margin-top:6px">
+    <div class="eyebrow">Temario completo</div>
+    <h1 style="margin-top:var(--s2)">${esc(d.title)}</h1>
+    ${d.description?`<p class="muted" style="margin-top:var(--s3)">${esc(d.description)}</p>`:''}</div>`));
+  if(d.doc_type)app.append($(`<div class="card card-paper deliverable">
+    <div class="microlabel" style="color:var(--paper-ink);opacity:.62">Terminas con</div>
+    <p class="delivername">${esc(d.doc_type)}</p>
+    <p class="delivernote">Hecho con tu propio trabajo, con tu nombre. No un certificado: el documento que un cliente habría pagado.</p></div>`));
+  app.append($(`<p class="muted t-sm" style="margin-top:var(--s4)">Estos ${d.modules.length} módulos existen sueltos. Tu ruta toma los que tu puesto pide y deja el resto — por eso el orden de abajo es el del curso, no necesariamente el tuyo.</p>`));
   d.modules.forEach(m=>{
-    app.append($(`<div class="modhead">Módulo ${m.module_no} · ${esc(m.module_title)}</div>`));
+    app.append($(`<h2 class="modhead">Módulo ${m.module_no} · ${esc(m.module_title)}</h2>`));
     if(m.module_description)app.append($(`<p class="muted t-sm" style="margin:-2px 0 10px">${esc(m.module_description)}</p>`));
     m.lessons.forEach(l=>{
       app.append($(`<div class="lrow" style="flex-wrap:wrap"><div class="num">${l.position}</div><div class="lt">${esc(l.title)}</div>
         ${l.objectives?`<div class="obj">Al terminar podrás: ${esc(l.objectives)}</div>`:''}</div>`));
     });
   });
-  const cta=$(`<button class="btn btn-primary" style="margin-top:10px">Quiero tomar este curso ${I('arrow','ic ic-s')}</button>`);
-  cta.onclick=()=>nav('#/lista'); app.append(cta);
+  const cta=$(`<div class="doors" style="margin-top:var(--s5)">
+    <a class="btn btn-primary" href="/oferta" data-go="oferta">Ver si esto está en tu ruta ${I('arrow','ic ic-s')}</a>
+    <a class="doorlink" href="/" data-go="">o haz una clase ahora</a></div>`);
+  // location.href via nav2, not a hash: `#/lista` over a server path produced
+  // /curso/<slug>#/lista, which shares as a syllabus and opens as a form.
+  cta.querySelectorAll('[data-go]').forEach(a=>{
+    a.onclick=e=>{ if(e.metaKey||e.ctrlKey||e.shiftKey)return; e.preventDefault(); nav2(a.dataset.go); };
+  });
+  app.append(cta);
 }
 function renderWaitlistForm(){
   tabbar.classList.add('hide'); app.innerHTML='';
-  const back=$(`<div class="back">‹ Volver</div>`); back.onclick=()=>nav2(''); app.append(back);
+  if(!AUTH)publicShell('');
+  else{const back=$(`<div class="back">‹ Volver</div>`); back.onclick=()=>nav2(''); app.append(back);}
   const box=$(`<div style="margin-top:14px;display:flex;flex-direction:column;gap:15px">
     <div><div class="eyebrow">Lista de espera</div>
     <h1 style="margin-top:10px">Te avisamos cuando se abra tu cupo.</h1>
@@ -1443,7 +1566,7 @@ function renderJobBox(){
   if(AUTH){
     const back=$(`<div class="back">‹ Mi objetivo</div>`);
     back.onclick=()=>nav('#/objetivo'); app.append(back);
-  }else app.append(publicHeader('oferta'));
+  }else publicShell('oferta');
   // Two front doors, one matcher (docs/09 item 4): a real posting, or just the
   // role/skill the person wants. Same honesty either way.
   const box=$(`<div style="margin-top:14px;display:flex;flex-direction:column;gap:15px">

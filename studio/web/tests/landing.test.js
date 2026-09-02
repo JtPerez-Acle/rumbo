@@ -18,6 +18,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
+import { JSDOM } from 'jsdom';
 import { REPO } from './harness.js';
 
 const DIST = path.join(REPO, 'studio/web/dist');
@@ -186,5 +187,68 @@ describe('the built public site', () => {
       const file = path.join(DIST, route, 'index.html');
       expect(fs.readFileSync(file, 'utf8'), route).not.toContain('cdn.jsdelivr.net');
     }
+  });
+});
+
+describe('the wide grid places every section', () => {
+  /* THE BUG THIS EXISTS FOR, and it reached production.
+   *
+   * `body.wide .app > *` puts each direct child of the shell in the text
+   * column. Astro renders an island as `<astro-island>` with
+   * `display: contents`, so the island is NOT a grid item — its CHILDREN become
+   * the grid items, and they carry no column of their own. They land in the
+   * implicit track past `full-end`, which rendered /oferta, /lista and /login
+   * as a 32px strip against the right edge of the screen.
+   *
+   * Every content assertion passed the whole time. The words were all there; a
+   * reader could not get at them. So this checks STRUCTURE, which is what was
+   * actually wrong — and it is why the landing survived: its islands are nested
+   * inside sections rather than sitting at the top level.
+   *
+   * Parsed with jsdom rather than a regex. The first version of this guard
+   * counted tags by hand, miscounted `<path></path>` and script bodies full of
+   * angle brackets, and reported a clean pass on the exact page that was broken.
+   * A guard that cannot be trusted is worse than none.
+   */
+  /* Only pages on the WIDE GRID, which is where the invariant actually lives.
+     `body.wide .app` is a named-line grid whose direct children take columns;
+     the app's shell is a plain flex column with no named tracks, and there a
+     `display:contents` island passing its children through to the flex parent
+     is both intentional and what gives the app its inter-card gap. Encoding the
+     condition beats keeping a list of exempt pages, which would go stale. */
+  const parse = (html) => new JSDOM(html).window.document;
+  const usesWideGrid = (doc) => doc.body.classList.contains('wide');
+  const topLevelIslands = (html) => {
+    const doc = parse(html);
+    if (!usesWideGrid(doc)) return 0;
+    return doc.querySelectorAll('main.app > astro-island').length;
+  };
+
+  it('never puts an island at the top level of the wide grid', () => {
+    const offenders = [];
+    let checked = 0;
+    for (const route of ['', 'cursos', 'oferta', 'lista', 'login', 'curso/curso-meta-ads', 'aprende']) {
+      const file = path.join(DIST, route, 'index.html');
+      if (!fs.existsSync(file)) continue;
+      const html = fs.readFileSync(file, 'utf8');
+      if (usesWideGrid(parse(html))) checked += 1;
+      if (topLevelIslands(html) > 0) offenders.push(route || '/');
+    }
+    // The condition must actually be matching pages, or this asserts nothing.
+    expect(checked, 'no page was found on the wide grid').toBeGreaterThan(3);
+    expect(offenders,
+      'wrap the island in an element so the grid has something to place').toEqual([]);
+  });
+
+  it('can tell a top-level island from a nested one', () => {
+    // Guards the guard: the assertion above passes trivially on a parser that
+    // never finds anything, which is exactly how its first version failed.
+    const wrap = (inner) => `<body class="wide"><main class="app">${inner}</main></body>`;
+    expect(topLevelIslands(wrap('<astro-island></astro-island>'))).toBe(1);
+    expect(topLevelIslands(wrap('<div><astro-island></astro-island></div>'))).toBe(0);
+    expect(topLevelIslands(wrap('<script>if(a<b&&c>d){}</script><astro-island></astro-island>'))).toBe(1);
+    expect(topLevelIslands(wrap('<svg><path d="M0 0"></path></svg><astro-island></astro-island>'))).toBe(1);
+    // And a page that is not on the grid is not this rule's business.
+    expect(topLevelIslands('<body><main class="app"><astro-island></astro-island></main></body>')).toBe(0);
   });
 });

@@ -16,5 +16,13 @@ import { SITE_NAME } from '../lib/site.js';
   title={`Pega la oferta que quieres — ${SITE_NAME}`}
   description="Te decimos qué pide de verdad, qué cubrimos, qué no, y con qué documento llegar a la entrevista. Sin cuenta."
 >
-  <JobAnalyser client:load />
+  {/* Wrapped, and the wrapper is load-bearing. `body.wide .app > *` places
+      each direct child in the text column, but Astro gives <astro-island>
+      `display:contents` — so the island is not a grid item, its CHILDREN
+      become the grid items instead, and they inherit no column. They land in
+      the implicit track past `full-end`: the whole form rendered 32px wide
+      against the right edge. A real element here takes the placement. */}
+  <div>
+    <JobAnalyser client:load />
+  </div>
 </Public>

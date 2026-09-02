@@ -30,5 +30,13 @@ import { SITE_NAME, TUTOR } from '../lib/site.js';
   {/* client:load, not client:visible: this island IS the page, it is above the
       fold on every device, and a form that appears a beat after the words
       around it is the flicker this migration exists to remove. */}
-  <LoginForm client:load />
+  {/* Wrapped, and the wrapper is load-bearing. `body.wide .app > *` places
+      each direct child in the text column, but Astro gives <astro-island>
+      `display:contents` — so the island is not a grid item, its CHILDREN
+      become the grid items instead, and they inherit no column. They land in
+      the implicit track past `full-end`: the whole form rendered 32px wide
+      against the right edge. A real element here takes the placement. */}
+  <div>
+    <LoginForm client:load />
+  </div>
 </Public>

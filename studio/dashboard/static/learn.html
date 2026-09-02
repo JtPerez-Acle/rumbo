@@ -59,6 +59,13 @@
     -webkit-tap-highlight-color:rgba(240,164,60,.18)}
   input,textarea{caret-color:var(--amber)}
   a{text-underline-offset:3px;text-decoration-thickness:1px}
+  /* An anchor wearing a component class IS that component, not a link.
+     Buttons, cards, the brand row and the lesson rows became <a> so they would
+     be focusable, crawlable and middle-clickable — and every one then inherited
+     the UA's #0000EE, which on a dark panel is 1.9:1 and is what made the
+     course list look "highlighted". Colour comes from the component or from the
+     surrounding text; never from :link. */
+  a.card,a.brandrow,a.lrow,a.cluster{color:inherit;text-decoration:none}
 
   /* THE focus ring. There was none: inputs set outline:none and signalled focus
      only by tinting a 1px border, and every other control is a div. A keyboard
@@ -116,7 +123,7 @@
   .btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--line)}
   .btn-ghost:hover{border-color:var(--line-strong)}
   .btn-paper{background:linear-gradient(150deg,#FBF3E1,var(--paper));color:var(--paper-ink);box-shadow:var(--glow-paper)}
-  .btn-sm{width:auto;font-size:var(--fs-sm);padding:9px 14px;font-weight:700}
+  .btn-sm{width:auto;font-size:var(--fs-sm);padding:9px 14px;font-weight:700;min-height:44px}
 
   /* ---- surfaces: three tiers ---- */
   .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s4)}
@@ -172,7 +179,15 @@
 
   /* ---- catalog cards: title / promise / deliverable / progress / meta ---- */
   .course-card{cursor:pointer;position:relative;overflow:hidden}
-  .course-card:not(.soon){border-color:rgba(240,164,60,.3)}
+  /* Amber is the lamp: it means "lit", and DESIGN.md allows exactly one.
+     Ringing all fourteen catalogue cards in it made the accent decoration —
+     fourteen highlighted boxes, so nothing highlighted. The cards take the
+     ordinary hairline; amber returns on hover and focus, where it means
+     "this one", which is what an accent is for. */
+  .course-card{border-color:var(--line);transition:border-color .18s var(--ease),
+    background .18s var(--ease)}
+  .course-card:not(.soon):hover{border-color:rgba(240,164,60,.45);background:var(--raised)}
+  .course-card:not(.soon):focus-visible{border-color:var(--amber)}
   .course-card.soon{cursor:default;opacity:.7}
   .course-card h3{margin-bottom:var(--s1);padding-right:70px}
   .course-card .desc{font-size:var(--fs-sm);color:var(--dim);margin:0 0 var(--s2);
@@ -354,10 +369,18 @@
   .sitenav{display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap;
     padding-bottom:var(--s3);border-bottom:1px solid var(--line)}
   .sitenav .brandrow{margin-right:auto;min-height:44px;text-decoration:none;color:inherit}
-  .sitenav a{color:var(--dim);font-weight:700;font-size:var(--fs-sm);text-decoration:none;cursor:pointer;
+  /* :not(.btn) because this rule was written for the TEXT links beside the
+     button. It is (0,1,1); .btn-primary is (0,1,0). When the nav CTA became an
+     anchor this quietly won and painted --dim grey lettering onto the amber
+     fill: 1.08:1, unreadable, on all five public routes.
+     min-height 44px: these were 32.8px at every breakpoint on a phone-first
+     product. */
+  .sitenav a:not(.btn){color:var(--dim);font-weight:700;font-size:var(--fs-sm);text-decoration:none;cursor:pointer;
+    min-height:44px;display:inline-flex;align-items:center;
     padding:6px 2px;border-bottom:2px solid transparent;transition:color .18s var(--ease)}
-  .sitenav a:hover{color:var(--text)}
-  .sitenav a.on{color:var(--amber);border-bottom-color:var(--amber)}
+  .sitenav a.btn{width:auto;text-decoration:none}
+  .sitenav a:not(.btn):hover{color:var(--text)}
+  .sitenav a:not(.btn).on{color:var(--amber);border-bottom-color:var(--amber)}
   .sitenav .navlinks{display:flex;gap:var(--s4);align-items:center}
   @media(max-width:600px){
     .sitenav{gap:var(--s3)}
@@ -498,10 +521,12 @@
     body.wide .sitenav .navlinks{gap:var(--s5)}
   }
   .navlink-quiet{color:var(--dim);font-weight:600;font-size:var(--fs-sm);
-    text-decoration:none;cursor:pointer;white-space:nowrap}
+    text-decoration:none;cursor:pointer;white-space:nowrap;
+    min-height:44px;display:inline-flex;align-items:center}
   .navlink-quiet:hover{color:var(--text);text-decoration:underline}
   .doorlink{color:var(--dim);font-weight:600;font-size:var(--fs-base);
-    text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+    text-decoration:underline;text-underline-offset:4px;cursor:pointer;
+    min-height:44px;display:inline-flex;align-items:center}
   .doorlink:hover{color:var(--text)}
 
   h2.askq{font-size:var(--fs-lg);line-height:1.3;letter-spacing:-.01em}
@@ -541,11 +566,15 @@
 
   /* The deliverable, on paper: in this system paper is reserved for the
      learner's own work, which is exactly what this card is promising. */
+  /* .card-paper is --panel with a paper-tinted border and a paper glow — it is
+     NOT a cream surface. Writing --paper-ink (#26200F) on it gave 1.11:1 on
+     every line of this card. On a dark ground the serif reads in --paper, which
+     is the token that means "the learner's work" here anyway. */
   .deliverable{margin-top:var(--s4)}
   .delivername{font-family:var(--serif);font-weight:600;font-size:var(--fs-xl);
-    line-height:1.15;color:var(--paper-ink);margin-top:var(--s2)}
-  .delivernote{font-size:var(--fs-sm);line-height:1.5;color:var(--paper-ink);
-    opacity:.72;margin-top:var(--s2)}
+    line-height:1.15;color:var(--paper);margin-top:var(--s2)}
+  .delivernote{font-size:var(--fs-sm);line-height:1.5;color:var(--dim);
+    margin-top:var(--s2)}
   h2.modhead{font-size:var(--fs-md);font-weight:700;font-family:var(--sans)}
   @media(min-width:900px){
     body.wide .outlinehead h1{font-size:clamp(32px,3.4vw,46px);line-height:1.06;
@@ -565,7 +594,8 @@
     text-transform:uppercase;color:var(--faint);margin-top:var(--s2)}
   /* A real name pointing at a real profile is the cheapest credibility on the
      page, and it stands in for the photo until there is one. */
-  .founder-link{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-deep)}
+  .founder-link{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-deep);
+    display:inline-flex;align-items:center;min-height:44px}
   .founder-link:hover{color:var(--amber-hi)}
 
   /* The step numeral. On a phone it is the compact amber chip the One Column
@@ -1496,7 +1526,7 @@ async function renderPublicOutline(slug){
     <h1 style="margin-top:var(--s2)">${esc(d.title)}</h1>
     ${d.description?`<p class="muted" style="margin-top:var(--s3)">${esc(d.description)}</p>`:''}</div>`));
   if(d.doc_type)app.append($(`<div class="card card-paper deliverable">
-    <div class="microlabel" style="color:var(--paper-ink);opacity:.62">Terminas con</div>
+    <div class="microlabel" style="color:var(--paper-dim)">Terminas con</div>
     <p class="delivername">${esc(d.doc_type)}</p>
     <p class="delivernote">Hecho con tu propio trabajo, con tu nombre. No un certificado: el documento que un cliente habría pagado.</p></div>`));
   app.append($(`<p class="muted t-sm" style="margin-top:var(--s4)">Estos ${d.modules.length} módulos existen sueltos. Tu ruta toma los que tu puesto pide y deja el resto — por eso el orden de abajo es el del curso, no necesariamente el tuyo.</p>`));

@@ -590,6 +590,10 @@
     display:flex;align-items:center;justify-content:center;color:var(--faint)}
   .founder-face img{width:100%;height:100%;object-fit:cover;display:block}
   .founder-text{font-family:var(--serif);font-size:var(--fs-md);line-height:1.5;color:var(--dim)}
+  /* The turn the whole note exists for. It reads as the takeaway, so it gets
+     its own line and the paper colour — the token that means "the work". */
+  .founder-line{color:var(--paper);margin-top:var(--s3)}
+  @media(min-width:900px){ body.wide .founder-text{max-width:62ch} }
   .founder-who{font-size:var(--fs-xs);font-weight:700;letter-spacing:.12em;
     text-transform:uppercase;color:var(--faint);margin-top:var(--s2)}
   /* A real name pointing at a real profile is the cheapest credibility on the
@@ -1180,7 +1184,8 @@ function founderNote(){
   return $(`<div class="founder">
     <div class="founder-face" aria-hidden="true">${I('user')}</div>
     <div>
-      <p class="founder-text">Lo abro de a poco porque leo lo que escribe cada persona que entra. Prefiero que a diez les sirva de verdad antes que a mil les sirva a medias.</p>
+      <p class="founder-text">Tener acceso al conocimiento no es lo mismo que aprender: eso el internet ya lo resolvió hace treinta años, y aun así casi nadie termina lo que empieza. Lo que sí funciona es que alguien lea lo que hiciste y te diga qué le falta, y eso siempre fue caro. Mi trabajo es que deje de serlo. Empieza chico porque no se puede masificar algo que todavía no funciona bien.</p>
+      <p class="founder-text founder-line">Quiero que «me gustaría aprender esto» se vuelva «estoy aprendiendo esto».</p>
       <p class="founder-who">Jose Tomás Pérez-Acle · fundador de Rumbo ·
         <a href="https://www.linkedin.com/in/jose-tomas-perez-acle-833a761b9/"
            target="_blank" rel="noopener noreferrer" class="founder-link">LinkedIn</a></p>

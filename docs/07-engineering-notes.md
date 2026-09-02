@@ -12,9 +12,9 @@ reached production in the first place.
    single-file frontends, extract the last `<script>` block and `node --check`
    it (nothing else catches a syntax error in a file with no build step).
    For anything under `studio/web/`, `npm run build` is the compile-check.
-1b. **Run the frontend suite** — `cd studio/web && npm test` (114 assertions).
-   It reads `learn.html` through a DOM shim, so it also catches an edit that
-   changed the shape the shim depends on.
+1b. **Run the frontend suite** — `cd studio/web && npm test` (134 assertions).
+   It builds first, then asserts against the built pages, so it catches a page
+   that stopped rendering its content as well as one that stopped compiling.
 2. **Run locally against the real cloud DB** — `preview_start` with the
    `learner-app` launch config (see doc 05).
 3. **Test with real data**, then **delete your test rows** (they live in the

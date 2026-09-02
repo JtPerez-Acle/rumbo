@@ -220,15 +220,27 @@ public branch at first, which made the "Pega tu oferta" button inside
 `#/objetivo` a dead end. Visual changes belong in the token block, never in
 element styles.
 
-The tests live in `studio/web/tests/` and run under vitest — **114 assertions**,
-`cd studio/web && npm test`. Four suites cover the vanilla SPA by extracting its
-script block and running it against a shared DOM shim (`harness.js`); a fifth
-(`tokens.test.js`) fails the build if `learn.html`'s inline `:root` drifts from
-`src/styles/tokens.css` while both copies exist, and is deleted with `learn.html`.
-The shim asserts its own substitution succeeded — a silently-empty harness once
-reported a clean pass, which is the failure mode `docs/07` warns about. They are
-DOM-shim rather than browser based because the browser pane wedges often enough
-that `docs/07` names this as the fallback.
+The tests live in `studio/web/tests/` and run under vitest — **134 assertions**,
+`cd studio/web && npm test`, which builds first so the suite always reads current
+output. Four kinds:
+
+- **The built public pages** (`landing.test.js`) — reads `dist/*/index.html`, the
+  bytes a visitor is served. It strips `<astro-island props="…">` before
+  asserting: an island's props are serialized into the markup, so a needle can
+  otherwise be found in a page that never renders it. That is not hypothetical —
+  the key-points assertion passed with the key points deleted until this was
+  fixed.
+- **The one live island** (`demo-verdict.test.js`) — mounts DemoAsk under jsdom
+  with a stubbed `fetch` and drives a real click. It must never reach the real
+  evaluator: that costs money, spends the visitor rate limit, and writes a row
+  into `demo_attempts`, which exists to record what strangers write.
+- **The vanilla SPA** (`how-section`, `job-render`, `cv-render`) — extracts its
+  script block and runs it against a shared DOM shim (`harness.js`). The shim
+  asserts its own substitution succeeded; a silently-empty harness once reported
+  a clean pass, which is the failure mode `docs/07` warns about.
+- **Drift guards** (`tokens`, `css-parity`) — `learn.html` still carries the
+  whole stylesheet inline, so these prove `tokens.css` + `app.css` reassemble it.
+  Both are deleted with `learn.html`.
 
 The lesson **step deep-links exist for a reason**: a pending conversation shown
 on Hoy must land exactly on the step where it can be answered. Without them,

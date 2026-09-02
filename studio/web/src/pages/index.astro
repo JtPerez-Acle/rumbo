@@ -27,6 +27,18 @@ import lesson from '../data/demo.json';
 const guideSource = lesson.written || lesson.transcript || '';
 assertNoMermaid(guideSource, 'the landing demo lesson');
 const guideHtml = renderMarkdown(guideSource);
+
+/* What the island actually needs, and nothing else.
+   Astro serializes an island's props into the HTML so it can hydrate with the
+   same values the build used. Handing it the whole lesson therefore shipped the
+   written guide, the transcript and the key points a SECOND time inside an
+   attribute — 5.8KB of a 28KB page, none of it read. */
+const ask = {
+  explain_prompt: lesson.explain_prompt,
+  doc_type: lesson.doc_type,
+  exercise: lesson.exercise?.instruction ? { instruction: lesson.exercise.instruction } : null,
+  reto: lesson.reto?.scenario ? { scenario: lesson.reto.scenario } : null,
+};
 ---
 <Public
   here="clase"
@@ -48,7 +60,7 @@ const guideHtml = renderMarkdown(guideSource);
           nada, y sin cuenta.
         </p>
       </div>
-      <div><DemoAsk lesson={lesson} client:load /></div>
+      <div><DemoAsk lesson={ask} client:load /></div>
     </div>
   </section>
 

@@ -38,7 +38,20 @@ python studio/cloud/course_factory.py <slug> backfill-explain  # per-lesson expl
 python studio/cloud/course_factory.py <slug> backfill-modules  # module_description
 python studio/cloud/course_factory.py <slug> backfill-prereqs  # module_prereqs (docs/09)
 python studio/cloud/course_factory.py <slug> fix-titles        # Spanish sentence case
+
+# LAST STEP, and it is not optional: the public pages are built from files.
+python studio/cloud/export_web.py           # rewrite studio/web/src/data/*.json
+python studio/cloud/export_web.py --check   # exits non-zero if that export is stale
 ```
+
+**A course is not public until `export_web.py` has run and the app has been
+deployed.** The fourteen `/curso/<slug>` pages and the catalog are static HTML
+generated at image-build time (docs/11), so a course that exists only in the
+database has no page — `verify` will say the rows are all there and the site will
+not show it. That is the price of a build step, it is stated here rather than
+discovered, and `--check` is what makes staleness loud: run it before a deploy.
+The exported JSON comes from the same endpoint functions the browser calls, so
+the built page and the API can never describe a different catalog.
 
 **`preflight` and `verify` are the two that matter**, and both exit non-zero so a
 script can gate on them (`all` runs preflight first and ends in verify).

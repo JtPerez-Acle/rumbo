@@ -97,7 +97,7 @@ studio/dashboard/         The application.
 
 studio/web/               The frontend build. Astro + Svelte islands, static
                           output, compiled in Docker stage 1 and served by
-                          FastAPI. `npm test` runs 114 assertions.
+                          FastAPI. `npm test` builds, then runs 134 assertions.
 
 studio/channels/*.toml    Course definitions. Single source of truth for anything
                           a learner sees.

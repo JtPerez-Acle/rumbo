@@ -95,7 +95,7 @@ says "esto no lo cubrimos" is the one people trust about what it does cover.
   `docs/03`.
 - **A visual change still belongs in the token layer**, which is now a real file
   (`studio/web/src/styles/tokens.css`) rather than a `:root` block inside a
-  3,192-line HTML file. It was true by convention before and is true by
+  3,000-line HTML file. It was true by convention before and is true by
   construction now; `tokens.test.js` fails on drift while both copies exist.
 - **CSP still requires `'unsafe-inline'` for scripts** while the vanilla
   frontends are the ones being served, so DOMPurify — not CSP — remains the real
@@ -104,14 +104,16 @@ says "esto no lo cubrimos" is the one people trust about what it does cover.
   versions with SRI. **The build step is what finally allows `'unsafe-inline'`
   to be dropped, but not until the pages carrying inline script are gone** —
   removing it earlier would break the live product to buy a header.
-- **114 assertions run under vitest** (`cd studio/web && npm test`) and assert
-  user-facing *promises*, not layout: the landing's "cómo funciona" block, the
-  job-analysis result page (25), and the CV screen (37). They exist because copy
-  here has aged silently before. Any overhaul keeps them green or changes them
-  deliberately.
-- **Hash routing throughout.** Back button, refresh and deep links all work, and
-  lesson steps are individually addressable so a pending item surfaced anywhere is
-  one tap from the place it can be answered.
+- **134 assertions run under vitest** (`cd studio/web && npm test`, which builds
+  first) and assert user-facing *promises*, not layout: the landing's "cómo
+  funciona" block, the job-analysis result page, the CV screen, and the built
+  public pages as they actually ship. They exist because copy here has aged
+  silently before. Any overhaul keeps them green or changes them deliberately.
+- **The public surface has real URLs; the app is still hash-routed.** `/`,
+  `/cursos`, `/curso/<slug>`, `/oferta`, `/lista` and `/login` are built files a
+  crawler and an answer engine can read. Inside the app, back button, refresh and
+  deep links all work, and lesson steps are individually addressable so a pending
+  item surfaced anywhere is one tap from the place it can be answered.
 - **Nothing a learner earns may ever go down** — work scores, quiz scores, the
   conversation bonus and credited module exemptions all keep the best attempt,
   enforced in SQL rather than by convention.

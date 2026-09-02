@@ -19,6 +19,7 @@ import sys
 import threading
 import tomllib
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import Cookie, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
@@ -666,7 +667,7 @@ def get_invites(request: Request):
     if proto in ("http", "https"):
         base = re.sub(r"^https?://", f"{proto}://", base)
     for r in rows:
-        r["link"] = f"{base}/aprende?invite={r['code']}"
+        r["link"] = f"{base}/login?invite={r['code']}"
         r["usable"] = bool(r["active"]) and r["uses"] < r["max_uses"]
     return {"invites": rows, "base": base}
 
@@ -752,7 +753,25 @@ app.include_router(learn_router)
 
 
 @app.get("/aprende")
-def aprende():
+def aprende(request: Request, learner_session: str | None = Cookie(default=None)):
+    """The learner app. Only for learners: it no longer contains a public half.
+
+    Two query strings arrive here from links already in the world and must keep
+    working — `?invite=CODE`, printed on every invite the operator has ever
+    handed out, and `?error=` from a magic link that expired. Both used to open
+    an in-app sign-in view; that view is a real page now, so they are forwarded
+    with their query intact rather than broken.
+    """
+    from fastapi.responses import RedirectResponse
+    if not _signed_in(learner_session):
+        q = request.query_params
+        invite, error = q.get("invite"), q.get("error")
+        if invite:
+            return RedirectResponse(f"/login?invite={quote(invite)}", status_code=302)
+        if error:
+            return RedirectResponse(f"/login?error={quote(error)}", status_code=302)
+        # Nothing to sign in with: the public site is what they came for.
+        return RedirectResponse("/", status_code=302)
     return FileResponse(Path(__file__).parent / "static" / "learn.html")
 
 
@@ -845,10 +864,17 @@ def _public(route: str, learner_session: str | None = None):
 
 
 @app.get("/")
-def site_home(learner_session: str | None = Cookie(default=None)):
+def site_home(publica: str | None = None,
+              learner_session: str | None = Cookie(default=None)):
     """The public site. This is what a stranger gets when they type the domain,
-    and it used to be a 401 from a dashboard nobody but the operator can use."""
-    return _public("/", learner_session)
+    and it used to be a 401 from a dashboard nobody but the operator can use.
+
+    `?publica=1` shows it to a signed-in learner instead of redirecting them
+    into the app. The operator is the only person with a permanent session and
+    this is their own marketing page; without the escape hatch, looking at it
+    means logging out of their own product. Perfil links here.
+    """
+    return _public("/", None if publica else learner_session)
 
 
 @app.get("/cursos")

@@ -777,30 +777,6 @@ const renderMD=(el,md)=>{
 };
 async function api(p,o){const r=await fetch('/api/learn'+p,{headers:{'Content-Type':'application/json'},...o}); if(r.status===401)return{__unauth:true}; return r.json();}
 
-/* THE SECOND LOAD.
-   Hydration wipes #app and rebuilds it, and the rebuild awaited the very data
-   the server had just used to prerender the page. A visitor therefore saw a
-   complete page, then an almost empty one, then it refilled in stages across
-   ~460ms of network. Setting body.wide server-side and removing the enter
-   animation fixed how that looked; neither touched why it happened.
-
-   The server now ships those payloads in window.__BOOT__, and this returns them
-   the FIRST time each is asked for. An await on an already-resolved value yields
-   a microtask, and microtasks run before the next paint — so the wipe and the
-   rebuild land in the same frame and the swap is never visible.
-
-   Consumed once, on purpose: a later in-app navigation must fetch fresh data
-   rather than replay whatever was true when the document was served. */
-function bootOnce(key){
-  const b=window.__BOOT__;
-  if(!b||b[key]===undefined)return null;
-  const v=b[key]; delete b[key];
-  return v;
-}
-async function apiBoot(key,path,opts){
-  const cached=bootOnce(key);
-  return cached!==null?cached:api(path,opts);
-}
 
 /* Evaluations really take 25-35s (measured), and there was no timeout anywhere:
    a stalled request left the "tu tutora está leyendo" card spinning forever with
@@ -904,41 +880,27 @@ let AUTH=false;
    strangers; the app for learners. Mid-lesson steps stay function-driven. */
 function nav(hash){ if(location.hash===hash)route(); else location.hash=hash; }
 window.addEventListener('hashchange', route);
-/* The view the server named, and it is consumed ONCE.
+/* This file is the LEARNER APP and nothing else.
 
-   It used to be re-read on every route(), which made it sticky: "#/" normalises
-   to an empty segment, empty is falsy, so on /login every in-SPA attempt to go
-   home fell straight back to __VIEW__ and re-rendered login. "‹ Conocer Rumbo"
-   and the waitlist's "‹ Volver" were both unusable on any server-routed page.
-   After the first render the hash is the only authority — including when it is
-   empty, which means the landing. */
-let __serverView=(window.__VIEW__?window.__VIEW__+(window.__ARG__?'/'+window.__ARG__:''):'');
-
+   It used to carry a whole second product: six public views for strangers, and
+   a `window.__VIEW__` the server injected to say which of them to open, because
+   /, /cursos, /curso/<slug>, /oferta, /lista and /login were all this same
+   document. They are built HTML now, and a visitor without a session is sent to
+   them by the server rather than rendered one here. Everything below therefore
+   assumes a learner. */
 async function route(){
-  const h=location.hash.replace(/^#\/?/,'')||__serverView;
-  __serverView='';
+  const h=location.hash.replace(/^#\/?/,'');
   const [seg,arg,step]=h.split('/');
-  // Only the landing runs wide; every other view is the phone column.
+  // The app is the phone column; the wide grid belongs to the public site.
   document.body.classList.remove('wide');
-  if(!AUTH){
-    if(seg==='login')renderLogin(new URLSearchParams(location.search).get('error'));
-    else if(seg==='lista')renderWaitlistForm();
-    else if(seg==='oferta')renderJobBox();
-    else if(seg==='cursos')renderPublicCatalog();
-    else if(seg==='explora'&&arg)renderPublicOutline(arg);
-    else renderLanding();
-    return;
-  }
+  // No session: the server would normally have redirected, so this is a cookie
+  // that expired between load and click. Send them to the real sign-in page.
+  if(!AUTH){ toLogin(); return; }
   const tabOf={hoy:'hoy',objetivo:'hoy',cv:'hoy',cursos:'cursos',curso:'cursos',leccion:'cursos',reto:'cursos',
                portafolio:'portafolio',documento:'portafolio','caso-view':'portafolio',perfil:'perfil'};
   STATE.tab=tabOf[seg]||'hoy';
   showTabs();
-  // The public landing is gated on !AUTH, which is right — a learner mid-course
-  // should not be sold to every time they open the app. But it also meant the
-  // operator could not look at their own marketing page without logging out of
-  // their own product, and that page is now the acquisition surface.
-  if(seg==='portada')renderLanding(true);
-  else if(seg==='objetivo')viewObjetivo();
+  if(seg==='objetivo')viewObjetivo();
   // Reachable while logged in too: an existing learner who finds a new offer
   // must be able to analyse it. This branch was missing, so the "Pega tu oferta"
   // button inside #/objetivo silently dropped authed learners on Hoy.
@@ -954,19 +916,18 @@ async function route(){
   else if(seg==='perfil')viewProfile();
   else if(seg==='como-funciona')renderOrientation(true);
   // Already signed in: /login has nothing to offer, so go where they were going.
+  // The hash form still arrives from old links and from a bookmark.
   else if(seg==='login')nav('#/hoy');
   else viewToday();
 }
 async function boot(){
-  /* The session check comes from the server when it can.
-     This awaited GET /api/learn/me before route() was ever called, so nothing
-     rendered until a round trip returned — 147ms live. The prerendered page sat
-     on screen for that whole window and was then replaced, and that gap is what
-     "it loads twice" actually was. Every previous attempt made the swap look
-     better or arrive sooner; none of them removed the wait.
-     apiBoot falls back to the real request when the payload is absent (the SPA
-     preview, /aprende, any route that does not prerender). */
-  const me=await apiBoot('me','/me');
+  /* One round trip before anything renders, and here that is correct: this is
+     an app behind a session, so there is nothing to show until we know whose it
+     is. The version of this comment that used to sit here was about the PUBLIC
+     pages, where the same await made a fully-rendered page wait 147ms to be
+     replaced by an empty one. Those pages are static files now and never call
+     this. */
+  const me=await api('/me');
   AUTH=!!me.authenticated;
   STATE.me=me;   // carries the declared project; the exercise step and Perfil read it
   // A route analysed before signing up is the reason many people sign up at all.
@@ -981,53 +942,19 @@ async function boot(){
       }catch(e){}   // non-fatal: never block boot on this
     }
   }
+  /* An invite link is /aprende?invite=CODE and thousands of them are already
+     out there in messages. The sign-in form lives at /login now, so carry the
+     code across rather than breaking every link ever sent. */
   const invite=new URLSearchParams(location.search).get('invite');
-  if(!AUTH&&invite){renderLogin();return;}   // invited links go straight to login
+  if(!AUTH&&invite){ location.href='/login?invite='+encodeURIComponent(invite); return; }
   if(AUTH&&!localStorage.getItem('aprende_onboarded')){renderOrientation(false);return;}
   route();
 }
 
-/* ---------- login ---------- */
-function renderLogin(err){
-  tabbar.classList.add('hide'); app.innerHTML='';
-  // publicShell already supplies the brand, the nav and the lamp. This view used
-  // to build its own brandrow and back link, so adding the shell gave /login TWO
-  // brand blocks — and the one it built carried "Aprende haciendo, con tutora
-  // IA", the category cliché the rest of this pass removed.
-  if(!AUTH)publicShell('');
-  else{
-    const back=$(`<div class="back" style="margin-bottom:10px">‹ Conocer Rumbo</div>`);
-    back.onclick=()=>nav2(''); app.append(back);   // nav2: the URL should agree
-  }
-  const box=$(`<div style="margin:auto 0;display:flex;flex-direction:column;gap:15px">
-    <div><div class="eyebrow">Tu clase de hoy te espera</div>
-    <h1 style="margin-top:10px">Entra y sigue donde lo dejaste.</h1>
-    <p class="muted" style="margin-top:10px">Entra con tu código de invitación. Cada día: un video corto, algo real que hacer, y ${TUTOR} leyendo lo que escribiste. Terminas con trabajo tuyo que mostrar, no con un certificado.</p></div>
-    ${err?`<div class="card" style="border-color:var(--terra);color:var(--terra);font-size:var(--fs-sm)">El enlace no es válido o expiró. Pide uno nuevo.</div>`:''}
-    <div><label>Tu nombre</label><input id="name" placeholder="Ana"></div>
-    <div><label>Tu correo</label><input id="email" type="email" placeholder="tu@correo.com" autocomplete="email"></div>
-    <div><label>Código de invitación</label><input id="invite" placeholder="Tu código de acceso"></div>
-    <input id="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
-    <button class="btn btn-primary" id="go">Entrar</button>
-    <div id="loginmsg" class="center muted t-sm"></div></div>`);
-  app.append(box);
-  const pre=new URLSearchParams(location.search).get('invite'); if(pre)box.querySelector('#invite').value=pre;
-  box.querySelector('#go').onclick=doLogin;
-}
-async function doLogin(){
-  const email=app.querySelector('#email').value.trim(), name=app.querySelector('#name').value.trim();
-  const invite=app.querySelector('#invite').value.trim(), company=app.querySelector('#company').value;
-  const msg=app.querySelector('#loginmsg');
-  if(!email.includes('@')){msg.textContent='Escribe un correo válido.';return;}
-  msg.textContent='Un momento…';
-  const res=await fetch('/api/learn/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,name,invite,company})});
-  if(res.status===429){msg.textContent='Demasiados intentos. Espera unos minutos.';return;}
-  if(res.status===403){msg.textContent='Necesitas un código de invitación válido para entrar.';return;}
-  const r=await res.json();
-  if(r.sent)msg.innerHTML='Te enviamos un enlace a tu correo. Ábrelo para entrar.';
-  else if(r.dev_link)window.location=r.dev_link;
-  else msg.textContent='No pudimos generar tu acceso.';
-}
+/* Sign-in lives at /login, which is a real page and not a view in here.
+   Every authed view that discovers an expired session calls this, so a learner
+   whose cookie died lands on the sign-in form rather than on a blank screen. */
+function toLogin(){ location.href='/login'; }
 
 /* ---------- public layer: the platform's face for strangers ---------- */
 /* "Cómo funciona" on two axes, because those are the two questions a stranger
@@ -1071,537 +998,17 @@ function renderHow(target){
   target.append(gets);
 }
 
-/* ---------- The landing IS the lesson ---------------------------------------
-   A stranger cannot try this product — access is invite-gated — and its value,
-   verified work rather than video, is invisible from outside. Every competitor
-   in the category claims an AI tutor, so a claim buys nothing here. This page
-   does not describe the loop: it runs one real lesson, takes one real answer,
-   and returns one real verdict from the same evaluator a logged-in learner
-   gets, before asking for anything. The wall arrives after the value. */
-async function renderLanding(preview){
-  tabbar.classList.add('hide'); app.innerHTML='';
-  if(preview){
-    // Say plainly that this is the stranger's view, and give a way back. Without
-    // it the doors below lead to #/login, which is nonsense for someone who is
-    // already signed in.
-    const bar=$(`<div class="note note-goal" style="display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s3)">
-      ${I('eye','ic ic-s')}<span style="flex:1">Estás viendo la <b>portada pública</b>: lo que ve alguien sin cuenta.</span>
-      <button class="btn btn-ghost btn-sm" id="pvback">Volver a la app</button></div>`);
-    bar.querySelector('#pvback').onclick=()=>nav('#/hoy');
-    app.append(bar);
-  }
-  publicShell('clase');
 
-  /* The first viewport issues an imperative — "haz una clase" — and used to
-     offer no way to obey it: the box was 2,837px down, 3.4 phone screens for a
-     reader who studies in stolen time, and the first thing under the lede on a
-     phone was a canned exchange from a stranger. The hero now carries the
-     question and the textarea themselves. The page's verb and the page's
-     affordance finally agree. */
-  const hero=$(`<section class="u-full band-hi hero"></section>`);
-  hero.append($(`<div class="u-wide herogrid">
-    <div>
-      <div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
-      <h1>No te contamos cómo funciona. Haz una clase.</h1>
-      <p class="muted lede">Primera lección del curso de Marketing con IA, entera. Explícala con tus palabras y ${TUTOR} te contesta de verdad — antes de pedirte nada, y sin cuenta.</p>
-    </div>
-    <div id="heroask"></div>
-  </div>`));
-  app.append(hero);
 
-  await renderDemoLesson(app);
-  renderHow(app);
 
-  /* El umbral, and it comes BEFORE the library on purpose.
-     The peak of this page is a machine quoting a stranger's own words back at
-     them. That peak used to be followed by an explainer and a course grid, so
-     the last thing read before the decision was an inventory — which is
-     mechanically why the best demo in the category was remembered as a
-     marketplace. The doors now follow the verdict, and the catalog is demoted
-     to one sentence below them. */
-  const th=$(`<section class="u-full band-deep threshold"></section>`);
-  th.append($(`<div>
-    <div class="eyebrow" style="color:var(--amber)">Fase alfa</div>
-    <h2 style="margin-top:var(--s3)">Ahora la parte que no se ve desde afuera.</h2>
-    <p class="muted" style="margin-top:var(--s4)">Eso fue una lección. Lo que de verdad hace el sistema es lo otro: dinos qué quieres ser y te armamos la ruta — qué módulos, en qué orden — y te decimos con nombre y apellido <b>lo que ese puesto pide y nosotros no enseñamos</b>. Casi nadie te dice eso.</p>
-    <p class="muted" style="margin-top:var(--s4)">Cada persona que entra escribe trabajo real y ${TUTOR} lo lee de verdad. Eso no escala de golpe, así que abrimos por invitación y de a pocos.</p>
-  </div>`));
-  th.append(founderNote());
-  th.append(landingDoors('lit'));
-  app.append(th);
 
-  /* The library, as inventory and nothing more: one sentence and a quiet link,
-     AFTER the decision. It used to be a first-class section whose fourteen
-     course names were fourteen of the page's seventeen h3s — so the document
-     outline of this homepage literally was a course catalog. */
-  app.append($(`<p class="muted t-sm center" style="margin:var(--s6) 0 var(--s2)">Detrás de esto hay <b>70 módulos</b> en 14 cursos. Tu ruta los ordena según lo que tu puesto pide, no según el índice de un curso. <a class="doorlink" href="/cursos" data-go="cursos">Ver qué enseñamos</a></p>`));
-  app.querySelector('[data-go="cursos"]').onclick=e=>{e.preventDefault();nav2('cursos');};
-}
 
-/* The tutor has a name. "Tu tutora" is a product with no identity, and this
-   page asks a stranger to hand their work to it. Vera: short, unambiguous in
-   Spanish, and it means true — which is the one thing this product sells.
-   NOTE: only the public surface says it so far. The app still says "tu tutora"
-   in a few hundred strings; renaming those is a separate, mechanical pass. */
-const TUTOR='Vera';
 
-/* Real exchanges, from the real evaluator.
-   Each was produced by POSTing an answer to /public/demo-explain and keeping
-   EXACTLY what came back — verdict, feedback, misconception, gaps. Not one
-   sentence of tutor output here was written by a copywriter, which is the only
-   reason any of it can be on the page: the whole argument of this surface is
-   that the evaluation is real, and an invented one would be the single most
-   damaging thing on it.
 
-   Both shown answers are WRONG on purpose. A model answer next to the textarea
-   would be copied, and `demo_attempts` exists to record what strangers actually
-   write when nobody is grading them — the one honest read we have on whether
-   the lesson teaches. Showing the answer would destroy the measurement. */
-const EXCHANGES={
-  // Half right: the page's proof that the tutor names gaps instead of scoring.
-  casi:{
-    badge:'Casi',
-    said:'Un objetivo SMART es un objetivo bien hecho, que sea claro y que se pueda cumplir. Sirve para no gastar de más en publicidad porque si tienes claro lo que quieres entonces no andas probando cosas al azar.',
-    fb:'Dices bien que un objetivo SMART es claro y que evita gastar de más porque no andas probando al azar. Eso captura el porqué. Pero cuando la pregunta te pide <b>qué significa</b>, necesitas explicar qué hay detrás de las siglas. Sin eso, la definición queda muy vaga.',
-    misconception:null,
-    gaps:['Explica qué significa cada letra de SMART: Específico, Medible, Alcanzable, Relevante, con Plazo.',
-          'Conecta cómo cada criterio ayuda a no malgastar dinero: “medible” evita no saber si funcionó, “plazo” evita campañas sin fin.']
-  },
-  // Confidently wrong: the only place the misconception mechanic is visible,
-  // and the thing no competitor's "AI tutor" actually does.
-  todavia:{
-    badge:'Todavía no',
-    said:'SMART significa que el objetivo tiene que ser específico, o sea muy detallado. Mientras más detalles le pongas mejor es el objetivo. Si escribes un párrafo largo explicando todo lo que quieres lograr, eso ya es un objetivo SMART.',
-    fb:'Captaste bien la idea de que escribir el objetivo ayuda a no ir a ciegas, y que la claridad es importante. Pero centrarte solo en “específico” y en escribir un párrafo largo deja fuera la parte más importante de SMART. De hecho, un párrafo muy detallado puede ser todo menos SMART si no cumple los otros cuatro criterios, y por ahí es justo donde se escapa el dinero.',
-    misconception:'Ojo: SMART no es sinónimo de “muy detallado” ni de escribir un texto largo. Es un acrónimo de cinco criterios que se revisan uno por uno.',
-    gaps:['Te faltaron las otras cuatro letras: Medible, Alcanzable, Relevante y con Plazo.',
-          'No explicaste por qué evitan malgastar dinero: sin métrica no sabes si la campaña funciona, sin plazo todo se dilata.']
-  }
-};
 
-function tutorPanel(key,extraClass){
-  const x=EXCHANGES[key];
-  return `<figure class="tutorpanel ${extraClass||''}">
-    <figcaption class="microlabel">Ejemplo real · una respuesta y lo que ${TUTOR} contestó</figcaption>
-    <div class="tp-said">
-      <span class="tp-who">Alguien escribió</span>
-      <p>“${x.said}”</p>
-    </div>
-    <div class="tp-verdict"><span class="tp-badge">${x.badge}</span><span class="tp-who">${TUTOR} respondió</span></div>
-    <p class="tp-fb">${x.fb}</p>
-    ${x.misconception?`<div class="tp-misc">${I('spark','ic ic-s')}<span>${esc(x.misconception)}</span></div>`:''}
-    <div class="tp-gaps">
-      <span class="microlabel">Lo que te falta</span>
-      ${x.gaps.map(g=>`<div class="tp-gap">${I('arrow','ic ic-s')}<span>${esc(g)}</span></div>`).join('')}
-    </div>
-    <p class="tp-foot">Reintentas sin límite. Se queda tu mejor intento.</p>
-  </figure>`;
-}
 
-/* Who is behind this. A page that asks for trust and shows no person is asking
-   for more than it gives. */
-function founderNote(){
-  return $(`<div class="founder">
-    <div class="founder-face" aria-hidden="true">${I('user')}</div>
-    <div>
-      <p class="founder-text">Tener acceso al conocimiento no es lo mismo que aprender: eso el internet ya lo resolvió hace treinta años, y aun así casi nadie termina lo que empieza. Lo que sí funciona es que alguien lea lo que hiciste y te diga qué le falta, y eso siempre fue caro. Mi trabajo es que deje de serlo. Empieza chico porque no se puede masificar algo que todavía no funciona bien.</p>
-      <p class="founder-text founder-line">Quiero que «me gustaría aprender esto» se vuelva «estoy aprendiendo esto».</p>
-      <p class="founder-who">Jose Tomás Pérez-Acle · fundador de Rumbo ·
-        <a href="https://www.linkedin.com/in/jose-tomas-perez-acle-833a761b9/"
-           target="_blank" rel="noopener noreferrer" class="founder-link">LinkedIn</a></p>
-    </div>
-  </div>`);
-}
 
-/* One lamp per page, and only on the public surface. Idempotent: several views
-   call it, and hydration can run twice. */
-function lightTheLamp(){
-  if(document.querySelector('.lamp'))return;
-  document.body.prepend($(`<div class="grain" aria-hidden="true"></div>`));
-  document.body.prepend($(`<div class="lamp" aria-hidden="true"></div>`));
-}
 
-/* ONE setup for every public view.
-   The lamp, the header and the wide grid were wired per-view, so they drifted:
-   the lamp burned on / and /cursos and was dark on /curso/<slug>, /oferta,
-   /lista and /login — present exactly where a visitor BROWSES and absent
-   exactly where they DECIDE. /oferta carries the only claim a competitor
-   cannot truthfully make and rendered as an unbranded 560px form.
-
-   It is also where the landmarks live. The public surface had no <header>,
-   <nav>, <main> or <footer> at all, on any page: a screen-reader user got one
-   undifferentiated run of text with no way to skip to content. */
-function publicShell(here){
-  document.body.classList.add('wide');
-  lightTheLamp();
-  app.append(publicHeader(here));
-}
-
-/* One header for every public view. Brand goes home; the three links are the
-   three things a stranger might actually want, in the order they want them:
-   see it work, browse what exists, get a route for their own job. `here` marks
-   the current one so the nav says where you are, not just where you can go. */
-function publicHeader(here){
-  /* Every link here carries a real href.
-     They were <a> with only a data-go attribute and a JS click handler, which
-     made all five UNFOCUSABLE — an anchor without href is not a tab stop, so
-     "La clase", "Cursos", "Tu ruta" and "Tengo una invitación" could not be
-     reached by keyboard on any public page. The keyboard shim below did not
-     catch them either: it deliberately skips A and BUTTON on the assumption
-     that anchors are natively focusable, which is exactly the assumption an
-     href-less anchor breaks. The href also gives a crawler its link graph back
-     — after hydration this document had six anchors and five had no href.
-     The click handler stays as an enhancement so in-SPA preview still works.
-
-     "Cursos" is now "Qué enseñamos". The route is the product and the courses
-     are inventory (confirmed 2026-09-02); a nav that offers "Cursos" as a
-     primary destination tells the visitor the opposite, and the visitor
-     believes the navigation over the copy. */
-  const nav=$(`<header class="sitenav u-wide">
-    <a class="brandrow" href="/"><div class="brandmark"></div><div class="brandname">Rumbo<small>Dinos qué quieres ser</small></div></a>
-    <nav class="navlinks" aria-label="Principal">
-      <a href="/" data-go="" class="${here==='clase'?'on':''}"${here==='clase'?' aria-current="page"':''}>La clase</a>
-      <a href="/oferta" data-go="oferta" class="${here==='oferta'?'on':''}"${here==='oferta'?' aria-current="page"':''}>Tu ruta</a>
-      <a href="/cursos" data-go="cursos" class="${here==='cursos'?'on':''}"${here==='cursos'?' aria-current="page"':''}>Qué enseñamos</a>
-    </nav>
-    ${AUTH
-      ? `<button class="btn btn-ghost btn-sm" data-go="hoy">Volver a la app</button>`
-      : `<span class="navcta"><a class="navlink-quiet" href="/login" data-go="login">Tengo una invitación</a>`
-        + `<a class="btn btn-primary btn-sm" href="/oferta" data-go="oferta">Dinos qué quieres ser</a></span>`}</header>`);
-  nav.querySelectorAll('[data-go]').forEach(el=>{
-    el.onclick=e=>{ if(e.metaKey||e.ctrlKey||e.shiftKey)return; e.preventDefault(); nav2(el.dataset.go); };
-  });
-  const brand=nav.querySelector('.brandrow');
-  brand.onclick=e=>{ if(e.metaKey||e.ctrlKey||e.shiftKey)return; e.preventDefault(); nav2(''); };
-  return nav;
-}
-// Public navigation keeps the real URLs the server hands out (/, /cursos,
-// /oferta) rather than turning them into fragments the moment someone clicks.
-function nav2(seg){
-  if(AUTH){ nav('#/'+(seg||'hoy')); return; }   // preview mode stays in the SPA
-  location.href='/'+seg;
-}
-
-/* The catalog as its own page, not a section buried under a full lesson.
-   docs/02 calls the browsable temarios marketing content: 14 courses and 420
-   lesson objectives, all real. */
-// Named for its surface: viewCatalog and renderJobResult each declare their
-// own local courseCard, and a shared bare name across three of them is a trap.
-function publicCourseCard(c){
-  /* A real <a href>, not a div with onclick. Two reasons: hydration used to
-     replace the prerender's fourteen crawlable links with divs, so a crawler
-     that runs JS saw no internal link graph at all; and an anchor is a tab stop
-     and a middle-clickable link for free.
-     The meta line leads with the DELIVERABLE, not "30 lecciones · 5 módulos".
-     Volume-as-value is the marketplace's signature move and it was on this card
-     fourteen times per page — while being the one number any competitor beats
-     trivially. The lesson count stays, demoted, because it is still a fair
-     thing to want to know. */
-  const card=$(`<a class="card course-card" href="/curso/${esc(c.slug)}">
-    <h3 style="padding-right:10px">${esc(c.title)}</h3>
-    ${c.description?`<p class="desc">${esc(c.description)}</p>`:''}
-    ${c.doc_type?`<p class="delivers">${I('doc','ic ic-s')} Terminas con: ${esc(c.doc_type)}</p>`:''}
-    <div class="meta"><span>${c.modules} módulos · ${c.total} lecciones</span>${I('arrow','ic ic-s')}</div></a>`);
-  card.onclick=e=>{
-    if(e.metaKey||e.ctrlKey||e.shiftKey)return;      // let the browser open it
-    e.preventDefault();
-    if(AUTH)nav('#/explora/'+c.slug); else location.href='/curso/'+c.slug;
-  };
-  return card;
-}
-async function renderCatalogInto(target, openAll){
-  // The boot payload is the bare course array; the endpoint wraps it. Normalise
-  // so everything below this line cannot tell which one it got.
-  const raw=await apiBoot('catalog','/public/catalog');
-  const d=Array.isArray(raw)?{courses:raw}:raw;
-  const cats=clusterize(d.courses||[]);
-  cats.forEach(([cat,items],i)=>{
-    const open=openAll||i===0;
-    const head=$(`<div class="cluster u-wide ${open?'open':''}">${I(CAT_ICON[cat]||'book')}<h2 class="ct">${esc(cat)}</h2><span class="cn">${items.length} ${items.length===1?'CURSO':'CURSOS'}</span><span class="chev">${I('arrow','ic ic-s')}</span></div>`);
-    const body=$(`<div class="cluster-body u-wide ${open?'':'hide'}"></div>`);
-    items.forEach(c=>body.append(publicCourseCard(c)));
-    head.onclick=()=>{head.classList.toggle('open');body.classList.toggle('hide');};
-    target.append(head); target.append(body);
-  });
-  return (d.courses||[]).length;
-}
-
-async function renderPublicCatalog(){
-  tabbar.classList.add('hide'); app.innerHTML='';
-  publicShell('cursos');
-  app.append($(`<div class="demohead hero">
-    <div class="eyebrow">La biblioteca</div>
-    <h1>Todo lo que puedes estudiar aquí.</h1>
-    <p class="muted" style="margin-top:10px">Cada curso abre su temario entero: los módulos, lo que sabrás hacer al terminar cada uno, y las lecciones una por una. Nada está escondido detrás del registro.</p></div>`));
-  const n=await renderCatalogInto(app, true);
-  app.append($(`<p class="faint t-sm" style="margin-top:var(--s4)">${n} cursos · toca cualquiera para leer su temario completo.</p>`));
-  app.append(landingDoors('ghost'));
-}
-
-/* The doors, in one place. `lit` gives the goal engine the primary treatment —
-   used once, under the verdict, where intent is highest. `ghost` is the quiet
-   copy at the tail of the page and after any failure, so a visitor who does not
-   want to write an answer still has somewhere to go. */
-function landingDoors(kind){
-  const el=$(`<div class="doors" style="margin-top:var(--s5)">
-    <button class="btn ${kind==='lit'?'btn-primary':'btn-ghost'}" data-go="oferta">Dinos qué quieres ser ${I('arrow','ic ic-s')}</button>
-    <a class="doorlink" href="/lista" data-go="lista">o pide tu acceso</a></div>`);
-  el.querySelectorAll('[data-go]').forEach(b=>b.onclick=e=>{
-    if(e.metaKey||e.ctrlKey||e.shiftKey)return; e.preventDefault(); nav('#/'+b.dataset.go);});
-  return el;
-}
-/* The free lesson, whole. Video, guide, and the question — then a real verdict
-   from the real evaluator. Everything below the verdict is the rest of the loop
-   shown as actual content (this lesson's exercise, this module's reto, the
-   document the course compiles into), never as a list of promises. */
-async function renderDemoLesson(target){
-  const d=await apiBoot('demo','/public/demo');
-  if(!d||d.detail){
-    target.append($(`<div class="note note-warn">${I('alert','ic ic-s')} <span>La clase de muestra no está disponible ahora mismo. Puedes armar tu ruta igual.</span></div>`));
-    target.append(landingDoors('lit'));
-    return;
-  }
-  const split=$(`<div class="lessonsplit u-wide" style="margin-top:var(--s4)"></div>`);
-  const left=$(`<div></div>`), right=$(`<div></div>`);
-  let kpAfter=null;                       // key points render below the split
-  split.append(left); split.append(right); target.append(split);
-
-  left.append($(`<div class="microlabel">${esc(d.course_title)} · lección 1</div>`));
-  left.append($(`<h2 class="lessontitle" style="margin:6px 0 10px">${esc(d.title)}</h2>`));
-  if(d.has_video){
-    // The plate, not a <video>: a real frame from the lesson with our own play
-    // affordance over it. The element is created on click, so nobody who does
-    // not press play pays 5.4 MB for it — this audience is on metered mobile
-    // data (PRODUCT.md), and a marketing page is the worst place to spend it.
-    const plate=$(`<div class="videoplate" role="button" tabindex="0" aria-label="Reproducir la lección">
-      <img src="/api/learn/public/demo-poster" alt="" width="540" height="960"
-        onerror="this.remove()">
-      <div class="playbtn">${I('play','ic')}</div>
-      <div class="plate-meta"><div class="microlabel" style="color:var(--paper-dim)">Video · 59 segundos</div></div></div>`);
-    plate.onclick=()=>{
-      const v=$(`<video controls autoplay playsinline preload="auto" src="/api/learn/public/demo-video"></video>`);
-      plate.replaceWith(v);
-      // iOS Safari only honours autoplay for muted video and wants the call
-      // inside the gesture; without this the tap does nothing on the product's
-      // stated primary device.
-      const p=v.play(); if(p&&p.catch)p.catch(()=>{});
-    };
-    left.append(plate);
-  }
-  // Key points sit BELOW the split, not in the left column. The guide starts
-  // collapsed, so the right column is shorter than the video column and this
-  // card used to leave a large dead field beside it on a wide screen — the most
-  // visible flaw on the page. Full width, two columns of bullets, it fills that
-  // space and reads as the lesson's takeaway instead of a caption to the video.
-  if((d.key_points||[]).length){
-    const kp=$(`<div class="card keypoints u-wide" style="margin-top:var(--s4)"><div class="microlabel">Lo que te llevas</div></div>`);
-    const grid=$(`<div class="kpgrid" style="margin-top:var(--s2)"></div>`);
-    d.key_points.forEach(p=>grid.append($(`<div class="gaprow"><span class="gx" style="color:var(--amber)">${I('check','ic ic-s')}</span><span>${esc(p)}</span></div>`)));
-    kp.append(grid);
-    kpAfter=kp;
-  }
-
-  right.append($(`<div class="ai-tag" style="margin-bottom:8px"><span class="dot"></span> La guía escrita</div>`));
-  const wrap=$(`<div class="guidewrap card card-paper written"></div>`);
-  // renderMD(target, markdown) — it WRITES into the element and returns nothing.
-  // It is also the XSS control (marked → DOMPurify), so this is the only way
-  // this content may ever reach the DOM.
-  renderMD(wrap, d.written||d.transcript||'');
-  right.append(wrap);
-  const more=$(`<button class="btn btn-ghost btn-sm" aria-expanded="false" style="margin-top:var(--s2)">Seguir leyendo la guía</button>`);
-  more.onclick=()=>{
-    const open=wrap.classList.toggle('open');
-    more.setAttribute('aria-expanded', String(open));
-    more.textContent=open?'Mostrar menos':'Seguir leyendo la guía';
-  };
-  right.append(more);
-  if(kpAfter)target.append(kpAfter);
-
-  /* The question. This is the surface's whole argument, so it is the lit card. */
-  const q=$(`<div class="demoq" style="margin-top:var(--s5)">
-    <div class="eyebrow">Ahora tú</div>
-    <h2 id="dqq" class="askq" style="margin:8px 0 4px">${esc(d.explain_prompt||'Explícalo en tus palabras.')}</h2>
-    <p class="muted t-sm" style="margin-top:6px">Con tus palabras, como se lo explicarías a alguien. No hay nota: esto se responde con <b>Lo tienes</b>, <b>Casi</b> o <b>Todavía no</b>, y con lo que te falta.</p>
-    <label for="dq" class="hide">Tu explicación</label>
-    <textarea id="dq" maxlength="4000" aria-labelledby="dqq" placeholder="Escribe aquí tu explicación…"></textarea>
-    <p class="faint t-sm" style="margin-top:8px">Guardamos lo que escribes, sin tu nombre ni tu correo, solo para saber si la lección enseña.</p>
-    <input id="dqc" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
-    <button class="btn btn-primary" id="dqgo" style="margin-top:var(--s3)">Que la tutora lo lea ${I('arrow','ic ic-s')}</button>
-    <div id="dqmsg" class="center muted t-sm" style="margin-top:8px"></div></div>`);
-  /* The question goes in the HERO when there is a slot for it, so the first
-     screen carries the box instead of a promise about one. On any surface that
-     does not build a hero (the logged-in preview), it falls back to the flow. */
-  const askSlot=document.getElementById('heroask');
-  if(askSlot)askSlot.append(q); else target.append(q);
-
-  /* One worked example, after the lesson, never beside the box.
-     There used to be two — the same component with the same caption 2,800px
-     apart, which read as a repeat and cost the visitor a re-read to discover it
-     was not. And on a phone the first thing under the headline was a stranger's
-     answer: a product that promises to read YOUR work opening with someone
-     else's, in the exact anatomy of a testimonial, on a site that has correctly
-     refused to have testimonials.
-     Deliberately still a WRONG answer, and the one carrying a misconception —
-     that is the mechanic nothing else in the category has. */
-  target.append($(`<div class="u-wide afterq">${tutorPanel('todavia','tp-inline')}
-    <div class="afterq-note">
-      <p class="muted t-sm">Esto es lo que recibe cualquiera que escriba algo arriba: un veredicto, el error de fondo si lo hay, y qué le falta — no una nota. La misma ${TUTOR} que lee el trabajo de quienes ya están dentro.</p>
-    </div></div>`));
-  const ta=q.querySelector('#dq');
-  attachDraft(ta,'demo',0);
-  const after=$(`<div role="status" aria-live="polite"></div>`); target.append(after);
-
-  q.querySelector('#dqgo').onclick=async()=>{
-    const content=ta.value.trim(), msg=q.querySelector('#dqmsg'), btn=q.querySelector('#dqgo');
-    if(content.length<40){msg.textContent='Escríbelo con tus palabras: unas dos o tres frases bastan.';return;}
-    btn.disabled=true; msg.textContent='';
-    const rc=readingCard('Tu tutora está leyendo tu respuesta…'); q.append(rc);
-    const r=await postWithTimeout('/api/learn/public/demo-explain',
-      {content,company:q.querySelector('#dqc').value},EVAL_TIMEOUT_MS);
-    rc.remove(); btn.disabled=false;
-    if(!r.res||!r.res.ok){
-      /* This was a dead end. The failure branch set msg.textContent and stopped,
-         so a visitor who did exactly what the page asked and hit the four-per-
-         hour cap got a lowercase server fragment in 12.5px muted text under a
-         re-enabled button, with nowhere to go. The doors are appended on the
-         LOAD-failure path and were missing from this one — the path a motivated
-         visitor actually reaches.
-         The 429 gets its own sentence because "demasiadas peticiones" describes
-         our rate limiter, not their situation, and the door that is still open
-         is the one this whole page is trying to point at anyway. */
-      const capped=r.res&&r.res.status===429;
-      msg.textContent=capped
-        ? `Ya evaluamos varias respuestas desde aquí en la última hora: es una alfa y ${TUTOR} corre de a poco. Vuelve en un rato — o dinos qué quieres ser y te armamos la ruta ahora, que eso sí está abierto.`
-        : ((r.data&&r.data.detail)||'No pudimos evaluarla ahora. Intenta en un momento.');
-      if(!q.querySelector('.doors'))q.append(landingDoors('ghost'));
-      btn.focus();                 // disabling a focused button loses their place
-      return;
-    }
-    clearDraft('demo',0);
-    renderDemoVerdict(after, r.data.evaluation||{}, d);
-    const quiet=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-    after.scrollIntoView({behavior:quiet?'auto':'smooth',block:'start'});
-  };
-}
-
-const VERDICT_WORD={lo_tienes:'Lo tienes',casi:'Casi',todavia_no:'Todavía no'};
-function renderDemoVerdict(target, ev, d){
-  target.innerHTML='';
-  const v=ev.verdict||'casi';
-  const card=$(`<div class="card card-spot" style="margin-top:var(--s4)">
-    <div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px">
-      <div class="verdict ${v}">${VERDICT_WORD[v]||'Casi'}</div>
-      <span class="vchip ${v}">tu tutora</span></div>
-    <p class="t-base" style="margin-top:var(--s3);white-space:pre-wrap">${esc(ev.feedback||'')}</p>
-    ${ev.misconception?`<div class="note note-warn" style="margin-top:var(--s3)">${I('alert','ic ic-s')} <span>${esc(ev.misconception)}</span></div>`:''}</div>`);
-  target.append(card);
-  if((ev.missing||[]).length){
-    target.append($(`<div class="microlabel" style="margin-top:var(--s3)">Para redondearlo te falta</div>`));
-    const box=$(`<div class="card"></div>`);
-    ev.missing.forEach(x=>box.append($(`<div class="gaprow"><span class="gx">${I('alert','ic ic-s')}</span><span>${esc(x)}</span></div>`)));
-    target.append(box);
-  }
-
-  /* What the rest of the loop actually is — shown with this lesson's real
-     exercise, this module's real reto and the real document the course ends in.
-     Sections that restate a claim in different words add length, not substance. */
-  target.append($(`<div class="microlabel" style="margin-top:var(--s5)">Llevas dos de los cinco pasos. Así sigue</div>`));
-  const next=$(`<div class="card"></div>`);
-  const row=(n,title,body)=>`<div class="nextup"><div class="nn">${n}</div>
-    <div><div style="font-weight:700;font-size:var(--fs-md)">${esc(title)}</div>
-    <div class="muted t-sm" style="margin-top:3px">${esc(body)}</div></div></div>`;
-  next.innerHTML=
-    row('3','El quiz','Tres preguntas donde las respuestas equivocadas también enseñan.')+
-    (d.exercise&&d.exercise.instruction
-      ? row('4','El ejercicio, sobre tu proyecto real',d.exercise.instruction.slice(0,190))
-      : row('4','El ejercicio','Produces algo real y lo pegas; tu tutora lo evalúa en tres dimensiones.'))+
-    (d.reto
-      ? row('5','El reto del módulo',d.reto.scenario.slice(0,190))
-      : row('5','El reto del módulo','Un caso nuevo que las lecciones no cubrieron.'));
-  target.append(next);
-  target.append($(`<div class="card card-paper" style="margin-top:var(--s3)">
-    <div class="ai-tag"><span class="dot"></span> Al final</div>
-    <h3 style="margin-top:8px">${esc(d.doc_type||'Un documento profesional tuyo')}</h3>
-    <p class="t-sm" style="margin-top:6px;opacity:.85">Tu trabajo evaluado se compila en el documento que un cliente habría pagado por recibir, con tu firma. No damos certificados: damos el trabajo.</p></div>`));
-
-  target.append(landingDoors('lit'));
-  target.append($(`<p class="faint t-sm center" style="margin:10px 0 0">Pega una oferta real o solo el puesto y te armamos la ruta completa — también sin cuenta.</p>`));
-}
-async function renderPublicOutline(slug){
-  tabbar.classList.add('hide'); app.innerHTML='';
-  const d=await apiBoot('course','/public/course/'+slug);
-  if(d.detail){nav2('cursos');return;}
-  publicShell('cursos');
-  /* These fourteen pages are the SEO surface (docs/11): somebody searching
-     "curso de Meta Ads en español" lands here, and they are most of the
-     strangers this product will ever get. So the page keeps the course word in
-     its title, slug and content — that word is what they searched, and calling
-     a syllabus a syllabus is accurate.
-     What changes is what it ARGUES. It used to be a thirty-row table of
-     contents ending in "Quiero tomar este curso" — Udemy's IA and Udemy's verb,
-     contradicting "the module, not the course, is the unit" in the same click.
-     Now: the deliverable first, the modules named as loose parts, and the exit
-     is the route. Rank for the course, convert to the route.
-
-     The <h1> is also new. This page had NO h1 at all — it opened at h2 — which
-     was both an accessibility defect and a wasted signal on the one surface
-     that has to rank. */
-  app.append($(`<div class="outlinehead" style="margin-top:6px">
-    <div class="eyebrow">Temario completo</div>
-    <h1 style="margin-top:var(--s2)">${esc(d.title)}</h1>
-    ${d.description?`<p class="muted" style="margin-top:var(--s3)">${esc(d.description)}</p>`:''}</div>`));
-  if(d.doc_type)app.append($(`<div class="card card-paper deliverable">
-    <div class="microlabel" style="color:var(--paper-dim)">Terminas con</div>
-    <p class="delivername">${esc(d.doc_type)}</p>
-    <p class="delivernote">Hecho con tu propio trabajo, con tu nombre. No un certificado: el documento que un cliente habría pagado.</p></div>`));
-  app.append($(`<p class="muted t-sm" style="margin-top:var(--s4)">Estos ${d.modules.length} módulos existen sueltos. Tu ruta toma los que tu puesto pide y deja el resto — por eso el orden de abajo es el del curso, no necesariamente el tuyo.</p>`));
-  d.modules.forEach(m=>{
-    app.append($(`<h2 class="modhead">Módulo ${m.module_no} · ${esc(m.module_title)}</h2>`));
-    if(m.module_description)app.append($(`<p class="muted t-sm" style="margin:-2px 0 10px">${esc(m.module_description)}</p>`));
-    m.lessons.forEach(l=>{
-      app.append($(`<div class="lrow" style="flex-wrap:wrap"><div class="num">${l.position}</div><div class="lt">${esc(l.title)}</div>
-        ${l.objectives?`<div class="obj">Al terminar podrás: ${esc(l.objectives)}</div>`:''}</div>`));
-    });
-  });
-  const cta=$(`<div class="doors" style="margin-top:var(--s5)">
-    <a class="btn btn-primary" href="/oferta" data-go="oferta">Ver si esto está en tu ruta ${I('arrow','ic ic-s')}</a>
-    <a class="doorlink" href="/" data-go="">o haz una clase ahora</a></div>`);
-  // location.href via nav2, not a hash: `#/lista` over a server path produced
-  // /curso/<slug>#/lista, which shares as a syllabus and opens as a form.
-  cta.querySelectorAll('[data-go]').forEach(a=>{
-    a.onclick=e=>{ if(e.metaKey||e.ctrlKey||e.shiftKey)return; e.preventDefault(); nav2(a.dataset.go); };
-  });
-  app.append(cta);
-}
-function renderWaitlistForm(){
-  tabbar.classList.add('hide'); app.innerHTML='';
-  if(!AUTH)publicShell('');
-  else{const back=$(`<div class="back">‹ Volver</div>`); back.onclick=()=>nav2(''); app.append(back);}
-  const box=$(`<div style="margin-top:14px;display:flex;flex-direction:column;gap:15px">
-    <div><div class="eyebrow">Lista de espera</div>
-    <h1 style="margin-top:10px">Te avisamos cuando se abra tu cupo.</h1>
-    <p class="muted" style="margin-top:8px">Estamos en fase alfa con acceso por invitación. Déjanos tu correo y cuéntanos qué quieres aprender.</p></div>
-    <div><label>Tu nombre</label><input id="wname" placeholder="Ana"></div>
-    <div><label>Tu correo</label><input id="wemail" type="email" placeholder="tu@correo.com"></div>
-    <div><label>¿Qué quieres lograr? (opcional)</label><textarea id="wmotivo" maxlength="500" placeholder="Ej: conseguir trabajo en marketing digital, hacer crecer mi tienda..."></textarea></div>
-    <!-- If they came from a job analysis, the role IS the answer. Prefilling it
-         costs them nothing and turns the waitlist into a real demand signal. -->
-    <input id="wcompany" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
-    <button class="btn btn-primary" id="wsend">Anotarme</button>
-    <div id="wmsg" class="center muted t-sm"></div></div>`);
-  app.append(box);
-  let jobRole=''; try{ jobRole=sessionStorage.getItem('aprende_job_role')||''; }catch(e){}
-  if(jobRole)box.querySelector('#wmotivo').value='Quiero postular a: '+jobRole;
-  box.querySelector('#wsend').onclick=async()=>{
-    const email=box.querySelector('#wemail').value.trim(), msg=box.querySelector('#wmsg');
-    if(!email.includes('@')){msg.textContent='Escribe un correo válido.';return;}
-    const res=await fetch('/api/learn/waitlist',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:box.querySelector('#wname').value.trim(),email,
-        motivo:box.querySelector('#wmotivo').value.trim(),company:box.querySelector('#wcompany').value})});
-    if(!res.ok){msg.textContent='No pudimos anotarte, intenta de nuevo.';return;}
-    box.innerHTML=`<div class="celebrate"><div class="medal">${I('send','ic')}</div><h2 style="margin-top:18px">¡Listo!</h2><p class="muted">Te escribiremos cuando tu cupo esté disponible.</p></div>`;
-  };
-}
 
 /* ---------- job target: paste a posting, get a route ----------
    The analysis genuinely takes ~2 minutes: the model reads the whole posting and
@@ -1618,13 +1025,12 @@ const JOB_STAGES=[
 const JOB_SLOW_AT=170;   // seconds — past this we say so instead of pretending
 
 function renderJobBox(){
-  // Authed learners keep their tab bar and go back to their goal, not to the
-  // public landing — this screen is reachable from inside the app now.
-  tabbar.classList.toggle('hide',!AUTH); app.innerHTML='';
-  if(AUTH){
-    const back=$(`<div class="back">‹ Mi objetivo</div>`);
-    back.onclick=()=>nav('#/objetivo'); app.append(back);
-  }else publicShell('oferta');
+  // Strangers analyse a posting at /oferta, which is a built page. This is the
+  // same screen for a learner who already has a session and finds a new offer —
+  // it keeps the tab bar and goes back to their goal.
+  tabbar.classList.remove('hide'); app.innerHTML='';
+  const back=$(`<div class="back">‹ Mi objetivo</div>`);
+  back.onclick=()=>nav('#/objetivo'); app.append(back);
   // Two front doors, one matcher (docs/09 item 4): a real posting, or just the
   // role/skill the person wants. Same honesty either way.
   const box=$(`<div style="margin-top:14px;display:flex;flex-direction:column;gap:15px">
@@ -1887,7 +1293,7 @@ let CV_PASS=70;
 const _cvCourses={};
 
 async function viewCv(){
-  const data=await api('/cv'); if(data.__unauth)return renderLogin();
+  const data=await api('/cv'); if(data.__unauth)return toLogin();
   if(data.exists)renderCvResult(data); else renderCvBox();
 }
 
@@ -2065,7 +1471,7 @@ function cvClaimCard(c){
 
 /* ---------- Mi objetivo: the route as the learner's spine (docs/09) ---------- */
 async function viewObjetivo(){
-  const jt=await api('/job-target'); if(jt.__unauth)return renderLogin();
+  const jt=await api('/job-target'); if(jt.__unauth)return toLogin();
   app.innerHTML='';
   const back=$(`<div class="back">‹ Hoy</div>`); back.onclick=()=>nav('#/hoy'); app.append(back);
   if(!jt.exists){
@@ -2211,7 +1617,7 @@ function showTabs(){
 async function viewToday(){
   const [d,jt]=await Promise.all([api('/today'),api('/job-target')]);
   STATE.objetivo=jt;   // the continue-card measures the route, not the course
-  if(d.__unauth)return renderLogin();
+  if(d.__unauth)return toLogin();
   app.innerHTML='';
   app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Hola, ${esc(d.name)}</small></div></div>${flameChip(d.streak)}</div>`));
   // The goal is the spine of the experience (docs/09): if there is an active
@@ -2312,7 +1718,7 @@ async function viewToday(){
 
 /* ---------- catalog ---------- */
 async function viewCatalog(){
-  const d=await api('/courses'); if(d.__unauth)return renderLogin();
+  const d=await api('/courses'); if(d.__unauth)return toLogin();
   app.innerHTML='';
   app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Rumbo<small>Tus cursos</small></div></div>${flameChip(d.streak)}</div>`));
   app.append($(`<h2 style="margin-top:6px">Cursos</h2>`));
@@ -2345,7 +1751,7 @@ async function viewCatalog(){
 
 /* ---------- course concierge ---------- */
 async function renderConcierge(){
-  const d=await api('/requests'); if(d.__unauth)return renderLogin();
+  const d=await api('/requests'); if(d.__unauth)return toLogin();
   app.append($(`<div style="margin-top:14px"><div class="eyebrow">¿No está lo que buscas?</div>
     <h2 style="margin-top:8px">Pide tu curso</h2>
     <p class="muted t-sm" style="margin-top:6px">Cuéntanos qué quieres aprender y lo construimos para ti: video, guía y quiz por lección. Te avisamos aquí cuando esté listo.</p></div>`));
@@ -2380,7 +1786,7 @@ async function renderConcierge(){
 
 /* ---------- outline (temario) ---------- */
 async function viewOutline(slug){
-  const d=await api('/course/'+slug); if(d.__unauth)return renderLogin();
+  const d=await api('/course/'+slug); if(d.__unauth)return toLogin();
   STATE.course=slug; app.innerHTML='';
   const back=$(`<div class="back">‹ Cursos</div>`); back.onclick=()=>nav('#/cursos'); app.append(back);
   const pct=d.total?Math.round(d.done/d.total*100):0;
@@ -2490,7 +1896,7 @@ async function renderCaseStudyCard(slug){
   }
 }
 async function viewProjectDoc(slug){
-  const d=await api('/project-doc/'+slug); if(d.__unauth)return renderLogin();
+  const d=await api('/project-doc/'+slug); if(d.__unauth)return toLogin();
   app.innerHTML='';
   const back=$(`<div class="back">‹ Volver</div>`); back.onclick=()=>history.back(); app.append(back);
   app.append($(`<div style="margin-top:4px"><div class="ai-tag"><span class="dot"></span> ${esc(d.doc_type)}</div></div>`));
@@ -2513,7 +1919,7 @@ async function viewProjectDoc(slug){
   app.append(re);
 }
 async function viewCaseStudy(slug){
-  const d=await api('/case-study/'+slug); if(d.__unauth)return renderLogin();
+  const d=await api('/case-study/'+slug); if(d.__unauth)return toLogin();
   app.innerHTML='';
   const back=$(`<div class="back">‹ Volver</div>`); back.onclick=()=>history.back(); app.append(back);
   app.append($(`<div style="margin-top:4px"><div class="ai-tag"><span class="dot"></span> Caso de estudio · metodología STAR</div></div>`));
@@ -2536,7 +1942,7 @@ async function viewCaseStudy(slug){
 
 /* ---------- module capstone (reto) ---------- */
 async function openCapstone(id){
-  const d=await api('/capstone/'+id); if(d.__unauth)return renderLogin();
+  const d=await api('/capstone/'+id); if(d.__unauth)return toLogin();
   if(d.detail){alert(d.detail);return;}
   app.innerHTML='';
   const back=$(`<div class="back">‹ Temario</div>`); back.onclick=()=>nav('#/curso/'+d.course_slug); app.append(back);
@@ -2589,7 +1995,7 @@ async function openCapstone(id){
 
 /* ---------- lesson ---------- */
 async function openLesson(id,step){
-  const l=await api('/lesson/'+id); if(l.__unauth)return renderLogin();
+  const l=await api('/lesson/'+id); if(l.__unauth)return toLogin();
   // is_review comes ONLY from the server (completed = review). Forcing it
   // client-side made completions via prev/next navigation silently not count.
   STATE.lesson=l; STATE.answers={};
@@ -3035,7 +2441,7 @@ async function finish(){
 
 /* ---------- portafolio: the product's endgame, promoted to the nav ---------- */
 async function viewPortfolio(){
-  const pf=await api('/portfolio'); if(pf.__unauth)return renderLogin();
+  const pf=await api('/portfolio'); if(pf.__unauth)return toLogin();
   app.innerHTML='';
   app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Portafolio<small>Tu trabajo, tu evidencia</small></div></div></div>`));
   const items=pf.items||[];
@@ -3089,7 +2495,7 @@ async function viewPortfolio(){
 
 /* ---------- profile ---------- */
 async function viewProfile(){
-  const d=await api('/profile'); if(d.__unauth)return renderLogin();
+  const d=await api('/profile'); if(d.__unauth)return toLogin();
   app.innerHTML='';
   app.append($(`<div class="topbar"><div class="brandrow"><div class="brandmark"></div><div class="brandname">Perfil</div></div>${flameChip(d.streak)}</div>`));
   app.append($(`<div class="card" style="text-align:center;padding:24px">
@@ -3122,8 +2528,12 @@ async function viewProfile(){
     d.courses.forEach(c=>{const pct=Math.round(c.done/c.total*100);
       app.append($(`<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><span style="font-weight:700;font-size:var(--fs-base)">${esc(c.title)}</span><span class="muted t-sm">${c.done}/${c.total}</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>`));});
   }
-  const portada=$(`<button class="btn btn-ghost" style="margin-top:8px">Ver la portada pública</button>`);
-  portada.onclick=()=>nav('#/portada'); app.append(portada);
+  /* A real link to the real page, opened in a new tab. It used to be an in-app
+     re-render of a copy of the landing; there is one landing now and it has an
+     address. `?publica=1` is what stops the server bouncing a signed-in visitor
+     straight back into the app. */
+  app.append($(`<a class="btn btn-ghost" style="margin-top:8px" href="/?publica=1"
+    target="_blank" rel="noopener">Ver la portada pública</a>`));
   const how=$(`<button class="btn btn-ghost" style="margin-top:8px">¿Cómo funciona Rumbo?</button>`);
   how.onclick=()=>nav('#/como-funciona'); app.append(how);
   const out=$(`<button class="btn btn-ghost" style="margin-top:2px">Salir</button>`);

@@ -260,8 +260,16 @@ documents, and scores.
 ### Named Rules
 
 **The Six Sizes Rule.** Six interface sizes exist (11 / 12.5 / 14 / 15.5 / 18 /
-22px) plus three display sizes (26 / 31 / 42px). Adding a seventh is a design
-failure, not a design decision.
+22px) plus four display sizes (26 / 31 / 42 / 56px). Adding a seventh interface
+size is a design failure, not a design decision.
+
+**The rule governs the interface and the app.** The three headline slots on the
+PUBLIC pages — the landing hero, the threshold section, a course temario's title
+— are **fluid**, because they span a 900px phone-adjacent layout to a 1920px
+desktop and any single fixed size is either small at the top end or overbearing
+at the bottom. They are `--fh-hero`, `--fh-section` and `--fh-page`, and their
+bounds live in `tokens.css` with everything else. Three named slots, not a scale:
+a fourth is the same design failure as a seventh interface size.
 
 **The Grotesk/Serif Split.** The interface is grotesk; the work is serif. If a
 piece of text is *about* the product, it is Archivo. If it is *the thing the

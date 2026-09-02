@@ -3,6 +3,24 @@
 *Written for the next coding agent. Everything here was learned by breaking
 something. Read it before your first edit; it will save you a session.*
 
+## Astro swallows the whitespace before an expression
+
+**Rule: never break the line between prose and `{expression}`.** Astro trims
+whitespace at a line boundary next to an interpolation, so
+
+```astro
+  ... y qué le falta — no una nota. La misma
+  {TUTOR} que lee el trabajo ...
+```
+
+renders as **"La mismaVera"**. It compiles, no test catches it, and it is
+invisible in a diff because the source looks correctly spaced. Keep the value on
+the same line as the word it follows, or write `{' '}` explicitly.
+
+Found once, on the landing, by reading a screenshot — which is the only reason
+it was found at all. Svelte does not do this, so the habit does not transfer
+between the two file types in `studio/web/`.
+
 ## The verification ritual (non-negotiable)
 
 Every change follows the same loop. Skipping a step is how the bugs below

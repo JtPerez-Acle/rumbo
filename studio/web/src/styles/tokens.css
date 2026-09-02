@@ -37,6 +37,14 @@
     /* type scale — six sizes, no more */
     --fs-xs:11px; --fs-sm:12.5px; --fs-base:14px; --fs-md:15.5px; --fs-lg:18px; --fs-xl:22px;
     --fd-md:26px; --fd-lg:31px; --fd-num:42px; --fd-streak:56px;
+    /* Editorial display, public pages only, and FLUID on purpose. The fixed
+       ramp above governs the interface and the app; these three headline
+       slots span 900px to 1920px, where any single fixed size is either
+       small at the top end or overbearing at the bottom. Named here so the
+       bounds are values in the token layer rather than literals in a rule. */
+    --fh-hero:clamp(44px,4.6vw,68px);
+    --fh-section:clamp(30px,3.2vw,44px);
+    --fh-page:clamp(32px,3.4vw,46px);
     /* space scale */
     --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
     /* radii */

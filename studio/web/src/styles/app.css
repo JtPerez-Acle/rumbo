@@ -469,7 +469,7 @@
        Fraunces at display scale is the one place the serif is allowed to be
        loud. */
     body.wide .hero{padding:calc(var(--s6)*2) 0 calc(var(--s6)*1.75);row-gap:var(--s5)}
-    body.wide .hero h1{font-size:clamp(44px,4.6vw,68px);line-height:1.02;
+    body.wide .hero h1{font-size:var(--fh-hero);line-height:1.02;
       letter-spacing:-.032em;max-width:none;margin-top:var(--s4)}
     body.wide .hero .lede{font-size:var(--fs-lg);line-height:1.5;
       margin-top:var(--s5);color:var(--dim)}
@@ -497,7 +497,7 @@
     body.wide .doors{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s4)}
 
     body.wide .threshold{padding:calc(var(--s6)*1.75) 0}
-    body.wide .threshold h2{font-size:clamp(30px,3.2vw,44px);line-height:1.08;
+    body.wide .threshold h2{font-size:var(--fh-section);line-height:1.08;
       letter-spacing:-.02em}
   }
 
@@ -525,9 +525,14 @@
   h2.lessontitle{font-size:var(--fs-lg);line-height:1.25;letter-spacing:-.01em}
 
   /* ---- the tutor panel: the product's own voice, shown not described ---- */
+  /* No drop shadow, per DESIGN.md's No-Shadow Rule: the only two shadows in
+     this system are the glows that mean "lit", and depth is tonal. This panel
+     carried the single generic box-shadow in the stylesheet — a -30px spread
+     under a 60px blur, so it barely escaped the element at all. Removed and
+     compared side by side: indistinguishable. The border and the gradient were
+     doing the work, which is what the rule says they should. */
   .tutorpanel{border:1px solid var(--line-strong);border-radius:var(--r-md);
-    background:linear-gradient(180deg,#1B1626,#171320);padding:var(--s5);margin:0;
-    box-shadow:0 24px 60px -30px rgba(0,0,0,.8)}
+    background:linear-gradient(180deg,#1B1626,#171320);padding:var(--s5);margin:0}
   .tutorpanel .microlabel{color:var(--faint)}
   .tp-who{font-size:var(--fs-xs);font-weight:700;letter-spacing:.13em;
     text-transform:uppercase;color:var(--faint)}
@@ -569,7 +574,7 @@
     margin-top:var(--s2)}
   h2.modhead{font-size:var(--fs-md);font-weight:700;font-family:var(--sans)}
   @media(min-width:900px){
-    body.wide .outlinehead h1{font-size:clamp(32px,3.4vw,46px);line-height:1.06;
+    body.wide .outlinehead h1{font-size:var(--fh-page);line-height:1.06;
       letter-spacing:-.025em}
     body.wide .deliverable{max-width:none}
   }
@@ -749,7 +754,7 @@
 .avatar {
   width: 64px;
   height: 64px;
-  border-radius: 99px;
+  border-radius: var(--r-full);
   margin: 0 auto 12px;
   background: linear-gradient(150deg, var(--amber-hi), var(--amber-deep));
   display: flex;

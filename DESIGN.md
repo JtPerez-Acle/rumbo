@@ -340,7 +340,11 @@ Borders are always `1px` and almost always `Line`. State is expressed by tinting
 that border with the state's own colour at 30–55% alpha rather than by thickening
 it, so rows never shift by a pixel when their state changes.
 
-The one deliberate break: the **document mock** on the landing uses a `6px` radius
+Two deliberate breaks. **Inline `code`** uses `5px`: a code span is about 20px
+tall, so the `10px` step rounds it into a pill — and a pill here means a status
+badge, so the shape would say the wrong thing.
+
+The other: the **document mock** on the landing uses a `6px` radius
 and `rotate(-1.6deg)`. Paper is cut square and lies at an angle on a bench; it is
 the only rotated element in the product and the only near-square corner.
 

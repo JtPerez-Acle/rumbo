@@ -115,7 +115,7 @@
 
   /* ---- brand / topbar ---- */
   .brandrow{display:flex;align-items:center;gap:11px}
-  .brandmark{width:32px;height:32px;border-radius:9px;position:relative;flex:none;
+  .brandmark{width:32px;height:32px;border-radius:var(--r-sm);position:relative;flex:none;
     background:linear-gradient(150deg,var(--amber-hi),var(--amber-deep));box-shadow:0 0 22px rgba(240,164,60,.5)}
   .brandmark::after{content:"";position:absolute;inset:9px;border-radius:3px;background:var(--ink)}
   .brandname{font-weight:800;font-size:var(--fs-md);letter-spacing:-.01em}
@@ -266,7 +266,7 @@
     border-radius:var(--r-md);background:var(--panel);margin-bottom:var(--s2)}
   .lrow.done{border-color:rgba(169,196,143,.3)} .lrow.current{border-color:rgba(240,164,60,.5)}
   .lrow.locked,.lrow.coming{opacity:.55} .lrow.clickable{cursor:pointer}
-  .lrow .num{width:28px;height:28px;flex:none;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  .lrow .num{width:28px;height:28px;flex:none;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;
     font-size:var(--fs-sm);font-weight:800;background:var(--ink);border:1px solid var(--line);color:var(--dim)}
   .lrow.done .num{background:var(--sage);color:var(--sage-ink);border-color:var(--sage)}
   .lrow.current .num{background:var(--amber);color:var(--amber-ink);border-color:var(--amber)}
@@ -287,7 +287,7 @@
   .seg button.on{color:var(--amber);border-color:var(--amber);background:rgba(240,164,60,.08)}
   .opt{width:100%;text-align:left;font-size:var(--fs-base);color:var(--text);background:var(--panel);
     border:1px solid var(--line);border-radius:var(--r-md);padding:14px;display:flex;gap:11px;align-items:center;transition:border-color .15s}
-  .opt .key{width:24px;height:24px;flex:none;border-radius:7px;background:var(--ink);border:1px solid var(--line);
+  .opt .key{width:24px;height:24px;flex:none;border-radius:var(--r-sm);background:var(--ink);border:1px solid var(--line);
     display:flex;align-items:center;justify-content:center;font-size:var(--fs-sm);font-weight:800;color:var(--dim)}
   .opt.correct{border-color:var(--sage);background:rgba(169,196,143,.10)} .opt.correct .key{background:var(--sage);color:var(--sage-ink)}
   .opt.wrong{border-color:var(--terra);background:rgba(229,130,94,.09)} .opt.wrong .key{background:var(--terra);color:var(--terra-ink)}
@@ -303,7 +303,7 @@
   .prompt{font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-xs);color:var(--paper);background:var(--ink);
     border:1px solid rgba(241,230,206,.2);border-radius:var(--r-sm);padding:var(--s3);line-height:1.6;white-space:pre-wrap;margin-top:var(--s2)}
   .copybtn{margin-top:9px;display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:700;
-    color:var(--paper);background:rgba(241,230,206,.08);border:1px solid rgba(241,230,206,.25);border-radius:8px;padding:8px 12px}
+    color:var(--paper);background:rgba(241,230,206,.08);border:1px solid rgba(241,230,206,.25);border-radius:var(--r-sm);padding:8px 12px}
 
   /* ---- written guide ---- */
   .written h2{font-family:var(--serif);font-size:var(--fs-lg);margin:var(--s4) 0 var(--s2)}
@@ -313,6 +313,11 @@
   .written table{width:100%;border-collapse:collapse;margin:var(--s3) 0;font-size:var(--fs-sm)}
   .written th,.written td{border:1px solid var(--line);padding:8px 10px;text-align:left}
   .written th{background:var(--raised);color:var(--amber);font-weight:700}
+  /* 5px, and NOT --r-sm: a code span is ~20px tall, so a 10px radius rounds
+     it into a pill — and a pill in this system is a status badge (.pill go,
+     .pill soon). The second sanctioned break from the three-radius rule,
+     alongside the document mock's 6px. Compared side by side before
+     keeping it. */
   .written code{background:var(--raised);padding:2px 5px;border-radius:5px;font-size:var(--fs-sm)}
   .diagram{background:#fff;border-radius:var(--r-md);padding:var(--s4);margin:var(--s3) 0;overflow-x:auto}
   .diagram-title{font-size:var(--fs-sm);font-weight:700;color:var(--amber);margin-bottom:var(--s2)}
@@ -593,13 +598,13 @@
      Rule wants beside its title. On a laptop, four across, the number IS the
      structure, so it becomes the serif numeral and the title drops below it. */
   .stephead{display:flex;align-items:center;gap:10px}
-  .stepnum{width:26px;height:26px;flex:none;border-radius:8px;display:flex;
+  .stepnum{width:26px;height:26px;flex:none;border-radius:var(--r-sm);display:flex;
     align-items:center;justify-content:center;font-size:var(--fs-sm);font-weight:800;
     background:var(--amber);color:var(--amber-ink)}
   @media(min-width:900px){
     body.wide .stephead{display:block}
     body.wide .stepnum{width:auto;height:auto;border-radius:0;background:none;display:block;
-      font-family:var(--serif);font-weight:700;font-size:38px;line-height:1;
+      font-family:var(--serif);font-weight:700;font-size:var(--fd-num);line-height:1;
       color:var(--amber-deep);font-variant-numeric:tabular-nums;margin-bottom:var(--s2)}
     body.wide .steps .card,body.wide .takeaways .card{height:100%}
     /* Four short takeaways read as a block at 1176px, not a list. */
@@ -660,7 +665,7 @@
   .demoq textarea{background:var(--ink);min-height:120px;margin-top:var(--s3)}
   .nextup{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) 0;border-bottom:1px solid var(--line)}
   .nextup:last-child{border-bottom:0}
-  .nextup .nn{flex:none;width:26px;height:26px;border-radius:8px;background:var(--ink);
+  .nextup .nn{flex:none;width:26px;height:26px;border-radius:var(--r-sm);background:var(--ink);
     border:1px solid var(--line);color:var(--amber);display:grid;place-items:center;
     font-size:var(--fs-sm);font-weight:800}
   .hide{display:none!important}

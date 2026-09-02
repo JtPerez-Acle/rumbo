@@ -30,7 +30,7 @@
     /* la lámpara (brand) */
     --amber:#F0A43C; --amber-hi:#FFC670; --amber-deep:#AD7423; --amber-ink:#241603;
     /* el papel (the work) */
-    --paper:#F1E6CE; --paper-dim:#CFC3A8; --paper-ink:#26200F;
+    --paper:#F1E6CE; --paper-hi:#FBF3E1; --paper-dim:#CFC3A8; --paper-ink:#26200F;
     /* semantics (earth, not neon) */
     --sage:#A9C48F; --sage-ink:#1C2A12;
     --terra:#E5825E; --terra-ink:#33170C;
@@ -41,6 +41,10 @@
     --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
     /* radii */
     --r-sm:10px; --r-md:14px; --r-lg:20px;
+    /* Fully round. Not a fourth radius — it is the pill/circle idiom, and it
+       was spelled 999px in seven rules and 99px in two, which is how one
+       intention becomes two values nobody can grep for. */
+    --r-full:999px;
     --sans:"Archivo",-apple-system,"Segoe UI",system-ui,sans-serif;
     --serif:"Fraunces",Georgia,serif;
     --glow-amber:0 12px 34px -12px rgba(240,164,60,.5);

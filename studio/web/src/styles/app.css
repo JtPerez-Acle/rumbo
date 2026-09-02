@@ -81,7 +81,7 @@
   /* ---- buttons ---- */
   button{font-family:inherit;cursor:pointer;border:none;color:inherit;background:none}
   .btn{display:flex;align-items:center;justify-content:center;gap:var(--s2);width:100%;
-    font-weight:700;font-size:var(--fs-md);border-radius:999px;padding:14px 22px;
+    font-weight:700;font-size:var(--fs-md);border-radius:var(--r-full);padding:14px 22px;
     transition:transform .15s var(--ease),box-shadow .2s}
   .btn:active{transform:scale(.98)}
   /* There was no rule for this at all: during a 25-35s evaluation the primary
@@ -92,7 +92,7 @@
   .btn-paper:hover{box-shadow:0 12px 38px -12px rgba(241,230,206,.4)}
   .btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--line)}
   .btn-ghost:hover{border-color:var(--line-strong)}
-  .btn-paper{background:linear-gradient(150deg,#FBF3E1,var(--paper));color:var(--paper-ink);box-shadow:var(--glow-paper)}
+  .btn-paper{background:linear-gradient(150deg,var(--paper-hi),var(--paper));color:var(--paper-ink);box-shadow:var(--glow-paper)}
   .btn-sm{width:auto;font-size:var(--fs-sm);padding:9px 14px;font-weight:700;min-height:44px}
 
   /* ---- surfaces: three tiers ---- */
@@ -119,7 +119,7 @@
     background:linear-gradient(150deg,var(--amber-hi),var(--amber-deep));box-shadow:0 0 22px rgba(240,164,60,.5)}
   .brandmark::after{content:"";position:absolute;inset:9px;border-radius:3px;background:var(--ink)}
   .brandname{font-weight:800;font-size:var(--fs-md);letter-spacing:-.01em}
-  .brandname small{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .brandname small{display:block;font-size:var(--fs-xs);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
   .topbar{display:flex;justify-content:space-between;align-items:center}
   .back{color:var(--dim);font-size:var(--fs-sm);cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-weight:600;
     min-height:44px;margin-left:-2px}
@@ -127,18 +127,18 @@
 
   /* ---- streak flame: ember → lit → roaring ---- */
   .flame{display:flex;align-items:center;gap:6px;font-weight:800;font-size:var(--fs-base);
-    padding:6px 12px;border-radius:999px;font-variant-numeric:tabular-nums;border:1px solid var(--line);color:var(--faint);background:var(--panel)}
+    padding:6px 12px;border-radius:var(--r-full);font-variant-numeric:tabular-nums;border:1px solid var(--line);color:var(--faint);background:var(--panel)}
   .flame.lit{color:var(--amber);border-color:rgba(240,164,60,.35);background:rgba(240,164,60,.10)}
   .flame.hot{color:var(--amber-hi);border-color:rgba(240,164,60,.55);background:rgba(240,164,60,.14);box-shadow:0 0 18px -4px rgba(240,164,60,.55)}
 
   /* ---- progress ---- */
-  .prog{height:7px;border-radius:99px;background:var(--raised);overflow:hidden;border:1px solid var(--line)}
+  .prog{height:7px;border-radius:var(--r-full);background:var(--raised);overflow:hidden;border:1px solid var(--line)}
   /* Revealed with clip-path, not width. Animating width relayouts the page on
      every frame and these bars sit inside cards in a scrolling column; scaleX
      avoids that but squashes the 99px end caps into ellipses at any fill under
      100%. clip-path does neither: the element keeps its geometry and only the
      visible region moves. */
-  .prog>i{display:block;height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,var(--amber-deep),var(--amber-hi));
+  .prog>i{display:block;height:100%;width:100%;border-radius:var(--r-full);background:linear-gradient(90deg,var(--amber-deep),var(--amber-hi));
     transition:clip-path .8s var(--ease)}
 
   .row{display:flex;align-items:center;gap:10px}
@@ -171,7 +171,7 @@
   .course-card .meta{display:flex;justify-content:space-between;align-items:center;margin-top:var(--s3);font-size:var(--fs-sm);color:var(--faint)}
 
   /* ---- pills ---- */
-  .pill{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+  .pill{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:var(--r-full)}
   .pill.soon{background:var(--raised);color:var(--faint);border:1px solid var(--line)}
   .pill.go{background:rgba(240,164,60,.16);color:var(--amber)}
   .pill.st-new{background:var(--raised);color:var(--dim);border:1px solid var(--line)}
@@ -198,7 +198,7 @@
   .verdict{font-family:var(--serif);font-weight:600;font-size:var(--fs-xl);line-height:1;letter-spacing:-.01em;flex:none}
   .verdict.lo_tienes{color:var(--sage)} .verdict.casi{color:var(--amber-hi)} .verdict.todavia_no{color:var(--terra)}
   .vchip{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;
-    padding:4px 10px;border-radius:999px;flex:none}
+    padding:4px 10px;border-radius:var(--r-full);flex:none}
   .vchip.lo_tienes{background:rgba(169,196,143,.16);color:var(--sage);border:1px solid rgba(169,196,143,.4)}
   .vchip.casi{background:rgba(240,164,60,.15);color:var(--amber);border:1px solid rgba(240,164,60,.4)}
   .vchip.todavia_no{background:rgba(229,130,94,.14);color:var(--terra);border:1px solid rgba(229,130,94,.35)}
@@ -213,8 +213,8 @@
   .dimrow .prog{flex:1;height:5px}
   /* la tutora está leyendo: anticipation, not a dead button */
   .reading{display:flex;flex-direction:column;gap:var(--s3)}
-  .readline{height:3px;border-radius:99px;background:var(--raised);overflow:hidden}
-  .readline i{display:block;height:100%;width:40%;border-radius:99px;
+  .readline{height:3px;border-radius:var(--r-full);background:var(--raised);overflow:hidden}
+  .readline i{display:block;height:100%;width:40%;border-radius:var(--r-full);
     background:linear-gradient(90deg,transparent,var(--amber),transparent);animation:sweep 1.4s var(--ease) infinite}
   @keyframes sweep{from{transform:translateX(-100%)}to{transform:translateX(350%)}}
 
@@ -226,7 +226,7 @@
     border-bottom:1px solid var(--line);opacity:.4;transition:opacity var(--dur) var(--ease)}
   .jstage:last-child{border-bottom:0}
   .jstage.done,.jstage.now{opacity:1}
-  .jdot{flex:none;width:18px;height:18px;border-radius:99px;border:1.7px solid var(--line-strong);
+  .jdot{flex:none;width:18px;height:18px;border-radius:var(--r-full);border:1.7px solid var(--line-strong);
     margin-top:2px;display:grid;place-items:center;color:transparent}
   .jstage.done .jdot{border-color:var(--sage);color:var(--sage)}
   .jstage.now .jdot{border-color:var(--amber);box-shadow:0 0 0 4px rgba(240,164,60,.13)}
@@ -238,8 +238,8 @@
   .jclock{font-variant-numeric:tabular-nums;color:var(--faint);font-size:var(--fs-sm)}
   .jslow{margin-top:var(--s3)}
   /* coverage read-out on the result */
-  .covbar{height:8px;border-radius:99px;background:var(--raised);overflow:hidden;margin-top:var(--s2)}
-  .covbar i{display:block;height:100%;width:100%;border-radius:99px;background:var(--amber);
+  .covbar{height:8px;border-radius:var(--r-full);background:var(--raised);overflow:hidden;margin-top:var(--s2)}
+  .covbar i{display:block;height:100%;width:100%;border-radius:var(--r-full);background:var(--amber);
     transition:clip-path .9s var(--ease)}
   .gaprow{display:flex;gap:var(--s2);align-items:flex-start;padding:var(--s2) 0;
     font-size:var(--fs-sm);color:var(--dim)}
@@ -283,7 +283,7 @@
   .navbtns button:disabled{opacity:.35}
   .seg{display:flex;gap:var(--s2)}
   .seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:var(--fs-sm);font-weight:700;
-    padding:11px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--dim);transition:all .2s}
+    padding:11px;border-radius:var(--r-full);background:var(--panel);border:1px solid var(--line);color:var(--dim);transition:all .2s}
   .seg button.on{color:var(--amber);border-color:var(--amber);background:rgba(240,164,60,.08)}
   .opt{width:100%;text-align:left;font-size:var(--fs-base);color:var(--text);background:var(--panel);
     border:1px solid var(--line);border-radius:var(--r-md);padding:14px;display:flex;gap:11px;align-items:center;transition:border-color .15s}
@@ -298,9 +298,9 @@
   /* ---- taller tag (was ai-tag): the workshop label, paper-toned ---- */
   .ai-tag{display:inline-flex;align-items:center;gap:7px;font-size:var(--fs-xs);font-weight:800;
     letter-spacing:.1em;text-transform:uppercase;color:var(--paper)}
-  .ai-tag .dot{width:6px;height:6px;border-radius:99px;background:var(--paper);box-shadow:0 0 8px rgba(241,230,206,.8)}
+  .ai-tag .dot{width:6px;height:6px;border-radius:var(--r-full);background:var(--paper);box-shadow:0 0 8px rgba(241,230,206,.8)}
   .ai-card{border-color:rgba(241,230,206,.28)}
-  .prompt{font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-xs);color:#E8DFC8;background:var(--ink);
+  .prompt{font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-xs);color:var(--paper);background:var(--ink);
     border:1px solid rgba(241,230,206,.2);border-radius:var(--r-sm);padding:var(--s3);line-height:1.6;white-space:pre-wrap;margin-top:var(--s2)}
   .copybtn{margin-top:9px;display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:700;
     color:var(--paper);background:rgba(241,230,206,.08);border:1px solid rgba(241,230,206,.25);border-radius:8px;padding:8px 12px}
@@ -319,7 +319,7 @@
 
   /* ---- celebration ---- */
   .celebrate{text-align:center;display:flex;flex-direction:column;align-items:center;gap:var(--s2);padding-top:var(--s5)}
-  .medal{width:92px;height:92px;border-radius:99px;display:flex;align-items:center;justify-content:center;
+  .medal{width:92px;height:92px;border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;
     background:radial-gradient(circle at 35% 30%,var(--amber-hi),var(--amber-deep));
     box-shadow:0 0 54px rgba(240,164,60,.55);color:var(--amber-ink);animation:pop .55s cubic-bezier(.22,1,.36,1)}
   .medal .ic{width:40px;height:40px;stroke-width:2}
@@ -531,7 +531,7 @@
     color:var(--dim);margin-top:var(--s2)}
   .tp-verdict{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s5)}
   .tp-badge{font-size:var(--fs-xs);font-weight:800;letter-spacing:.1em;text-transform:uppercase;
-    background:var(--amber);color:var(--amber-ink);padding:4px 10px;border-radius:999px}
+    background:var(--amber);color:var(--amber-ink);padding:4px 10px;border-radius:var(--r-full)}
   .tp-fb{font-size:var(--fs-base);line-height:1.55;color:var(--text);margin-top:var(--s3)}
   .tp-gaps{margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid var(--line)}
   .tp-gap{display:flex;gap:var(--s2);align-items:flex-start;margin-top:var(--s2);
@@ -572,7 +572,7 @@
   /* ---- founder note ---- */
   .founder{display:flex;gap:var(--s4);align-items:flex-start;margin-top:var(--s5);
     padding-top:var(--s5);border-top:1px solid var(--line)}
-  .founder-face{width:52px;height:52px;flex:none;border-radius:999px;overflow:hidden;
+  .founder-face{width:52px;height:52px;flex:none;border-radius:var(--r-full);overflow:hidden;
     background:var(--raised);border:1px solid var(--line-strong);
     display:flex;align-items:center;justify-content:center;color:var(--faint)}
   .founder-face img{width:100%;height:100%;object-fit:cover;display:block}
@@ -636,7 +636,7 @@
   .videoplate::after{content:"";position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(to top,rgba(16,13,23,.82),rgba(16,13,23,.05) 42%)}
   .playbtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
-    width:66px;height:66px;border-radius:99px;display:grid;place-items:center;
+    width:66px;height:66px;border-radius:var(--r-full);display:grid;place-items:center;
     background:linear-gradient(140deg,var(--amber-hi),var(--amber));color:var(--amber-ink);
     box-shadow:var(--glow-amber);transition:transform .2s var(--ease)}
   .playbtn .ic{width:26px;height:26px;stroke-width:2;margin-left:3px}

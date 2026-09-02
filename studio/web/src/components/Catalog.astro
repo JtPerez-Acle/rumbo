@@ -1,0 +1,29 @@
+---
+/* The catalog, grouped by area.
+ *
+ * <details>/<summary> rather than a div with a click handler. It expands with
+ * no JavaScript at all, it is keyboard-operable and announced as a disclosure
+ * for free, and browser find-in-page opens a closed section to reveal a match —
+ * none of which the SPA's version did. The classes are the same, so it looks
+ * identical; `.cluster` gets `open` from the element's own state via CSS.
+ */
+import CourseCard from './CourseCard.astro';
+import Icon from './Icon.astro';
+import { clusterize, CAT_ICON } from '../lib/icons.js';
+
+const { courses, openFirstOnly = false } = Astro.props;
+const clusters = clusterize(courses);
+---
+{clusters.map(([category, items], i) => (
+  <details class="cluster-wrap u-wide" open={openFirstOnly ? i === 0 : true}>
+    <summary class="cluster">
+      <Icon name={CAT_ICON[category] || 'book'} />
+      <h2 class="ct">{category}</h2>
+      <span class="cn">{items.length} {items.length === 1 ? 'CURSO' : 'CURSOS'}</span>
+      <span class="chev"><Icon name="arrow" class="ic ic-s" /></span>
+    </summary>
+    <div class="cluster-body">
+      {items.map((c) => <CourseCard course={c} />)}
+    </div>
+  </details>
+))}

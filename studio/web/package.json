@@ -1,0 +1,26 @@
+{
+  "name": "rumbo-web",
+  "private": true,
+  "type": "module",
+  "description": "Rumbo's frontend. Currently: the test suite that guards the vanilla frontends during the Astro migration. Later: the Astro app itself.",
+  "scripts": {
+    "test": "astro build && vitest run",
+    "test:watch": "vitest",
+    "build": "astro build",
+    "dev": "astro dev",
+    "preview": "astro preview"
+  },
+  "devDependencies": {
+    "@astrojs/svelte": "^9.0.1",
+    "@sveltejs/vite-plugin-svelte": "^7.3.0",
+    "@testing-library/svelte": "^5.4.2",
+    "astro": "^7.2.10",
+    "dompurify": "^3.4.14",
+    "jsdom": "^30.0.1",
+    "markdown-it": "^15.0.1",
+    "marked": "^18.0.11",
+    "mermaid": "^11.17.2",
+    "svelte": "^5.57.0",
+    "vitest": "^4.1.11"
+  }
+}

@@ -1,0 +1,190 @@
+/* The landing, as it actually ships.
+ *
+ * These assertions were written against the SPA's renderDemoLesson() and moved
+ * here when the landing became a built page. They test the same promises — the
+ * lesson is content and not a description of content, the question is really
+ * askable, and the page claims no testimonial, no customer count and no price,
+ * because PRODUCT.md records that none of those exist.
+ *
+ * What changed is the subject, and it changed for the better: this reads
+ * dist/index.html, the bytes a visitor is served. The old suite ran the SPA's
+ * render function inside a DOM shim and could pass while the served page was
+ * eleven characters of "Cargando…" — which is exactly what it once was.
+ *
+ * The build has to have run. `npm test` runs it; a bare `vitest run` after
+ * editing a page will test the previous build, so the first assertion checks
+ * the file is not stale in the only way a file can prove that.
+ */
+import { describe, it, expect, beforeAll } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
+import { REPO } from './harness.js';
+
+const DIST = path.join(REPO, 'studio/web/dist');
+const demo = JSON.parse(
+  fs.readFileSync(path.join(REPO, 'studio/web/src/data/demo.json'), 'utf8'),
+);
+
+/** Markup with <script>, <style> and island props removed.
+ *
+ * The props strip is not cosmetic. Astro serializes an island's props into an
+ * `<astro-island props="...">` attribute, so a needle can be found in a page
+ * that never renders it — which is exactly what happened here: the key-points
+ * assertion passed with the key points deleted, because the same words were
+ * sitting unread inside that attribute. This is the RENDERED page. */
+const noScripts = (html) =>
+  html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/props="[^"]*"/gi, ' ');
+
+describe('the landing', () => {
+  let html, text;
+
+  beforeAll(() => {
+    const file = path.join(DIST, 'index.html');
+    if (!fs.existsSync(file)) {
+      throw new Error(
+        'dist/index.html is missing — run `npm run build` first. ' +
+        '`npm test` does it for you.',
+      );
+    }
+    html = fs.readFileSync(file, 'utf8');
+    text = noScripts(html);
+  });
+
+  it('is a real page, not a shell', () => {
+    // The guard the old suite could not have: every public page used to serve
+    // exactly eleven characters of body text to anything that does not run JS.
+    expect(text.length).toBeGreaterThan(8000);
+    expect(text).not.toContain('Cargando…');
+  });
+
+  describe('the lesson is content, not a description of content', () => {
+    it('renders the real title', () => expect(text).toContain(demo.title));
+    it('names the course as provenance', () => expect(text).toContain('Marketing con IA'));
+    it('renders the key points', () => expect(text).toContain('metodología SMART'));
+    it('renders the written guide itself', () =>
+      // Not a link to it, not a promise of it: the guide's own prose.
+      expect(text).toContain('Elige un proyecto que te importe'));
+  });
+
+  describe('the video costs nothing until it is asked for', () => {
+    it('shows a play affordance, not a bare <video>', () => {
+      expect(text).toMatch(/class="[^"]*videoplate/);
+      expect(text).not.toMatch(/<video[^>]*src=/);
+    });
+    it('uses a real frame from the lesson as the poster', () => expect(text).toMatch(/demo-poster/));
+    it('does not preload the video', () => expect(text).not.toMatch(/preload="(auto|metadata)"/));
+    it('can expand the guide', () => expect(text).toMatch(/Seguir leyendo/));
+  });
+
+  describe('the question is the argument', () => {
+    it('asks the real explain prompt', () => expect(text).toContain(demo.explain_prompt));
+    it('gives them somewhere to answer', () => expect(text).toMatch(/<textarea[^>]*id="dq"/));
+    it('labels the textarea by the question', () => expect(text).toMatch(/aria-labelledby="dqq"/));
+    it('has the honeypot', () =>
+      expect(text).toMatch(/aria-hidden="true"[^>]*left:-9999px|left:-9999px[^>]*aria-hidden/));
+    it('promises a verdict, never a score', () => expect(text).toMatch(/No hay nota/));
+    it('discloses storage honestly', () => expect(text).toMatch(/Guardamos lo que escribes/));
+  });
+
+  describe('reachability', () => {
+    // The finish review caught a page that offered NOTHING until a verdict
+    // rendered. What this guards is that a visitor always has a way forward.
+    // The doors are one primary plus a text link on purpose: three equal
+    // choices at the decision point is no hierarchy at all.
+    it('leads with the goal engine', () => expect(text).toMatch(/Dinos qué quieres ser/));
+    it('offers a second way out', () => expect(text).toMatch(/o pide tu acceso/));
+    it('every door is a real link a crawler can follow', () => {
+      expect(text).toMatch(/href="\/oferta"/);
+      expect(text).toMatch(/href="\/lista"/);
+      expect(text).toMatch(/href="\/cursos"/);
+      expect(text).toMatch(/href="\/login"/);
+    });
+    it('has no anchor without a destination', () => {
+      // Five of six anchors on this page once had no href: they were divs with
+      // click handlers, so they were neither focusable nor crawlable.
+      const anchors = text.match(/<a\b[^>]*>/g) || [];
+      expect(anchors.length).toBeGreaterThan(5);
+      expect(anchors.filter((a) => !/href=/.test(a))).toEqual([]);
+    });
+  });
+
+  describe('the document outline is not a course catalog', () => {
+    // The homepage had 1 h1, 1 h2 and SEVENTEEN h3s, fourteen of them course
+    // names — so its outline literally read as a marketplace, whatever the copy
+    // said. The library is one sentence and a quiet link now, after the
+    // decision rather than before it.
+    it('has exactly one h1', () =>
+      expect((text.match(/<h1\b/g) || []).length).toBe(1));
+    it('does not list the catalog in headings', () =>
+      expect((text.match(/<h3\b/g) || []).length).toBeLessThan(4));
+  });
+
+  describe('honesty — PRODUCT.md records that none of these exist', () => {
+    it('fabricates no learner document', () =>
+      expect(text).not.toMatch(/documento real de una alumna/i));
+    it('invents no testimonial or customer count', () =>
+      expect(text).not.toMatch(
+        /(testimonio|alumnas? satisfech|\d+\s*(alumnos|estudiantes|usuarios)\b)/i));
+    it('invents no pricing', () =>
+      expect(text).not.toMatch(/(\$\s?\d+\s*\/\s*mes|precio|suscripción)/i));
+    it('labels the sample document as an example', () =>
+      // The only existing portfolio document belongs to a seeded account.
+      expect(text).not.toMatch(/documento de (una|un) (alumna|alumno) real/i));
+  });
+
+  describe('regression guards', () => {
+    it('leaks no undefined', () => expect(text).not.toMatch(/\bundefined\b/));
+    it('leaks no [object Object]', () => expect(text).not.toContain('[object Object]'));
+    it('renders no unresolved template literal', () => expect(text).not.toMatch(/\$\{/));
+  });
+});
+
+describe('the built public site', () => {
+  const page = (route) => {
+    const file = path.join(DIST, route, 'index.html');
+    return fs.existsSync(file) ? noScripts(fs.readFileSync(file, 'utf8')) : null;
+  };
+
+  it('builds every public route', () => {
+    for (const route of ['cursos', 'oferta', 'lista', 'login']) {
+      expect(page(route), `${route} did not build`).toBeTruthy();
+    }
+  });
+
+  it('builds one page per course in the export', () => {
+    const catalog = JSON.parse(
+      fs.readFileSync(path.join(REPO, 'studio/web/src/data/catalog.json'), 'utf8'),
+    );
+    const built = fs.readdirSync(path.join(DIST, 'curso'));
+    expect(built.sort()).toEqual(catalog.courses.map((c) => c.slug).sort());
+  });
+
+  it('ships the catalog as links, with no JavaScript at all', () => {
+    const cursos = page('cursos');
+    expect((cursos.match(/href="\/curso\//g) || []).length).toBeGreaterThanOrEqual(14);
+    const raw = fs.readFileSync(path.join(DIST, 'cursos/index.html'), 'utf8');
+    expect(raw).not.toMatch(/<script/);
+  });
+
+  it('argues the deliverable before the lesson count on a temario', () => {
+    const meta = page('curso/curso-meta-ads');
+    expect(meta).toContain('Plan de campaña');
+    expect(meta.indexOf('Terminas con')).toBeLessThan(meta.indexOf('Módulo 1'));
+  });
+
+  it('says on /oferta what it will not teach', () => {
+    // The gap report is the one claim a competitor cannot truthfully copy, and
+    // it existed only in the server-rendered copy of this page before.
+    expect(page('oferta')).toMatch(/no enseñamos|no lo cubre/);
+  });
+
+  it('loads no third-party script on any public page', () => {
+    for (const route of ['', 'cursos', 'oferta', 'lista', 'login']) {
+      const file = path.join(DIST, route, 'index.html');
+      expect(fs.readFileSync(file, 'utf8'), route).not.toContain('cdn.jsdelivr.net');
+    }
+  });
+});

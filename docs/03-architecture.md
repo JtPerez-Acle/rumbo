@@ -54,7 +54,7 @@ studio/
     app.py                  ← FastAPI app, token gate, admin API, page routes
     learn_routes.py         ← the entire learner API (/api/learn/*)
     static/index.html       ← admin dashboard (single file, vanilla JS)
-    static/learn.html       ← learner app (single file, vanilla JS SPA + design tokens)
+    static/index.html       ← operator dashboard (the last vanilla page)
     static/doc.html         ← public project-document page (paper, print-ready)
     static/caso.html        ← public case-study page (paper)
   generate_batch.py         ← queue/pending/*.json → MoneyPrinterTurbo → output/
@@ -198,29 +198,66 @@ JS. `/aprende/doc/{token}` serves **both** per-course and goal documents
 
 ## Frontend
 
-Both UIs are **single vanilla-JS files, no build step**.
+**The frontend is built** (Astro + Svelte, `studio/web/`), compiled in Docker
+stage 1 and served by FastAPI. Node exists at build time only; production is the
+same single Python process it always was.
 
-`learn.html` is the learner SPA: a **CSS token layer** (`:root` — colors, a
-six-step type scale, spacing, radii, motion) plus component classes, an inline
-**SVG icon set** (`PATHS` + `I()`), and a **hash router**
-(`#/hoy`, `#/cursos`, `#/curso/{slug}`, `#/leccion/{id}[/{explica|quiz|ejercicio}]`,
-`#/reto/{id}`, `#/objetivo`, `#/portafolio`, `#/documento/{slug}`,
-`#/caso-view/{slug}`, `#/perfil`, plus public `#/`, `#/explora/{slug}`,
-`#/lista`, `#/login`). **`#/oferta` is routed in BOTH branches** — a logged-in
-learner who finds a new offer must be able to analyse it; it lived only in the
-public branch at first, which made the "Pega tu oferta" button inside
-`#/objetivo` a dead end. Visual changes belong in the token block, never in
-element styles.
+The cause was a bug, not a preference. The public URLs used to be the learner SPA
+with a hand-written body injected into it, and the served document and the
+hydrated one were never the same markup — a visitor watched one page become a
+different page. Four fixes attacked the transition. The transition was not the
+problem; there being two documents was. See PRODUCT.md for the decision and its
+cost.
 
-There is no bundler and no test runner. Two Node checks stand in, run against
-the extracted script block: `check_job_render.js` (the analysis result page,
-25 assertions) and `check_how_section.js` (the landing's promises, 13). Both are
-DOM-shim based — the browser pane wedges often enough that `docs/07` names this
-as the fallback.
+**Two surfaces, two shapes, and the difference is deliberate:**
+
+- **The public site is static HTML.** `/`, `/cursos`, `/curso/<slug>`, `/oferta`,
+  `/lista`, `/login` are files, generated from `src/data/*.json` (written by
+  `export_web.py`). `/cursos` and the fourteen temarios ship **zero JavaScript**;
+  the landing ships ~51KB for the one part that has to be alive, the question and
+  the verdict. A learner holding a session is redirected into the app rather than
+  shown these, so no public page ever has to discover auth state after load —
+  which is what made the header flicker in the first place.
+- **The app is a client-only island.** `/aprende` is `<App client:only="svelte">`:
+  every screen is per-learner, the app is behind a session, and robots.txt
+  excludes it. There is nothing honest to prerender, so it does not pretend to.
+
+`App.svelte` owns the session and the route; each view is a component that
+fetches its own data. **Still a hash router** (`#/hoy`, `#/cursos`,
+`#/curso/{slug}`, `#/leccion/{id}[/{explica|quiz|ejercicio}]`, `#/reto/{id}`,
+`#/objetivo`, `#/cv`, `#/oferta`, `#/portafolio`, `#/documento/{slug}`,
+`#/caso-view/{slug}`, `#/perfil`) — real paths would buy crawlability and
+per-route rendering, neither of which applies to a session-gated app, and would
+cost every deep link already sitting in a learner's inbox.
 
 The lesson **step deep-links exist for a reason**: a pending conversation shown
 on Hoy must land exactly on the step where it can be answered. Without them,
 completed lessons skipped the explain step and the conversation was unreachable.
+
+**Values live in `src/styles/tokens.css`** and nowhere else; `app.css` is the
+component layer and consumes them.
+
+### The tests
+
+`cd studio/web && npm test` — **128 assertions**, and it builds first so the
+suite always reads current output. Three kinds:
+
+- **The built pages** (`landing.test.js`) — reads `dist/*/index.html`, the bytes
+  a visitor is served. It strips `<astro-island props="…">` before asserting: an
+  island's props are serialized into the markup, so a needle can otherwise be
+  found in a page that never renders it. Not hypothetical — the key-points
+  assertion passed with the key points deleted until this was fixed.
+- **Components under jsdom** (`demo-verdict`, `job-render`, `cv-render`,
+  `how-section`) — real renders, real clicks, stubbed `fetch`. They must never
+  reach the real evaluator: that costs money, spends the visitor rate limit, and
+  writes a row into `demo_attempts`, which exists to record what strangers write.
+- **The public-surface audit** (`check_public_surface.py`) — HTTP plus the build
+  output, including that `learn.html` has not come back and that no CDN script
+  origin has.
+
+Every suite was verified to FAIL on a real regression before being trusted. That
+is not ceremony: the shim these replaced could pass while the page a visitor
+received was eleven characters of "Cargando…", and it did.
 
 ## Request flows worth knowing
 
@@ -293,7 +330,8 @@ exposed directly, `_client_ip` becomes attacker-controlled.
 | **`rubric_version` on every evaluation** | Comparing scores across rubric versions made the tutor contradict itself in front of a learner |
 | **Best attempt always wins** (submissions, quiz scores, conversation bonus) | Retrying must never be a gamble, or "try again" is dishonest |
 | **Videos canonical per lesson; personalization in the path** | Marginal cost per learner ≈ 0 |
-| **Single-file vanilla-JS frontends + CSS token layer** | No build step, no framework drift; a visual change is one token edit |
+| **Astro + Svelte islands, static output, built in Docker stage 1** | Replaces hand-written prerendering, whose served and hydrated documents could never be made identical; Node stays out of production |
+| **Tokens in one real stylesheet** (`studio/web/src/styles/tokens.css`) | A visual change is still one token edit — now by construction rather than by convention |
 | **Evaluations formative; gates on engagement, not passing** | Completion is the metric that kills edutainment products |
 | **Reward appropriation, don't police AI** | AI detection is unreliable and contradicts a curriculum that teaches AI use |
 | **Verification = counting rows, not exit codes** | A pipeline once reported success while producing zero lessons |

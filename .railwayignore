@@ -1,10 +1,17 @@
-MoneyPrinterTurbo/.venv
-MoneyPrinterTurbo/.git
-MoneyPrinterTurbo/storage
-MoneyPrinterTurbo/config.toml
-MoneyPrinterTurbo/docs
-MoneyPrinterTurbo/test
+# The upstream render engine. The image NEVER copies it — the Dockerfile makes
+# an empty /app/MoneyPrinterTurbo for entrypoint.py's config.toml and takes the
+# dependency list from the tracked requirements.txt at the repo root. Railway
+# already skips the clone because `railway up` honours .gitignore; docker build
+# honours THIS file instead, so without the line below a local build ships ~700MB
+# to the daemon and throws all of it away.
+MoneyPrinterTurbo/
 studio/output
 studio/queue/done
 .claude
 **/__pycache__
+
+# The frontend workspace: source is copied into the Node build stage, but
+# node_modules and dist are produced there and must never ship from the host.
+studio/web/node_modules
+studio/web/dist
+studio/web/.astro

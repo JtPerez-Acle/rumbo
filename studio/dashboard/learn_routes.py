@@ -378,7 +378,7 @@ def enter(token: str, request: Request):
         learner_id = db.consume_login_token(conn, token)
         if not learner_id:
             conn.commit()
-            return RedirectResponse("/aprende?error=enlace_invalido", status_code=303)
+            return RedirectResponse("/login?error=enlace_invalido", status_code=303)
         session = secrets.token_urlsafe(32)
         db.create_session(conn, learner_id, session)
         # They are back in, so they are no longer waiting. Self-clearing beats a

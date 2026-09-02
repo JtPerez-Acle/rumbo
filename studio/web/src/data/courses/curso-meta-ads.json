@@ -1,0 +1,194 @@
+{
+  "description": "De cero a campañas rentables en Facebook e Instagram: píxel, públicos, creatividades y escalado",
+  "doc_type": "Plan de campaña en Meta Ads",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Crear correctamente una cuenta publicitaria, configurar roles y añadir método de pago.",
+          "position": 1,
+          "title": "Tu cuenta publicitaria y Business Manager"
+        },
+        {
+          "objectives": "Instalar el píxel en tu sitio web y configurar eventos de conversión clave (ViewContent, AddToCart, Purchase).",
+          "position": 2,
+          "title": "Instalar el píxel con eventos estándar"
+        },
+        {
+          "objectives": "Activar el setup en un clic de CAPI desde Events Manager y verificar el envío de eventos.",
+          "position": 3,
+          "title": "Reforzar la señal con la API de conversiones"
+        },
+        {
+          "objectives": "Revisar el puntaje EMQ, identificar parámetros faltantes y alcanzar al menos 7,0 en eventos de compra.",
+          "position": 4,
+          "title": "Diagnóstico de calidad de evento"
+        },
+        {
+          "objectives": "Verificar la activación del Pixel asistido por IA y establecer una línea base de calidad antes/después.",
+          "position": 5,
+          "title": "Pixel asistido por IA y estado del admin"
+        },
+        {
+          "objectives": "Crear una campaña de tráfico mínima, publicarla y revisar que los eventos lleguen sin duplicados a Events Manager.",
+          "position": 6,
+          "title": "Primer test de datos: campaña de tráfico"
+        }
+      ],
+      "module_description": "Montarás una cuenta publicitaria completamente funcional con tu píxel y API de conversiones, logrando que tus eventos de compra alcancen un EMQ de al menos 7.0. Sin dolores de cabeza técnicos, solo una base sólida.",
+      "module_no": 1,
+      "module_title": "Montar la base técnica"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Explicar por qué la segmentación detallada es solo una sugerencia y cómo el sistema expande automáticamente.",
+          "position": 7,
+          "title": "Cómo segmenta Meta en 2026: señales, no restricciones"
+        },
+        {
+          "objectives": "Subir una lista de clientes, crear un público de visitantes del sitio y uno de interacción.",
+          "position": 8,
+          "title": "Crea públicos personalizados con tus datos"
+        },
+        {
+          "objectives": "Crear un público similar del 1% basado en compradores y entender por qué no debe restringirse.",
+          "position": 9,
+          "title": "Públicos similares (lookalike): cuándo y cómo"
+        },
+        {
+          "objectives": "Configurar exclusiones de compradores recientes y entender cuándo aplican las categorías de crédito o empleo.",
+          "position": 10,
+          "title": "Exclusiones y categorías especiales"
+        },
+        {
+          "objectives": "Configurar Advantage+ Audience en un nuevo conjunto de anuncios y comparar su rendimiento inicial con segmentación detallada.",
+          "position": 11,
+          "title": "Advantage+ Audience: el público automático"
+        },
+        {
+          "objectives": "Cuantificar eventos perdidos por navegador y verificar que el EMQ de tu evento de compra alcanza al menos 8,5 con parámetros completos.",
+          "position": 12,
+          "title": "Audita tu pérdida de señal"
+        }
+      ],
+      "module_description": "Sabrás por qué el algoritmo ignora tus restricciones y cómo crear públicos que realmente funcionan, con lookalikes del 1% basados en compradores que sí escalan.",
+      "module_no": 2,
+      "module_title": "Entender las señales y los públicos"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Explicar cómo Andromeda evalúa primero el anuncio antes que el público y por qué cambiar solo el CTA no funciona.",
+          "position": 13,
+          "title": "El creativo es tu nuevo targeting"
+        },
+        {
+          "objectives": "Identificar qué formato usar según tu objetivo: Reels para alcance, estáticos para catálogo, carrusel para productos múltiples.",
+          "position": 14,
+          "title": "Formatos que funcionan en Meta"
+        },
+        {
+          "objectives": "Escribir y grabar tres variantes de gancho para un mismo producto, diferenciando el problema que resuelves.",
+          "position": 15,
+          "title": "El gancho de 3 segundos"
+        },
+        {
+          "objectives": "Redactar título, texto principal y CTA para un anuncio, usando el marco PAS (problema-agitación-solución) en formato nativo.",
+          "position": 16,
+          "title": "Copywriting que vende en Meta"
+        },
+        {
+          "objectives": "Arma un plan de 5 ángulos creativos distintos para tu campaña (problema, objeción, testimonio, comparación, oferta).",
+          "position": 17,
+          "title": "Estructura de ángulos creativos"
+        },
+        {
+          "objectives": "Configurar un flujo de revisión manual para cualquier asset generado con IA antes de subirlo a Ads Manager.",
+          "position": 18,
+          "title": "Riesgos del creativo automático y cómo gobernarlos"
+        }
+      ],
+      "module_description": "Crearás anuncios que paran el scroll con ganchos de 3 segundos y copys que venden, usando ángulos que convierten sin que el creativo automático te sabotee.",
+      "module_no": 3,
+      "module_title": "Creatividades que conectan y convierten"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Seleccionar entre ventas, clientes potenciales o interacción según lo que necesitas medir, y configurar la optimización de conversión.",
+          "position": 19,
+          "title": "Elige el objetivo correcto para tu negocio"
+        },
+        {
+          "objectives": "Calcular el presupuesto mínimo para generar 50 conversiones por semana en tu ad set y entender por qué 7 días sin cambios son obligatorios.",
+          "position": 20,
+          "title": "Presupuesto diario y salida de la fase de aprendizaje"
+        },
+        {
+          "objectives": "Decidir cuándo usar una campaña Advantage+ Sales y cuándo reservar una manual para probar conceptos nuevos.",
+          "position": 21,
+          "title": "Estructura Advantage+ vs. campañas manuales"
+        },
+        {
+          "objectives": "Configurar puja por menor costo, cost cap y bid cap, y entender cuándo usar value optimization.",
+          "position": 22,
+          "title": "Estrategias de puja sin misterio"
+        },
+        {
+          "objectives": "Crear una campaña Advantage+ Sales con 3 ángulos creativos, presupuesto calculado y público automático, y publicarla.",
+          "position": 23,
+          "title": "Lanza tu campaña real"
+        },
+        {
+          "objectives": "Distinguir entre un ajuste menor de presupuesto (que no reinicia) y uno estructural (que sí reinicia) para evitar el error más caro.",
+          "position": 24,
+          "title": "Cambios que no reinician el aprendizaje"
+        }
+      ],
+      "module_description": "Lanzarás tu campaña de ventas con el presupuesto justo para salir del aprendizaje, usando Advantage+ o manual, y pujas que no se disparan.",
+      "module_no": 4,
+      "module_title": "Lanzar tu campaña rentable"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Configurar las ventanas de atribución (7d clic, 1d vista, engage-through) y entender por qué tus números cayeron sin que cambiara el rendimiento.",
+          "position": 25,
+          "title": "Atribución en Meta después de 2026"
+        },
+        {
+          "objectives": "Calcular el ROAS de plataforma, el MER y el CPA real de tu campaña, y diferenciarlos para decidir presupuesto.",
+          "position": 26,
+          "title": "Las métricas que importan: ROAS, MER y CPA"
+        },
+        {
+          "objectives": "Configurar un estudio de Conversion Lift básico y leer el resultado para saber si tus anuncios causan ventas.",
+          "position": 27,
+          "title": "Haz un experimento de incrementality"
+        },
+        {
+          "objectives": "Aumentar presupuesto verticalmente en un 20% cada 3 días cuando el CPA es estable, y duplicar la campaña horizontalmente para testear públicos.",
+          "position": 28,
+          "title": "Escalar sin romper el ROAS"
+        },
+        {
+          "objectives": "Crear una regla que apague ad sets con CPA mayor al doble del objetivo y otra que ajuste presupuesto con base en ROAS.",
+          "position": 29,
+          "title": "Reglas automatizadas para proteger tu inversión"
+        },
+        {
+          "objectives": "Revisar facturación con location fees, preparar el registro de datos para la ley chilena, y alistar tu cuenta para automatización agéntica.",
+          "position": 30,
+          "title": "Checklist operativo y legal final"
+        }
+      ],
+      "module_description": "Interpretarás tus métricas reales (ROAS, MER, CPA), escalarás sin romper la rentabilidad y configurarás reglas para que Meta no gaste de más mientras duermes.",
+      "module_no": 5,
+      "module_title": "Medir, optimizar y escalar"
+    }
+  ],
+  "slug": "curso-meta-ads",
+  "title": "Meta Ads",
+  "total": 30
+}

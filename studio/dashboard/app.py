@@ -19,6 +19,7 @@ import sys
 import threading
 import tomllib
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import Cookie, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
@@ -91,10 +92,13 @@ def _ensure_schema() -> None:
 # FastAPI: it is the allowlist the whole gate rests on, and a checker that cannot
 # import it silently skips the only assertion that matters.
 from admin_paths import is_admin_path as _is_admin_path  # noqa: E402
-# Server-rendered bodies for the public surfaces. Dependency-free, same reason
-# as admin_paths above: it renders from plain dicts and can be tested without
-# FastAPI or a database.
-import prerender  # noqa: E402
+# The public site: where its built pages live, who is redirected past them, and
+# robots/sitemap. Dependency-free for the same reason as admin_paths above — a
+# check script must be able to assert it without importing FastAPI.
+import public_site  # noqa: E402
+# NOT `import site as public_site`: `site` is a stdlib module (it is what sets up
+# sys.path at startup), so that import silently bound the standard library and
+# every attribute lookup failed at import time.
 
 
 def _https(request: Request) -> bool:
@@ -103,22 +107,32 @@ def _https(request: Request) -> bool:
     return proto == "https" or request.url.scheme == "https"
 
 
-# Headers applied to every response. The learner app renders Markdown compiled
-# from learner submissions, so defence in depth around that sink is worth having.
-# NOTE: script-src still needs 'unsafe-inline' because both frontends are
-# single-file pages with inline <script> blocks (docs/03: no bundler, on
-# purpose). CSP therefore does not stop injected inline script on its own —
-# DOMPurify at the marked.parse sink is the actual XSS control. What this DOES
-# buy: no plugins, no <base> hijack, no framing, no third-party script origins
-# beyond the pinned CDN, and no mixed content.
+# Headers applied to every response. The app renders Markdown compiled from
+# learner submissions, so defence in depth around that sink is worth having.
+#
+# NO THIRD-PARTY SCRIPT ORIGIN, as of the Astro migration. marked, DOMPurify and
+# mermaid are bundled from node_modules instead of fetched from a CDN with an
+# SRI hash: the versions are pinned in package-lock.json, they cannot be swapped
+# under us by a compromised CDN, and a phone on mobile data opens one fewer
+# connection. `connect-src` lost the CDN with them.
+#
+# 'unsafe-inline' REMAINS, and it is worth being precise about why rather than
+# repeating that it is temporary:
+#   1. the operator dashboard (static/index.html) is still a single file with an
+#      inline <script>. It is the next thing to migrate.
+#   2. Astro emits a small inline bootstrap for each island.
+# So CSP still does not stop injected inline script on its own, and DOMPurify at
+# the render sink remains the actual XSS control. What this DOES buy: no
+# plugins, no <base> hijack, no framing, no third-party script at all, and no
+# mixed content.
 CSP = (
     "default-src 'self'; "
-    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+    "script-src 'self' 'unsafe-inline'; "
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
     "font-src 'self' https://fonts.gstatic.com data:; "
     "img-src 'self' data: blob:; "
     "media-src 'self' blob:; "
-    "connect-src 'self' https://cdn.jsdelivr.net; "
+    "connect-src 'self'; "
     "object-src 'none'; base-uri 'self'; form-action 'self'; "
     "frame-ancestors 'none'"
 )
@@ -663,7 +677,7 @@ def get_invites(request: Request):
     if proto in ("http", "https"):
         base = re.sub(r"^https?://", f"{proto}://", base)
     for r in rows:
-        r["link"] = f"{base}/aprende?invite={r['code']}"
+        r["link"] = f"{base}/login?invite={r['code']}"
         r["usable"] = bool(r["active"]) and r["uses"] < r["max_uses"]
     return {"invites": rows, "base": base}
 
@@ -742,24 +756,6 @@ def panel():
     return FileResponse(Path(__file__).parent / "static" / "index.html")
 
 
-@app.get("/")
-def site_home(learner_session: str | None = Cookie(default=None)):
-    """The public site. This is what a stranger gets when they type the domain,
-    and until now it was a 401 from a dashboard nobody but the operator can use.
-
-    Same shell as /aprende — the SPA opens on the landing for a logged-out
-    visitor and on Hoy for a learner with a session, which is the behaviour that
-    was already there. What changes is only which URL reaches it."""
-    _courses, _demo = _catalog_data(), _demo_data()
-    return _spa_shell("learn.html", {
-        "title": f"{SITE_NAME} — aprende haciendo, con tutora IA",
-        "description": ("Haz una clase real ahora mismo, sin cuenta: mira el "
-                        "video, lee la guía y explícalo con tus palabras. Tu "
-                        "tutora te responde de verdad."),
-    }, prerender=prerender.landing_html(_courses, _demo), wide=True,
-       boot={"catalog": _courses, "demo": _demo, "me": _me_data(learner_session)})
-
-
 # ---- Learner app (Rumbo) ----
 from learn_routes import router as learn_router  # noqa: E402
 
@@ -767,91 +763,58 @@ app.include_router(learn_router)
 
 
 @app.get("/aprende")
-def aprende():
-    return FileResponse(Path(__file__).parent / "static" / "learn.html")
+def aprende(request: Request, learner_session: str | None = Cookie(default=None)):
+    """The learner app. Only for learners: it no longer contains a public half.
+
+    Two query strings arrive here from links already in the world and must keep
+    working — `?invite=CODE`, printed on every invite the operator has ever
+    handed out, and `?error=` from a magic link that expired. Both used to open
+    an in-app sign-in view; that view is a real page now, so they are forwarded
+    with their query intact rather than broken.
+    """
+    from fastapi.responses import RedirectResponse
+    if not _signed_in(learner_session):
+        q = request.query_params
+        invite, error = q.get("invite"), q.get("error")
+        if invite:
+            return RedirectResponse(f"/login?invite={quote(invite)}", status_code=302)
+        if error:
+            return RedirectResponse(f"/login?error={quote(error)}", status_code=302)
+        # Nothing to sign in with: the public site is what they came for.
+        return RedirectResponse("/", status_code=302)
+    return FileResponse(public_site.page("/aprende"))
 
 
-def _spa_shell(template: str, meta: dict | None = None,
-               view: str | None = None, arg: str | None = None,
-               prerender: str | None = None, wide: bool = False,
-               boot: dict | None = None):
-    """Serve an SPA shell with server-injected <title>/OG tags, and optionally
-    the view it should open on.
+def _spa_shell(template: str, meta: dict | None = None):
+    """Serve an SPA shell with server-injected <title>/OG tags.
 
-    Two different needs, one mechanism. Share pages need metadata because
-    link-preview crawlers on WhatsApp and LinkedIn never run JS. The public
-    surfaces need it for the same reason plus two more: a search engine cannot
-    index a URL fragment, and "pega la oferta que quieres" has to be linkable
-    from a bio, an ad or a message — docs/08 calls that the acquisition asset
-    and it had no address at all.
+    Only the three token share pages use this now. Link-preview crawlers on
+    WhatsApp and LinkedIn never run JS, so the metadata has to be in the served
+    document; the body still hydrates, which is fine for a page reached from a
+    message rather than from a search result.
 
-    The SPA stays hash-routed internally. The server only says which view to
-    open first; `route()` falls back to it when there is no hash. `view` and
-    `arg` are JSON-encoded rather than interpolated, because `arg` carries a
-    course slug and this lands inside a <script>.
+    It used to do four more things for the public surfaces — inject a
+    prerendered body, a `__BOOT__` payload, a starting view, and `body.wide`.
+    Those pages are static files now (site.py), and every one of those
+    mechanisms existed only to make a hand-assembled document resemble the one
+    hydration would build a moment later.
     """
     import html as _html
-    import json as _json
+    import re as _re
     from fastapi.responses import HTMLResponse
     page = (Path(__file__).parent / "static" / template).read_text(encoding="utf-8")
-    if view:
-        # NOT named `boot`: that is a parameter of this function, and calling
-        # this local `boot` silently overwrote the caller's payload on every
-        # route that passes a view. /cursos and /curso/<slug> shipped
-        # window.__BOOT__="<script>window.__VIEW__=…" — the view script,
-        # JSON-encoded as a string — while / worked because it passes no view.
-        view_script = (f'<script>window.__VIEW__={_json.dumps(view)};'
-                       f'window.__ARG__={_json.dumps(arg or "")};</script>\n')
-        page = page.replace("</head>", view_script + "</head>", 1)
     if meta:
         title = _html.escape(meta["title"], quote=True)
         desc = _html.escape(meta["description"], quote=True)
-        page = page.replace("<title>", f"<title data-og>", 1)
-        import re as _re
-        page = _re.sub(r"<title data-og>.*?</title>", f"<title>{title}</title>", page, count=1)
+        page = page.replace("<title>", "<title data-og>", 1)
+        page = _re.sub(r"<title data-og>.*?</title>", f"<title>{title}</title>",
+                       page, count=1)
         tags = (f'<meta property="og:title" content="{title}">\n'
                 f'<meta property="og:description" content="{desc}">\n'
                 # website, not article: these are product surfaces, not posts.
                 f'<meta property="og:type" content="website">\n'
                 f'<meta name="description" content="{desc}">\n')
         page = page.replace("</head>", tags + "</head>", 1)
-    if boot:
-        # THE SECOND LOAD, fixed at the source.
-        # Hydration wipes #app and rebuilds it, and the rebuild AWAITS the same
-        # data the server just used to prerender the page. So a visitor saw a
-        # complete page, then an almost empty one, then it refilled in stages
-        # over ~460ms of network. That is the "it loads twice" — not the layout
-        # flash and not the enter animation, which were symptoms sitting on top
-        # of it.
-        # Handing the SPA the data it is about to ask for makes those awaits
-        # resolve from memory. Awaiting an already-resolved value yields a
-        # microtask, and microtasks run BEFORE the next paint — so the wipe and
-        # the rebuild land in the same frame and the swap is never seen.
-        page = page.replace(
-            "</head>",
-            "<script>window.__BOOT__=" + _json.dumps(boot, ensure_ascii=False,
-                                                     separators=(",", ":"))
-            + ";</script>\n</head>", 1)
-    if wide:
-        # `body.wide` carries the ENTIRE desktop composition, and until now only
-        # JS ever set it — so the first paint of a server-rendered page was the
-        # phone layout, and hydration snapped it to desktop. Invisible while the
-        # body was just "Cargando…"; very visible once there was real content to
-        # watch reflow. The server already knows which view it is opening, so it
-        # can say so in the markup instead of making the client discover it.
-        page = page.replace("<body>", '<body class="wide">', 1)
-    if prerender:
-        # Swap the loading node INSIDE #app. Every SPA view starts with
-        # `app.innerHTML=''`, so hydration erases this cleanly — no double
-        # render, nothing to reconcile. Before this, the body a crawler saw was
-        # the eleven characters of "Cargando…"; it is also what a phone on
-        # mobile data stared at for the several seconds hydration takes.
-        loading = '<div class="center muted" style="margin-top:40px">Cargando…</div>'
-        if loading in page:
-            page = page.replace(loading, prerender, 1)
-        else:                                    # template changed under us
-            print("prerender skipped: loading node not found in template",
-                  file=sys.stderr)
     return HTMLResponse(page)
 
 
@@ -860,185 +823,131 @@ def _share_page(template: str, meta: dict | None):
     return _spa_shell(template, meta)
 
 
-# ---- Public surfaces with real URLs (docs/11) ------------------------------
-# These are NOT in _is_admin_path and must never be: they are the public face.
-# Each one opens the SPA on a view that already exists as a hash route, so the
-# old links keep working and nothing about the app changed.
+# ---- The public site (docs/11) --------------------------------------------
+# Static files, built by Astro in the Docker image and served straight off disk.
+# These are NOT in _is_admin_path and must never be: they are the public face of
+# the product.
+#
+# Each route is declared explicitly rather than mounted as a catch-all. A
+# StaticFiles mount at "/" would shadow every API route it happened to match and
+# would serve whatever appeared in the build directory; the admin gate is an
+# allowlist, and an allowlist only works when the set of routes is known.
 
 SITE_NAME = "Rumbo"
-# The default og:description on every public page. "Aprende haciendo, con
-# tutora IA" was the category's generic self-description — every competitor
-# makes that claim, so it positioned us as one of them in the one string that
-# travels furthest.
-_SITE_DESC = ("Dinos qué quieres ser y te armamos la ruta — incluido lo que ese "
-              "puesto pide y nosotros no enseñamos. Terminas con trabajo real "
-              "que mostrar, no con un certificado.")
 
 
-def _catalog_data() -> list[dict]:
-    """Courses for the prerendered catalog and the sitemap.
+def _signed_in(learner_session: str | None) -> bool:
+    """Whether this request carries a live learner session.
 
-    Reuses the endpoint the SPA already calls, so the server-rendered page and
-    the hydrated one can never disagree about what the catalog contains. Any
-    failure degrades to an empty list: a page that renders without its catalog
-    still beats a 500, and the SPA will fill it in a second later.
+    Calls the endpoint function itself, so the answer can never disagree with
+    what /api/learn/me would say. Any failure means "not signed in": showing a
+    learner the public page is a small wrong, and refusing to serve the homepage
+    because the database blinked is a large one.
     """
+    if not learner_session:
+        return False
     try:
         import learn_routes
-        return learn_routes.public_catalog().get("courses", [])
+        return bool(learn_routes.me(learner_session).get("authenticated"))
     except Exception as exc:
-        print(f"prerender catalog skipped: {exc}", file=sys.stderr)
-        return []
+        print(f"session check failed, serving public page: {exc}", file=sys.stderr)
+        return False
 
 
-def _me_data(learner_session: str | None) -> dict:
-    """The session check, done server-side.
+def _public(route: str, learner_session: str | None = None):
+    """Serve a built public page, or send a signed-in learner into the app."""
+    from fastapi.responses import RedirectResponse
+    if learner_session and _signed_in(learner_session):
+        target = public_site.SIGNED_IN_DESTINATION.get(route)
+        if target:
+            # 302, not 301: this depends on a cookie, and a browser that cached
+            # it permanently would send a logged-OUT visitor to the app forever.
+            return RedirectResponse(target, status_code=302)
+    path = public_site.page(route)
+    if not path.is_file():
+        # The frontend build did not make it into the image. Say so loudly in
+        # the log: a blank public site is the kind of failure that otherwise
+        # gets discovered by a stranger.
+        print(f"public page missing from the build: {path}", file=sys.stderr)
+        raise HTTPException(503, "el sitio se está actualizando, vuelve en un minuto")
+    return FileResponse(path)
 
-    boot() awaited GET /api/learn/me before it called route(), so NOTHING
-    rendered until a network round trip came back — 147ms on the live site. The
-    prerendered page sat on screen for that whole window and was then replaced,
-    which is the "it loads twice" nobody could shake. Every other fix attacked
-    what the swap LOOKED like; this removes the wait that made a swap visible at
-    all. Calls the endpoint function itself so the two can never disagree.
+
+@app.get("/")
+def site_home(publica: str | None = None,
+              learner_session: str | None = Cookie(default=None)):
+    """The public site. This is what a stranger gets when they type the domain,
+    and it used to be a 401 from a dashboard nobody but the operator can use.
+
+    `?publica=1` shows it to a signed-in learner instead of redirecting them
+    into the app. The operator is the only person with a permanent session and
+    this is their own marketing page; without the escape hatch, looking at it
+    means logging out of their own product. Perfil links here.
     """
-    try:
-        import learn_routes
-        return learn_routes.me(learner_session)
-    except Exception as exc:
-        print(f"prerender me skipped: {exc}", file=sys.stderr)
-        return {"authenticated": False}
-
-
-def _demo_data() -> dict | None:
-    """The free lesson, for the landing's server-rendered body. Same endpoint
-    the SPA calls, so the two can never describe different lessons."""
-    try:
-        import learn_routes
-        return learn_routes.demo_payload()
-    except Exception as exc:
-        print(f"prerender demo skipped: {exc}", file=sys.stderr)
-        return None
-
-
-def _course_data(slug: str) -> dict | None:
-    """One temario, via the same endpoint the SPA uses. None if absent."""
-    try:
-        import learn_routes
-        return learn_routes.public_course(slug)
-    except Exception as exc:
-        print(f"prerender course {slug} skipped: {exc}", file=sys.stderr)
-        return None
-
-
-@app.get("/robots.txt", include_in_schema=False)
-def robots():
-    """Public surfaces open, the app and the API closed.
-
-    Notably excludes /aprende and the share pages: a learner's documents live on
-    unguessable tokens, and a token in a search index is no longer unguessable.
-    """
-    from fastapi.responses import PlainTextResponse
-    return PlainTextResponse(
-        prerender.robots_txt(os.environ.get("PUBLIC_BASE_URL", "")))
-
-
-@app.get("/sitemap.xml", include_in_schema=False)
-def sitemap():
-    from fastapi.responses import Response
-    slugs = [c["slug"] for c in _catalog_data()]
-    return Response(
-        prerender.sitemap_xml(os.environ.get("PUBLIC_BASE_URL", ""), slugs),
-        media_type="application/xml")
-
-
-@app.get("/oferta")
-def public_oferta():
-    """The job analyser. docs/08 calls this the acquisition asset and says it
-    ships standalone — it could not be linked to before this route existed."""
-    return _spa_shell("learn.html", {
-        "title": f"Pega la oferta que quieres — {SITE_NAME}",
-        "description": ("Te decimos qué pide de verdad, qué cubrimos, qué no, y "
-                        "con qué documento llegar a la entrevista. Sin cuenta."),
-    }, view="oferta", prerender=prerender.simple_html(
-        "Pega la oferta que quieres",
-        ["Pega el aviso de trabajo que te interesa, o escribe sólo el nombre del "
-         "puesto. En unos dos minutos sabes qué pide de verdad, qué parte de eso "
-         "cubrimos, qué no, y tu ruta: qué cursos y qué módulos, en qué orden.",
-         "Si el puesto pide algo que no enseñamos, te lo decimos y te lo listamos. "
-         "Preferimos eso a venderte un curso que no lo cubre.",
-         "No necesitas cuenta para probarlo."]))
-
-
-@app.get("/lista")
-def public_lista():
-    return _spa_shell("learn.html", {
-        "title": f"Pide tu acceso — {SITE_NAME}",
-        "description": _SITE_DESC,
-    }, view="lista", prerender=prerender.simple_html(
-        "Pide tu acceso",
-        ["Rumbo está en fase alfa y el acceso es por invitación. Déjanos tu "
-         "correo y qué quieres lograr, y te escribimos cuando abramos un cupo.",
-         "Mientras tanto puedes hacer una clase completa sin cuenta en la "
-         "portada, y leer el temario entero de cualquier curso."]))
-
-
-@app.get("/login")
-def public_login():
-    """Sign-in. This was a 404 while the public header linked to it — the header
-    was wired to a real URL that had never been created, so the primary way into
-    the product from every public page was a dead end for anyone logged out.
-
-    It is a real URL rather than only a fragment for the same reason as the
-    others: it has to be linkable. "Ve a rumbo.app/login" is a sentence someone
-    says out loud."""
-    return _spa_shell("learn.html", {
-        "title": f"Entrar — {SITE_NAME}",
-        "description": ("Entra con tu invitación. El acceso es por invitación "
-                        "mientras estamos en fase alfa."),
-    }, view="login", prerender=prerender.simple_html(
-        "Entrar a Rumbo",
-        ["Escribe tu correo y te mandamos un enlace para entrar. No hay "
-         "contraseña que recordar.",
-         "¿Todavía no tienes invitación? Puedes hacer una clase completa sin "
-         "cuenta en la portada, o pedir tu acceso."]))
+    return _public("/", None if publica else learner_session)
 
 
 @app.get("/cursos")
 def public_cursos(learner_session: str | None = Cookie(default=None)):
     """The whole catalog at its own address. It used to exist only as a section
     below a full lesson on the landing, reachable by scrolling past all of it."""
-    courses = _catalog_data()
-    return _spa_shell("learn.html", {
-        "title": f"Todos los cursos — {SITE_NAME}",
-        # NOT "14 cursos, 420 lecciones": an inventory count is the
-        # marketplace's own positioning, it is the one number a competitor beats
-        # trivially, and this string is what every WhatsApp share of the catalog
-        # previews as.
-        "description": ("Los módulos que tu ruta puede tomar, con el temario "
-                        "abierto entero y el documento con el que termina cada uno."),
-    }, view="cursos", prerender=prerender.catalog_html(courses), wide=True,
-       boot={"catalog": courses, "me": _me_data(learner_session)})
+    return _public("/cursos", learner_session)
 
 
 @app.get("/curso/{slug}")
 def public_curso(slug: str, learner_session: str | None = Cookie(default=None)):
     """A course temario at its own address. docs/02 calls the browsable temarios
     marketing content: 14 courses and 420 lesson objectives, all real, and until
-    now invisible to search because they lived behind a fragment."""
-    meta = {"title": f"Temario — {SITE_NAME}", "description": _SITE_DESC}
-    # One fetch now serves both the meta tags and the body, where it used to
-    # serve only the meta tags: the thirty lesson titles this page is actually
-    # about were never in the HTML.
-    course = _course_data(slug)
-    body = None
-    if course:
-        meta = {"title": f"{course['title']} — {SITE_NAME}",
-                "description": course.get("description") or _SITE_DESC}
-        body = prerender.course_html(course)
-    return _spa_shell("learn.html", meta, view="explora", arg=slug,
-                      prerender=body, wide=True,
-                      boot={"course": course, "me": _me_data(learner_session)}
-                           if course else {"me": _me_data(learner_session)})
+    recently invisible to search because they lived behind a fragment."""
+    from fastapi.responses import RedirectResponse
+    if learner_session and _signed_in(learner_session):
+        return RedirectResponse(f"/aprende#/explora/{slug}", status_code=302)
+    route = f"/curso/{slug}"
+    if not public_site.exists(route):
+        # An unknown slug is not a broken build, it is a course that is not
+        # ours. Sending it to the catalog beats a dead end.
+        return RedirectResponse("/cursos", status_code=302)
+    return FileResponse(public_site.page(route))
+
+
+@app.get("/oferta")
+def public_oferta(learner_session: str | None = Cookie(default=None)):
+    """The job analyser. docs/08 calls this the acquisition asset and says it
+    ships standalone — it could not be linked to before this route existed."""
+    return _public("/oferta", learner_session)
+
+
+@app.get("/lista")
+def public_lista():
+    """The waitlist. No redirect: someone already inside gains nothing from it
+    and loses nothing either, and nobody arrives here holding a session."""
+    return _public("/lista")
+
+
+@app.get("/login")
+def public_login(learner_session: str | None = Cookie(default=None)):
+    """Sign-in. This was a 404 while the public header linked to it, so the
+    primary way into the product from every public page was a dead end.
+
+    It is a real URL rather than a fragment because it has to be linkable:
+    "ve a ponrumbo.com/login" is a sentence someone says out loud."""
+    return _public("/login", learner_session)
+
+
+@app.get("/robots.txt", include_in_schema=False)
+def robots():
+    from fastapi.responses import PlainTextResponse
+    return PlainTextResponse(
+        public_site.robots_txt(os.environ.get("PUBLIC_BASE_URL", "")))
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+def sitemap():
+    from fastapi.responses import Response
+    return Response(
+        public_site.sitemap_xml(os.environ.get("PUBLIC_BASE_URL", ""),
+                                public_site.course_slugs()),
+        media_type="application/xml")
 
 
 @app.get("/aprende/caso/{token}")
@@ -1123,6 +1032,21 @@ if os.environ.get("ENABLE_SCHEDULER", "0") == "1":
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/media", StaticFiles(directory=OUTPUT_DIR), name="media")
+
+# The public site's CSS and island bundles. Every filename is content-hashed by
+# the build, so these are immutable: a year of cache is safe and a deploy
+# invalidates by changing the name. Mounted narrowly at /assets rather than
+# serving the whole build directory, so nothing under it can shadow a route.
+#
+# Absent only when someone runs the server without building the frontend first
+# (run_local.ps1 does it for you). The site 503s in that case and says why, so
+# there is no need to fail the process here.
+if public_site.DIST.is_dir():
+    app.mount("/assets", StaticFiles(directory=public_site.DIST / "assets"),
+              name="web-assets")
+else:
+    print(f"frontend build missing at {public_site.DIST} — the public site will "
+          f"503. Run: cd studio/web && npm ci && npm run build", file=sys.stderr)
 
 
 if __name__ == "__main__":

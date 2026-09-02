@@ -1,0 +1,194 @@
+{
+  "description": "Audita creadores a mano, negocia tarifas y contratos, y mide una campaña sin depender de herramientas de pago",
+  "doc_type": "Plan de campaña de creadores",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Elegirás UNA marca real y UN mercado con los que trabajarás todo el curso. Escribirás el problema de negocio o comunicación que tu campaña debe resolver en una sola frase concreta.",
+          "position": 1,
+          "title": "Elige tu marca, tu mercado y tu objetivo real"
+        },
+        {
+          "objectives": "Clasificarás creadores por su función (comunidad, autoridad, producción UGC, notoriedad) y no solo por su cantidad de seguidores. Diferenciarás un perfil que te da acceso a una audiencia de uno que solo te vende contenido.",
+          "position": 2,
+          "title": "Más allá del número: tipos reales de creador"
+        },
+        {
+          "objectives": "Dibujarás el mapa de poder de tu campaña: marca, agencia, talento, manager, plataforma, audiencia, medios y regulador. Identificarás quién controla el contenido, quién paga y quién responde ante una crisis.",
+          "position": 3,
+          "title": "Quién es quién: la cadena de actores"
+        },
+        {
+          "objectives": "Calcularás el costo real de coordinación, riesgo y capacidad interna para decidir documentadamente si tu campaña se gestiona directa o con agencia, sin dogmas.",
+          "position": 4,
+          "title": "Agencia sí, agencia no: la decisión operativa"
+        },
+        {
+          "objectives": "Distinguirás una colaboración pagada de una cobertura ganada y arquitecturarás campañas donde contenido de creador y estrategia de medios se refuerzan sin confundirse.",
+          "position": 5,
+          "title": "Marketing de creadores y PR en el mismo plano"
+        },
+        {
+          "objectives": "Completarás la primera ficha de tu campaña con objetivo, audiencia, restricciones legales y el outcome que te dirá si ganaste o perdiste.",
+          "position": 6,
+          "title": "Objetivo, riesgo y criterio de éxito"
+        }
+      ],
+      "module_description": "Podrás mapear a todos los jugadores del ecosistema, decidir si te conviene contratar directo o con agencia, y fijar un objetivo de campaña medible para tu marca real.",
+      "module_no": 1,
+      "module_title": "El campo y sus actores"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Construirás una lista de 20 o más candidatos para tu marca usando búsquedas manuales, hashtags, competidores y medios, sin una herramienta de pago.",
+          "position": 7,
+          "title": "Embudo manual: del universo a la longlist"
+        },
+        {
+          "objectives": "Extraerás y registrarás los datos públicos clave de una muestra de 10-12 contenidos de un creador creando una planilla comparable y auditable.",
+          "position": 8,
+          "title": "Hoja de evidencia por creador"
+        },
+        {
+          "objectives": "Calcularás engagement rate por followers, por alcance y por vistas. Usarás mediana y promedio para saber cuándo un viral te está engañando. Diferenciarás un 'like' de una 'interacción'.",
+          "position": 9,
+          "title": "Las matemáticas del engagement"
+        },
+        {
+          "objectives": "Analizarás curvas de crecimiento, ratio comentarios/likes, idioma y calidad de comentarios de una muestra manual para decidir si una audiencia requiere más investigación. Separarás 'desconocido' de 'sospechoso'.",
+          "position": 10,
+          "title": "Cazar banderas rojas sin herramientas"
+        },
+        {
+          "objectives": "Cruzarás el contenido, tono, audiencia y valores del creador con tu marca para construir una matriz de riesgos y brand safety que excluya perfiles tóxicos antes de hablar de precios.",
+          "position": 11,
+          "title": "Compatibilidad real, no afinidad percibida"
+        },
+        {
+          "objectives": "Emitirás un juicio escrito para 3-5 candidatos de tu marca donde separes hecho, interpretación y limitación. Sustituirás el 'score de autenticidad' por un argumento defendible.",
+          "position": 12,
+          "title": "El veredicto: apto, condicionado o fuera"
+        }
+      ],
+      "module_description": "Podrás encontrar creadores, extraer datos reales de sus perfiles, calcular su engagement real, triangular señales de audiencia inflada y entregar un shortlist defendible con evidencia.",
+      "module_no": 2,
+      "module_title": "Scouting y auditoría manual de audiencia"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Desglosarás un fee total en producción, distribución orgánica, derechos de uso, exclusividad y servicios adicionales para poder comparar ofertas reales sin mezclar partidas.",
+          "position": 13,
+          "title": "Lo que pagas: producción, distribución y derechos"
+        },
+        {
+          "objectives": "Calcularás el CPM y CPV equivalente de un creador usando su mediana de impresiones o vistas históricas. Construirás tres escenarios de negociación (pesimista, base, oportunidad) para tu propuesta comercial.",
+          "position": 14,
+          "title": "CPM, CPV y escenarios de precio"
+        },
+        {
+          "objectives": "Completarás una matriz que defina exactamente dónde, cómo y por cuánto tiempo puedes usar el contenido, la imagen y la voz del creador, incluyendo whitelisting y paid media.",
+          "position": 15,
+          "title": "Tu cara en mi anuncio: matriz de usos"
+        },
+        {
+          "objectives": "Redactarás o revisarás las 12 cláusulas base que no pueden faltar: entregables, compensación, revisión, crisis bilateral, propiedad intelectual, IA y ley aplicable.",
+          "position": 16,
+          "title": "El contrato que te salva"
+        },
+        {
+          "objectives": "Calcularás un sobreprecio de exclusividad basado en el costo de oportunidad del creador. Añadirás kill fees, fuerza mayor y un árbol de terminación que proteja a ambas partes.",
+          "position": 17,
+          "title": "Exclusividad justa y cláusulas de salida"
+        },
+        {
+          "objectives": "Consultarás la normativa de divulgación publicitaria vigente para tu mercado (o el de tu marca) y añadirás la instrucción obligatoria de identificación comercial a tu brief y contrato.",
+          "position": 18,
+          "title": "Disclosure legal: lo que exige tu país"
+        }
+      ],
+      "module_description": "Podrás construir una tarifa por componentes reales, calcular un CPM manual, redactar un contrato que proteja imagen y derechos, y cumplir la ley de disclosure en tu mercado.",
+      "module_no": 3,
+      "module_title": "Negociación, tarifas, contratos y divulgación"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Redactarás un brief que traduzca el objetivo de tu marca en una petición clara para tu creador, separando mandatorios legales de espacios creativos flexibles.",
+          "position": 19,
+          "title": "El brief de una página"
+        },
+        {
+          "objectives": "Seleccionarás tu mezcla de creadores asignando roles funcionales (héroe, experto, community, amplificador) en vez de cuotas de '30% macro, 70% micro' sin evidencia.",
+          "position": 20,
+          "title": "Arquitectura del mix"
+        },
+        {
+          "objectives": "Construirás un calendario de producción y publicación con dueños, fechas de corte, SLA de revisión y dependencias para tu campaña.",
+          "position": 21,
+          "title": "El calendario que no falla"
+        },
+        {
+          "objectives": "Diseñarás el flujo de revisiones con un solo dueño que consolida feedback, asignarás responsables (RACI) y establecerás SLAs realistas para que el contenido no se atore en legal.",
+          "position": 22,
+          "title": "Pipeline de aprobación: RACI sin dolor"
+        },
+        {
+          "objectives": "Planificarás la comunicación con el talento, la logística de producto y los eventos (press trips, lanzamientos) sin depender de un CRM de pago ni de un software de gestión de talento.",
+          "position": 23,
+          "title": "Relacionamiento profesional, no solo transaccional"
+        },
+        {
+          "objectives": "Construirás un checklist de última milla con QA de links, disponibilidad de producto, verificación de disclosure y contactos de crisis para el día de publicación.",
+          "position": 24,
+          "title": "Runbook de lanzamiento"
+        }
+      ],
+      "module_description": "Podrás transformar tu shortlist en un plan de campaña real: brief, mix de creadores, calendario, pipeline de aprobación y gestión de eventos sin que la operación se descontrole.",
+      "module_no": 4,
+      "module_title": "Campaña de punta a punta"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Crearás un diccionario de métricas para tu campaña especificando KPI, fórmula, fuente de datos y periodo. Distinguirás actividad (outputs) de resultado (outcomes) de negocio (impacto).",
+          "position": 25,
+          "title": "Plan de medición: qué mides y de dónde sale"
+        },
+        {
+          "objectives": "Calcularás el Earned Media Value de tu campaña con un modelo de CPM comparable propio. Exigirás la fórmula a cualquier proveedor o agencia que te suelte un EMV. No confundirás EMV con ingresos reales.",
+          "position": 26,
+          "title": "EMV: el numerito que cada uno calcula como quiere"
+        },
+        {
+          "objectives": "Calcularás el retorno sobre tu inversión usando margen incremental y costo total de campaña. Declararás tu método de atribución (código, UTM, holdout), su ventana y sus limitaciones.",
+          "position": 27,
+          "title": "ROI y atribución sin humo"
+        },
+        {
+          "objectives": "Escribirás un informe de una página con decisión, objetivo, resultados vs. forecast, explicación de ganadores y perdedores, y siguiente acción recomendada.",
+          "position": 28,
+          "title": "El reporte que quiere tu jefe"
+        },
+        {
+          "objectives": "Redactarás un comunicado con gancho noticioso y construirás un registro de cobertura mediática con análisis de mensaje, sentimiento y vocero, sin un dashboard de social listening.",
+          "position": 29,
+          "title": "Nota de prensa y clipping manual"
+        },
+        {
+          "objectives": "Aplicarás un árbol de decisión para escalar (o no) una señal negativa. Documentarás responsabilidades, notificación, pausa, respuesta legal/comunicacional y un post-mortem para tu caso de marca.",
+          "position": 30,
+          "title": "El árbol de crisis reputacional"
+        }
+      ],
+      "module_description": "Podrás medir tu campaña y construir tu propio EMV transparente, calcular un ROI con supuestos explícitos, reportar a dirección y gestionar una crisis reputacional sacando aprendizajes reales.",
+      "module_no": 5,
+      "module_title": "Medición, PR digital y crisis"
+    }
+  ],
+  "slug": "curso-influencer-marketing",
+  "title": "Influencer marketing y PR digital",
+  "total": 30
+}

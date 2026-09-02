@@ -1,0 +1,194 @@
+{
+  "description": "De un club real a un proyecto formulado y postulable: diagnóstico, presupuesto, marco lógico y patrocinio",
+  "doc_type": "Proyecto deportivo formulado",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Seleccionarás una organización deportiva real (club, municipio, federación) con la que trabajarás todo el curso y construirás su ficha de posicionamiento: circuito, contrapartes públicas y nivel institucional.",
+          "position": 1,
+          "title": "Elige tu organización real y ubícala en el mapa del sistema deportivo"
+        },
+        {
+          "objectives": "Distinguirás el circuito público-social, federado y comercial, y analizarás cómo tu organización obtiene recursos de cada uno.",
+          "position": 2,
+          "title": "Los tres circuitos del deporte y cómo se mezclan en tu organización"
+        },
+        {
+          "objectives": "Compararás la estructura de los entes rectores del deporte en Chile, Colombia, México, Argentina y Perú para identificar la contraparte real de tu organización y su estabilidad.",
+          "position": 3,
+          "title": "Arquitectura institucional en cinco países: por qué cambia con cada gobierno"
+        },
+        {
+          "objectives": "Mapearás las fuentes de financiamiento que aplican a tu organización: fondos concursables, subvenciones, patrocinio y cooperación internacional.",
+          "position": 4,
+          "title": "Quién financia qué: el mapa de flujos de dinero público y privado"
+        },
+        {
+          "objectives": "Identificarás los programas presupuestados pero no ejecutados que afectan a tu territorio y aprenderás a monitorear la ejecución real, no solo la asignación.",
+          "position": 5,
+          "title": "Deporte escolar y municipal: los eslabones donde casi todo se asigna pero poco se ejecuta"
+        },
+        {
+          "objectives": "Buscarás y analizarás las bases vigentes de al menos tres fondos concursables, subvenciones o incentivos tributarios aplicables a tu organización, anotando URL, plazos y requisitos de admisibilidad.",
+          "position": 6,
+          "title": "Identifica los 3 instrumentos de financiamiento a los que tu organización puede postular hoy"
+        }
+      ],
+      "module_description": "Ubicarás tu organización en los tres circuitos, identificarás quién financia qué y mapearás los flujos de dinero reales para reducir la dependencia de una sola fuente.",
+      "module_no": 1,
+      "module_title": "El sistema deportivo: actores, circuitos y financiamiento"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Realizarás un diagnóstico de tu organización que incluya evidencia verificable en cada dimensión, detectando qué datos te faltan y cómo conseguirlos.",
+          "position": 7,
+          "title": "Diagnóstico en 5 dimensiones: legal, deportiva, financiera, infraestructura y entorno"
+        },
+        {
+          "objectives": "Redactarás 3 objetivos estratégicos con el formato qué cambia, para quién, cuánto y cuándo, a partir de tu diagnóstico.",
+          "position": 8,
+          "title": "Objetivos estratégicos que responden a qué, quién, cuánto y cuándo"
+        },
+        {
+          "objectives": "Construirás una matriz FODA donde cada afirmación se sustenta en un dato del diagnóstico, no en impresiones.",
+          "position": 9,
+          "title": "FODA con evidencia: que cada fortaleza y debilidad cite un dato"
+        },
+        {
+          "objectives": "Seleccionarás 6 de los 8 indicadores clave (cobertura, retención, dependencia financiera, ejecución, ocupación, progresión, etc.) y establecerás línea base y responsable para cada uno.",
+          "position": 10,
+          "title": "Los 8 indicadores de gestión que todo club debe medir"
+        },
+        {
+          "objectives": "Adaptarás las perspectivas social-deportiva, financiera, de procesos y de personas para tu organización, definiendo la relación entre ellas.",
+          "position": 11,
+          "title": "Cuadro de mando integral adaptado al deporte: cuatro perspectivas, una misión"
+        },
+        {
+          "objectives": "Articularás un ciclo anual que alinee el diagnóstico de agosto-septiembre con el plan operativo de noviembre-diciembre y las postulaciones a fondos que cierran en esas fechas.",
+          "position": 12,
+          "title": "Calendario anual de planificación: sincroniza diagnóstico, POA y postulaciones"
+        }
+      ],
+      "module_description": "Diagnosticarás tu organización en 5 dimensiones con evidencia, fijarás objetivos con línea base y armarás un tablero de indicadores para tomar decisiones.",
+      "module_no": 2,
+      "module_title": "Planificación y estrategia aplicadas al deporte"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Reconstruirás el presupuesto anual de tu organización desglosado en recursos humanos, operación, equipamiento, difusión, administración e imprevistos.",
+          "position": 13,
+          "title": "Presupuesto por partidas, no por totales: la estructura que exigen los fondos"
+        },
+        {
+          "objectives": "Compararás tu presupuesto con las estructuras de costos típicas del sector para detectar desviaciones y afinar tu planilla.",
+          "position": 14,
+          "title": "Estructura de costos reales: cuánto cuesta operar un club, un evento o un recinto"
+        },
+        {
+          "objectives": "Diseñarás un esquema de profesionalización gradual (contador → coordinador → gerente) y valorizarás el voluntariado para usarlo como aporte propio en proyectos.",
+          "position": 15,
+          "title": "Recursos humanos y voluntariado: cómo valorizar lo que no se paga en efectivo"
+        },
+        {
+          "objectives": "Evaluarás el costo de ciclo de vida de tu recinto (o del que usas) con las partidas de personal, servicios y mantención, usando el caso real de la Arena da Amazônia como referencia.",
+          "position": 16,
+          "title": "Instalaciones deportivas: el costo de operar 30 años supera al de construir"
+        },
+        {
+          "objectives": "Auditarás tu organización frente a los estándares de gobernanza (separación de poderes, límites de mandato, auditoría externa) y listarás 3 brechas a cerrar.",
+          "position": 17,
+          "title": "Compliance e integridad: lo que exigen la FIFA, el COI y la inspección estatal"
+        },
+        {
+          "objectives": "Calcularás el porcentaje de ingresos que depende de tu fuente principal y diseñarás al menos una medida concreta para diversificar, usando el desfinanciamiento del ENARD como advertencia documentada.",
+          "position": 18,
+          "title": "Transparencia y el riesgo de depender de una sola fuente: el caso ENARD"
+        }
+      ],
+      "module_description": "Presupuestarás por partidas como un gestor, auditarás el gobierno de tu organización y calcularás el riesgo de depender de una sola fuente.",
+      "module_no": 3,
+      "module_title": "Administración, gobernanza y cumplimiento para la vida real"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Transformarás los hallazgos de tu diagnóstico en un árbol de problemas con causas, problema central y efectos, usando datos concretos.",
+          "position": 19,
+          "title": "Árbol de problemas: de tu diagnóstico a un problema central verificable"
+        },
+        {
+          "objectives": "Espejarás el árbol de problemas a objetivos y completarás la matriz con resumen narrativo, indicadores CCT, medios de verificación y supuestos para cada nivel.",
+          "position": 20,
+          "title": "Árbol de objetivos y matriz de marco lógico: fin, propósito, componentes y actividades"
+        },
+        {
+          "objectives": "Cotizarás cada partida de tu proyecto dentro de los límites de las bases del fondo elegido, distinguiendo qué paga el fondo, qué pones tú y qué es valorizado.",
+          "position": 21,
+          "title": "Presupuesto del proyecto por partidas admisibles, con cotizaciones y fuentes"
+        },
+        {
+          "objectives": "Articularás una carta Gantt simple con tres hitos (inicio formal, corte de medio término y cierre) y la ajustarás al período de ejecución que fija la base.",
+          "position": 22,
+          "title": "Cronograma con hitos obligatorios: no empieces hasta que el convenio esté firmado"
+        },
+        {
+          "objectives": "Aplicarás una pauta de pertinencia, coherencia vertical, viabilidad de supuestos y costo por beneficiario para detectar debilidades en tu matriz antes de enviarla.",
+          "position": 23,
+          "title": "Evaluación ex-ante: cómo revisar tu proyecto antes de postular"
+        },
+        {
+          "objectives": "Integrarás todos los artefactos producidos hasta ahora en un expediente completo y verificarás que cumple con los requisitos de admisibilidad de las bases vigentes.",
+          "position": 24,
+          "title": "Ensambla tu expediente: ficha, MML, presupuesto, cronograma y revisión de admisibilidad"
+        }
+      ],
+      "module_description": "Construirás un proyecto completo y postulable: árbol de problemas, matriz de marco lógico, presupuesto por partidas, cronograma con hitos y evaluación ex-ante.",
+      "module_no": 4,
+      "module_title": "Formulación de proyectos con marco lógico, el corazón del curso"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Identificarás el modelo de ingresos de tu organización (cuotas, mensualidades, TV, eventos) y evaluarás su recurrencia para reducir fragilidad.",
+          "position": 25,
+          "title": "Modelos de negocio en el deporte: quién paga, por qué y con qué recurrencia"
+        },
+        {
+          "objectives": "Inventariarás los activos de marketing de tu organización (presencia, contenido, activación, datos) y los valorizarás contra alternativas de mercado.",
+          "position": 26,
+          "title": "El patrocinio es una compra de activos, no una donación"
+        },
+        {
+          "objectives": "Armarás un borrador de propuesta con inventario valorizado, tres niveles de paquete, beneficio tributario si aplica, y compromiso de reporte.",
+          "position": 27,
+          "title": "Propuesta de patrocinio valorizada: paquetes de tres niveles con precio"
+        },
+        {
+          "objectives": "Diseñarás el plan operativo de un evento (carrera, torneo) con presupuesto, punto de equilibrio, permisos y plan de contingencia.",
+          "position": 28,
+          "title": "Gestión de eventos: ciclo completo y decisiones que no se pueden improvisar"
+        },
+        {
+          "objectives": "Formularás un programa con propósito social medible (convivencia, permanencia escolar) y presupuesto para la medición, usando el modelo de la Ciclovía de Bogotá como referencia.",
+          "position": 29,
+          "title": "Deporte para el desarrollo social: cómo medir resultados, no solo asistencia"
+        },
+        {
+          "objectives": "Extraerás lecciones operativas de los Juegos Panamericanos Lima 2019, INDER Medellín, la Ciclovía de Bogotá, la Arena da Amazônia, el programa de estadios de Brasil 2014 y el desfinanciamiento del ENARD.",
+          "position": 30,
+          "title": "Seis casos reales de éxito y fracaso en Latinoamérica"
+        }
+      ],
+      "module_description": "Valorizarás activos de patrocinio, diseñarás un evento viable y extraerás principios de éxitos y fracasos documentados en Latinoamérica para blindar tu gestión.",
+      "module_no": 5,
+      "module_title": "Aplicación sectorial: modelos de negocio, patrocinio, eventos y lecciones de la vida real"
+    }
+  ],
+  "slug": "curso-gestion-deportiva",
+  "title": "Gestión deportiva",
+  "total": 30
+}

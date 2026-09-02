@@ -153,19 +153,25 @@ appear in Google and in ChatGPT and Perplexity answers; answer engines fetch raw
 HTML and do not execute JS, so the page selling that course could not do the
 thing the course teaches.
 
-`prerender.py` renders those bodies from plain dicts. It is **dependency-free on
-purpose**, for the same reason `admin_paths.py` is: it can be tested without
-importing FastAPI or opening a connection. `_spa_shell` swaps the markup in for
-the `Cargando…` node **inside `#app`**, and every SPA view begins with
-`app.innerHTML=''`, so hydration erases it cleanly. **That is the entire
-integration contract** — there is no double render and nothing to reconcile,
-which is why the module renders a self-contained block instead of trying to
-match what the SPA will build. Verified live: after hydration the prerendered
-`<h1>` is gone and "Módulo 1" appears exactly once.
+`prerender.py` rendered those bodies from plain dicts and injected them into the
+SPA in place of its `Cargando…` node. **That approach is gone as of 2026-09-02,
+and the reason is worth keeping.** It was never one document: the server's markup
+and the markup hydration built were written separately and could not be made
+identical — the served page had three top-level elements and the hydrated one
+had ten. A visitor watched one page become a different page, four fixes attacked
+the transition rather than the cause, and the cause was that there were two
+authors of the same screen.
 
-Measured on `curso-seo-aeo`: **11 → 8,582 characters**. The catalog now carries
+**The six public URLs are built HTML now** (Astro, `studio/web/`), generated at
+image-build time and served straight off disk by `public_site.py`. There is one
+document. `/cursos` and the fourteen temarios ship **no JavaScript at all**; the
+landing ships ~51KB for the one part that has to be alive — the question and the
+verdict — where every one of these pages used to load 158KB of SPA.
+
+Measured on `curso-seo-aeo`: **11 → 8,582 characters**. The catalog carries
 14 real `<a href="/curso/…">` anchors, which is how a crawler reaches the
-temarios at all. `robots.txt` and a 19-URL `sitemap.xml` exist; both used to 404.
+temarios at all — and they survive to the rendered page now, where hydration
+used to replace all fourteen with divs. `robots.txt` and a 19-URL `sitemap.xml` exist; both used to 404.
 `robots.txt` excludes `/aprende` and the share pages deliberately — a learner's
 documents live on unguessable tokens, and a token in a search index is no longer
 unguessable.
@@ -189,11 +195,11 @@ pinned to `11.4.1`. Two things not to redo:
 ## Checks
 
 ```bash
-node studio/dashboard/check_demo_render.js studio/dashboard/static/learn.html  # 34 assertions
-node studio/dashboard/check_how_section.js          # the landing's promises, 13 assertions
+cd studio/web && npm test    # demo-render.test.js, 36 assertions
+#   (how-section.test.js covers the landing's promises, 15 assertions)
 ```
 
-`check_demo_render.js` guards this surface's **argument**, not its layout: that a
+`demo-render.test.js` guards this surface's **argument**, not its layout: that a
 real lesson renders, that the question is asked, that the verdict is a word and
 never a number, that what follows is this module's real exercise and reto, that
 both door sets exist (the finish review found the page had **no** call to action
@@ -201,7 +207,7 @@ until a verdict rendered), that a failed demo still offers somewhere to go, and
 that nothing claims a testimonial, a price or a real learner document — because
 `PRODUCT.md` records that none of those exist.
 
-`check_how_section.js` still guards the "Cómo funciona" block, which survives
+`how-section.test.js` still guards the "Cómo funciona" block, which survives
 below the lesson.
 
 `check_public_surface.py` asserts what the **server serves**, which the three

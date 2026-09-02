@@ -32,6 +32,23 @@ $env:PYTHONIOENCODING   = "utf-8"
 if (-not $env:DATABASE_URL) { throw "DATABASE_PUBLIC_URL not found - is the Railway CLI linked?" }
 if (-not $env:OPENROUTER_API_KEY) { Write-Output "WARNING: no OPENROUTER_API_KEY - AI evaluations and job analysis will fail" }
 
+# The frontend, built. In production this happens in Docker stage 1 and lands at
+# the same path; locally it has to happen here, or every public route 503s with
+# "el sitio se esta actualizando" and the cause is a missing directory rather
+# than anything in the code you just changed.
+$web = Join-Path $repo "studio\web"
+if (-not (Test-Path (Join-Path $web "node_modules"))) {
+    Write-Output "installing frontend deps (first run)..."
+    Push-Location $web; npm ci; Pop-Location
+    if ($LASTEXITCODE -ne 0) { throw "npm ci failed" }
+}
+Write-Output "building the public site..."
+Push-Location $web; npm run build; Pop-Location
+if ($LASTEXITCODE -ne 0) { throw "frontend build failed - fix it before starting the server" }
+$dest = Join-Path $repo "studio\dashboard\static\web"
+if (Test-Path $dest) { Remove-Item -Recurse -Force $dest }
+Copy-Item -Recurse (Join-Path $web "dist") $dest
+
 # Honour an assigned PORT so two sessions can run previews side by side; a stale
 # server from another session serving old code is a documented time sink
 # (docs/07: uvicorn has no --reload here, preview_start reuses what is running).

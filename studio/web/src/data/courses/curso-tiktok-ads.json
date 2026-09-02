@@ -1,0 +1,194 @@
+{
+  "description": "De cero a anuncios que venden en TikTok: creatividades nativas, pujas, Smart+ y escalado",
+  "doc_type": "Plan de campaña en TikTok Ads",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Identificar las secciones principales del Ads Manager y definir la campaña real que trabajarás todo el curso.",
+          "position": 1,
+          "title": "Bienvenida y proyecto transversal"
+        },
+        {
+          "objectives": "Crear un Business Center, añadir un método de pago y configurar una cuenta de anunciante activa.",
+          "position": 2,
+          "title": "Crea tu Business Center y cuenta publicitaria"
+        },
+        {
+          "objectives": "Instalar el código base del píxel en tu sitio web y verificar que registre eventos básicos como página vista.",
+          "position": 3,
+          "title": "Instala el pixel de TikTok"
+        },
+        {
+          "objectives": "Activar el envío de eventos de conversión servidor a servidor y comprobar que lleguen correctamente.",
+          "position": 4,
+          "title": "Configura el Events API (CAPI)"
+        },
+        {
+          "objectives": "Reconocer la estructura campaña-grupo-anuncio y navegar las políticas de revisión que aplican a tu nicho.",
+          "position": 5,
+          "title": "Jerarquía de cuenta y políticas que frenan anuncios"
+        },
+        {
+          "objectives": "Diseñar en borrador tu primera campaña, grupo de anuncios y anuncio con una checklist pre-lanzamiento.",
+          "position": 6,
+          "title": "Arma la estructura de tu proyecto"
+        }
+      ],
+      "module_description": "Tendrás tu cuenta publicitaria activa, el píxel instalado y la estructura de tu campaña real lista para lanzar.",
+      "module_no": 1,
+      "module_title": "Base técnica: prepara tu estructura publicitaria"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Crear un público de visitantes web y otro de compradores usando los eventos del píxel.",
+          "position": 7,
+          "title": "Públicos personalizados desde el píxel"
+        },
+        {
+          "objectives": "Subir un archivo CSV de correos o teléfonos y evaluar la tasa de coincidencia.",
+          "position": 8,
+          "title": "Públicos personalizados con listas de clientes"
+        },
+        {
+          "objectives": "Generar un público similar a partir de tu mejor público personalizado y elegir el porcentaje adecuado.",
+          "position": 9,
+          "title": "Públicos similares (lookalike)"
+        },
+        {
+          "objectives": "Configurar manualmente la segmentación por edad, ubicación, intereses y comportamientos.",
+          "position": 10,
+          "title": "Segmentación demográfica y por intereses"
+        },
+        {
+          "objectives": "Estructurar un test de públicos con variables aisladas para identificar cuál rinde mejor.",
+          "position": 11,
+          "title": "Prueba combinaciones de públicos"
+        },
+        {
+          "objectives": "Entender cómo la automatización usa tus públicos semilla y preparar señales para campañas automatizadas.",
+          "position": 12,
+          "title": "Prepara públicos para Smart+"
+        }
+      ],
+      "module_description": "Crearás públicos que apuntan a gente con intención de compra, usando datos de tu web, listas de clientes y segmentación manual.",
+      "module_no": 2,
+      "module_title": "Audiencias con intención: llega a quien va a comprar"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Identificar el formato nativo: vertical, crudo, basado en un gancho inmediato.",
+          "position": 13,
+          "title": "Por qué la creatividad en TikTok es diferente"
+        },
+        {
+          "objectives": "Redactar un gancho de 3 segundos, mantener la retención y colocar un CTA claro para tu producto.",
+          "position": 14,
+          "title": "Estructura gancho, cuerpo y CTA"
+        },
+        {
+          "objectives": "Planear y grabar un video publicitario con apariencia de contenido generado por usuario, usando solo un smartphone.",
+          "position": 15,
+          "title": "Producción de creatividades estilo UGC"
+        },
+        {
+          "objectives": "Solicitar un código de autorización y crear un Spark Ad a partir de un post orgánico propio o de un creador.",
+          "position": 16,
+          "title": "Spark Ads: convierte orgánico en pagado"
+        },
+        {
+          "objectives": "Verificar dimensiones, duración, textos superpuestos y evitar palabras que activen rechazo automático.",
+          "position": 17,
+          "title": "Especificaciones creativas y revisión visual"
+        },
+        {
+          "objectives": "Construir un set de 3 a 5 variaciones creativas y programar su rotación para mantener el rendimiento.",
+          "position": 18,
+          "title": "Diversidad creativa y manejo de fatiga"
+        }
+      ],
+      "module_description": "Graba videos nativos con tu teléfono, lanza Spark Ads y arma un set de creatividades que mantienen el rendimiento sin fatiga.",
+      "module_no": 3,
+      "module_title": "Creatividades que venden: de nativas a Spark Ads"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Diferenciar entre objetivos de alcance, consideración y conversión, y alinear el tuyo con tu meta de negocio.",
+          "position": 19,
+          "title": "Elige el objetivo de campaña correcto"
+        },
+        {
+          "objectives": "Lanzar una campaña manual de conversión con puja optimizada y evento de compra configurado.",
+          "position": 20,
+          "title": "Campaña manual: tráfico vs. conversión"
+        },
+        {
+          "objectives": "Crear una campaña Smart+ para conversiones y decidir qué módulos automatizar y cuáles mantener manuales.",
+          "position": 21,
+          "title": "Campañas Smart+: cuándo y cómo usarlas"
+        },
+        {
+          "objectives": "Entender cost cap, bid cap y ROAS mínimo objetivo; fijar un presupuesto que permita salir de la fase de aprendizaje.",
+          "position": 22,
+          "title": "Estrategias de puja y presupuesto diario"
+        },
+        {
+          "objectives": "Investigar palabras clave con la herramienta de TikTok y montar una campaña de Search Ads.",
+          "position": 23,
+          "title": "Anuncios de búsqueda: captura intención declarada"
+        },
+        {
+          "objectives": "Reconocer en qué mercados aplica GMV Max y preparar tu catálogo para cuando Shop llegue a Chile.",
+          "position": 24,
+          "title": "GMV Max y contexto de TikTok Shop en LATAM"
+        }
+      ],
+      "module_description": "Manejarás campañas manuales y Smart+, elegirás la puja correcta y explorarás anuncios de búsqueda y GMV Max.",
+      "module_no": 4,
+      "module_title": "Campañas y estrategia de puja: de manual a Smart+"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Comparar ventanas de atribución clic y vista, y elegir la que refleja el verdadero impacto de tus anuncios.",
+          "position": 25,
+          "title": "Atribución y reportería de TikTok"
+        },
+        {
+          "objectives": "Interpretar el rendimiento de tu campaña usando los benchmarks del mercado chileno e identificar dónde está el cuello de botella.",
+          "position": 26,
+          "title": "Métricas clave: CPM, CTR, CVR, CPA, ROAS"
+        },
+        {
+          "objectives": "Determinar si tu campaña tiene datos suficientes para escalar y programar el primer aumento de presupuesto.",
+          "position": 27,
+          "title": "Fase de aprendizaje y salida a escala"
+        },
+        {
+          "objectives": "Ejecutar una prueba dividida de creatividades y declarar un ganador basado en CPA o ROAS.",
+          "position": 28,
+          "title": "Optimización creativa con pruebas A/B"
+        },
+        {
+          "objectives": "Aplicar duplicación de grupos de anuncios (horizontal) y aumento controlado de presupuesto (vertical), configurando reglas automáticas.",
+          "position": 29,
+          "title": "Estrategias de escalado horizontal y vertical"
+        },
+        {
+          "objectives": "Revisar los resultados acumulados de tu proyecto, documentar aprendizajes y planear la siguiente iteración.",
+          "position": 30,
+          "title": "Proyecto final: audita tu campaña de 30 días"
+        }
+      ],
+      "module_description": "Leerás tus métricas, optimizarás con pruebas A/B y escalarás tu campaña con datos reales, sin quedarte estancado en fase de aprendizaje.",
+      "module_no": 5,
+      "module_title": "Medición, optimización y escalado con datos reales"
+    }
+  ],
+  "slug": "curso-tiktok-ads",
+  "title": "TikTok Ads",
+  "total": 30
+}

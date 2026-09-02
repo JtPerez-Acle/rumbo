@@ -1,0 +1,25 @@
+---
+/* One course, as a real link.
+ *
+ * The meta line leads with the DELIVERABLE, not "30 lecciones · 5 módulos".
+ * Volume-as-value is the marketplace's signature move, it was on this card
+ * fourteen times per page, and it is the one number any competitor beats
+ * trivially. The lesson count stays, demoted, because it is still a fair thing
+ * to want to know.
+ */
+import Icon from './Icon.astro';
+const { course: c } = Astro.props;
+---
+<a class="card course-card" href={`/curso/${c.slug}`}>
+  <h3 style="padding-right:10px">{c.title}</h3>
+  {c.description && <p class="desc">{c.description}</p>}
+  {c.doc_type && (
+    <p class="delivers">
+      <Icon name="doc" class="ic ic-s" /> Terminas con: {c.doc_type}
+    </p>
+  )}
+  <div class="meta">
+    <span>{c.modules} módulos · {c.total} lecciones</span>
+    <Icon name="arrow" class="ic ic-s" />
+  </div>
+</a>

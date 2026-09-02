@@ -1,0 +1,194 @@
+{
+  "description": "Modela fenómenos culturales como redes: construye el grafo, interpreta las métricas y reconoce sus límites",
+  "doc_type": "Análisis de redes de un fenómeno cultural",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Seleccionar un fenómeno cultural concreto y formular una pregunta que pueda reformularse como relación entre pares de entidades discretas.",
+          "position": 1,
+          "title": "Elige tu fenómeno y dime qué quieres entender"
+        },
+        {
+          "objectives": "Completar la declaración de grafo: qué es un nodo, cuándo existe una arista, cómo se observa, y dónde se traza la frontera.",
+          "position": 2,
+          "title": "Nodo, arista, frontera: las tres decisiones que definen todo"
+        },
+        {
+          "objectives": "Distinguir preguntas convertibles en grafo de preguntas que requieren otros métodos, identificando el error de categoría en cada caso.",
+          "position": 3,
+          "title": "Lo que no se puede grafificar (y por qué)"
+        },
+        {
+          "objectives": "Escribir a mano la matriz de adyacencia de un subconjunto de tu red y entender por qué en la práctica trabajamos con listas de aristas.",
+          "position": 4,
+          "title": "La matriz de adyacencia: tu red en forma de tabla"
+        },
+        {
+          "objectives": "Crear un archivo aristas.csv con 20–40 relaciones reales de tu fenómeno, documentando la fuente de cada arista.",
+          "position": 5,
+          "title": "Manos a los datos: construye tu primer CSV de aristas"
+        },
+        {
+          "objectives": "Importar tu CSV a Gephi, aplicar un layout de fuerza, y escribir qué significa y qué NO significa la posición de los nodos.",
+          "position": 6,
+          "title": "Primer vistazo en Gephi: lo que ves y lo que no ves"
+        }
+      ],
+      "module_description": "Podrás decidir si tu pregunta cultural se puede grafificar, definir nodos y aristas con criterio empírico, y construir tu primera lista de relaciones.",
+      "module_no": 1,
+      "module_title": "Del fenómeno al grafo: construye tu red con honestidad"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Calcular el grado en tu red e interpretarlo como volumen de actividad relacional directa, sin confundirlo con prestigio ni con calidad.",
+          "position": 7,
+          "title": "Grado no es influencia (y MusicLab lo demostró)"
+        },
+        {
+          "objectives": "Identificar los nodos con mayor intermediación en tu red y escribir por qué la métrica mide posición geodésica, no transmisión efectiva.",
+          "position": 8,
+          "title": "Intermediación: el puente que puede no estar usándose"
+        },
+        {
+          "objectives": "Calcular cercanía y eigenvector en tu red, explicar sus supuestos de aplicación, y decidir cuál responde a tu pregunta cultural.",
+          "position": 9,
+          "title": "Cercanía y eigenvector: cuándo usarlas y cuándo no"
+        },
+        {
+          "objectives": "Calcular densidad, componentes y clustering en tu red, e interpretarlos evitando la comparación ingenua entre redes de distinto tamaño.",
+          "position": 10,
+          "title": "Densidad, componentes y clustering: la cohesión y sus trampas"
+        },
+        {
+          "objectives": "Producir un reporte de 8 indicadores sobre tu red con NetworkX o igraph, justificando por qué elegiste cada métrica y no otras.",
+          "position": 11,
+          "title": "El reporte métrico mínimo: menos es más"
+        },
+        {
+          "objectives": "Redactar un párrafo de interpretación para grado, intermediación y clustering que condicione cada afirmación a las decisiones de construcción.",
+          "position": 12,
+          "title": "Interpretación escrita: 'dado cómo construí esta red...'"
+        }
+      ],
+      "module_description": "Podrás calcular métricas de centralidad y cohesión, explicar qué asume cada una sobre cómo circula algo por tu red, y detectar la malinterpretación más común.",
+      "module_no": 2,
+      "module_title": "Mide sin mentir: métricas, supuestos y malinterpretaciones"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Ejecutar Leiden tres veces con semillas distintas, comparar las particiones, y nombrar cada comunidad estable con conocimiento de tu terreno.",
+          "position": 13,
+          "title": "Comunidades con Leiden: una hipótesis, no un descubrimiento"
+        },
+        {
+          "objectives": "Explicar por qué la modularidad no detecta comunidades pequeñas en redes grandes y cómo afecta eso a la interpretación de tu partición.",
+          "position": 14,
+          "title": "El límite de resolución y otros peligros de la modularidad"
+        },
+        {
+          "objectives": "Medir si en tu red los vínculos conectan a similares y distinguir conceptualmente homofilia de elección de homofilia inducida por la estructura de oportunidades.",
+          "position": 15,
+          "title": "Homofilia: ¿eligen parecerse o solo tienen eso disponible?"
+        },
+        {
+          "objectives": "Identificar en tu red un nodo candidato a broker entre comunidades y escribir qué evidencia extra-red haría falta para afirmar que ejerce corretaje.",
+          "position": 16,
+          "title": "Agujeros estructurales: el valor de tender puentes entre grupos"
+        },
+        {
+          "objectives": "Evaluar si tu red se ajusta al modelo núcleo-periferia de Borgatti-Everett e interpretar qué mecanismo social (ventaja acumulativa, efecto Mateo) es plausible.",
+          "position": 17,
+          "title": "Núcleo-periferia: la firma estructural de la consagración"
+        },
+        {
+          "objectives": "Construir una red persona×evento de tu fenómeno, proyectarla con umbral, y comparar el clustering obtenido contra lo esperado por un modelo nulo bipartito.",
+          "position": 18,
+          "title": "Redes bipartitas: proyección con los ojos abiertos"
+        }
+      ],
+      "module_description": "Podrás detectar comunidades con Leiden, evaluar si tu red tiene núcleo-periferia, identificar agujeros estructurales, y trabajar con redes bipartitas sin caer en sus trampas.",
+      "module_no": 3,
+      "module_title": "Estructura: comunidades, puentes y la dualidad de la afiliación"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Explicar qué significan 'mundo pequeño' y 'cola pesada' en tu red, y por qué Broido y Clauset encontraron que las leyes de potencia estrictas son raras.",
+          "position": 19,
+          "title": "Mundo pequeño y escala libre: las topologías de referencia"
+        },
+        {
+          "objectives": "Explicar el modelo de umbrales de Granovetter 1978 y formular una hipótesis sobre qué umbrales podrían operar en la adopción de una práctica de tu fenómeno.",
+          "position": 20,
+          "title": "Umbrales: por qué distribuciones casi idénticas producen resultados opuestos"
+        },
+        {
+          "objectives": "Distinguir una práctica informacional de una práctica identitaria en tu fenómeno y argumentar cuál se difundiría por lazos débiles y cuál necesita redundancia.",
+          "position": 21,
+          "title": "Contagio complejo: cuando los lazos débiles no bastan"
+        },
+        {
+          "objectives": "Explicar por qué las afirmaciones de contagio de obesidad y felicidad a tres grados fueron cuestionadas metodológicamente, y qué implica para tu propio análisis.",
+          "position": 22,
+          "title": "El caso Christakis-Fowler: cuando 'contagio' es una palabra grande"
+        },
+        {
+          "objectives": "Partir tu lista de aristas en dos períodos, comparar densidad y componente gigante, y señalar un camino del agregado que nunca existió en el tiempo.",
+          "position": 23,
+          "title": "Redes temporales: tu grafo agregado miente sobre la difusión"
+        },
+        {
+          "objectives": "Correr los modelos de segregación y diseminación cultural en NetLogo, variar un parámetro, y escribir qué demuestra el modelo (suficiencia) y qué no (explicación).",
+          "position": 24,
+          "title": "Modelos basados en agentes: Schelling y Axelrod en NetLogo"
+        }
+      ],
+      "module_description": "Podrás distinguir contagio simple de complejo, partir tu red en períodos, y correr modelos basados en agentes para entender emergencia y path dependence en cultura.",
+      "module_no": 4,
+      "module_title": "Dinámica: difusión, umbrales y por qué lo viral no se predice desde el contenido"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": " Explicar por qué 'los conectados se parecen' admite tres explicaciones indistinguibles con datos observacionales, y decidir cuál reportar en tu red.",
+          "position": 25,
+          "title": "Homofilia vs. influencia: la confusión constitutiva"
+        },
+        {
+          "objectives": "Identificar en tu análisis un posible salto de nivel (de comunidad a individuo o de red total a experiencia de un nodo) y corregir la redacción.",
+          "position": 26,
+          "title": "Falacia ecológica: la comunidad no es el individuo"
+        },
+        {
+          "objectives": "Auditar la frontera de tu red, estimar qué porcentaje de relaciones quedó fuera, y desconfiar de la centralidad de los nodos de borde.",
+          "position": 27,
+          "title": "Frontera y datos faltantes: lo que amputaste de tu red"
+        },
+        {
+          "objectives": "Explicar por qué una red de follows o likes mide conducta en esa plataforma bajo ese algoritmo, no la estructura social, y qué sesgos introduce tu fuente de datos.",
+          "position": 28,
+          "title": "La plataforma no es la sociedad: el proxy digital bajo sospecha"
+        },
+        {
+          "objectives": "Escribir qué dimensión de tu fenómeno cultural no captura tu red y qué método interpretativo necesitarías para complementarla.",
+          "position": 29,
+          "title": "Cuantificar la cultura: lo que la métrica descarta"
+        },
+        {
+          "objectives": "Aplicar la tabla de límites del Bloque 5 a tu propio proyecto, redactar una autocrítica de una página, y decidir qué afirmaciones retiras o condicionas.",
+          "position": 30,
+          "title": "Crítica metodológica final: audita tu propia red con la tabla de límites"
+        }
+      ],
+      "module_description": "Podrás auditar la homofilia-influencia, la falacia ecológica, el sesgo de frontera, los datos faltantes y el proxy digital en cualquier red publicada, incluida la tuya.",
+      "module_no": 5,
+      "module_title": "Límites: lo que estas herramientas no pueden hacer (y cómo saberlo)"
+    }
+  ],
+  "slug": "curso-grafos-cultura",
+  "title": "Grafos y sistemas complejos",
+  "total": 30
+}

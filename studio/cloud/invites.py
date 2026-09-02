@@ -19,7 +19,7 @@ def create(label: str, max_uses: int) -> None:
         db.create_invite(conn, code, label, max_uses)
         conn.commit()
     print(f"code: {code}  (label: {label!r}, max_uses: {max_uses})")
-    print(f"invite link: /aprende?invite={code}")
+    print(f"invite link: /login?invite={code}")
 
 
 def show() -> None:

@@ -1,0 +1,38 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "fraunces",
+        "createdAt": "2026-09-02T21:40:28.995Z",
+        "reason": "user confirmed: DESIGN.md's load-bearing rule is 'the interface is grotesk (Archivo), the work is serif (Fraunces)'; PRODUCT.md lists El Taller Nocturno as a binding identity to be refined and not replaced, and the user's frontend spec put palette/type redesign on the explicit Not-doing list"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#000",
+        "createdAt": "2026-09-02T22:23:50.028Z",
+        "reason": "video letterbox behind a 9:16 element; --ink is a warm near-black and would show as a purple frame against the video's own true-black bars. Not a palette colour."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#fff",
+        "createdAt": "2026-09-02T22:23:50.107Z",
+        "reason": "canvas for mermaid, which renders with its light 'default' theme; a substrate for third-party output rather than a surface in El Taller Nocturno"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#0000ee",
+        "createdAt": "2026-09-02T22:23:50.197Z",
+        "reason": "named in a comment and in a reset rule to OVERRIDE the UA link blue — it is the value being defeated, and it caused the 1.9:1 course-list regression"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "3px",
+        "createdAt": "2026-09-02T22:23:50.276Z",
+        "reason": "the brandmark's 14px inner square; the documented 6px would round it to near-circular and it is the logo's own geometry"
+      }
+    ]
+  }
+}

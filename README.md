@@ -93,7 +93,11 @@ studio/cloud/             The engine.
 studio/dashboard/         The application.
   app.py                  FastAPI: admin API, token gate, share pages
   learn_routes.py         The entire learner API
-  static/learn.html       The learner app — one file, no build step
+  static/index.html       The operator dashboard (the last vanilla page)
+
+studio/web/               The whole frontend. Astro pages + Svelte components,
+                          compiled in Docker stage 1 and served by FastAPI.
+                          `npm test` builds, then runs 128 assertions.
 
 studio/channels/*.toml    Course definitions. Single source of truth for anything
                           a learner sees.

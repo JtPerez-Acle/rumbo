@@ -147,6 +147,35 @@ def main(argv: list[str]) -> int:
         print("=" * 68)
         return 2
 
+    # ---- the frontend is built, and nothing ships from a CDN ---------------
+    # /aprende is behind a session and answers a cookie-less request with a
+    # redirect, so what is asserted here is the BUILD OUTPUT rather than a
+    # response. learn.html — the 3,192-line file both frontends used to live in —
+    # is gone; if it comes back, so does the bug that ended it.
+    from pathlib import Path as _Path
+    dist = _Path(__file__).resolve().parents[1] / "web" / "dist"
+    legacy = _Path(__file__).resolve().parents[1] / "dashboard" / "static" / "learn.html"
+    check("the vanilla SPA is gone", not legacy.exists(),
+          "learn.html is back; the public surface and the app would drift again")
+    check("the app was built", (dist / "aprende" / "index.html").is_file(),
+          "run: cd studio/web && npm ci && npm run build")
+    if (dist / "aprende" / "index.html").is_file():
+        app_html = (dist / "aprende" / "index.html").read_text(encoding="utf-8")
+        check("the app is branded Rumbo",
+              "Rumbo" in app_html and "Aprende IA" not in app_html)
+        # A learner's workspace must never enter a search index: their documents
+        # live on unguessable tokens, and an indexed token is not unguessable.
+        check("the app tells crawlers to stay out", "noindex" in app_html)
+        # marked, DOMPurify and mermaid are bundled now. A CDN reappearing here
+        # is a third party back on the critical path of a page that carries a
+        # session cookie and a portfolio.
+        for page, label in ((dist / "index.html", "the landing"),
+                            (dist / "aprende" / "index.html", "the app")):
+            if page.is_file():
+                check(f"{label} loads no CDN script",
+                      "cdn.jsdelivr.net" not in page.read_text(encoding="utf-8"),
+                      "a third-party script origin is back")
+
     # Preflight. Without this, an unreachable base means every HTTP assertion
     # below waits out its own timeout and the run takes minutes to tell you the
     # server is not running. A tool that is slow to say "no" is a tool nobody
@@ -162,22 +191,33 @@ def main(argv: list[str]) -> int:
         return 1 if offline_bad else 0
 
     # ---- public surfaces answer, and carry real metadata -------------------
-    for path, want_view in (("/oferta", '"oferta"'), ("/lista", '"lista"'),
-                            ("/cursos", '"cursos"'), ("/login", '"login"')):
+    # Each of these is now its own built HTML file, so a page either IS its view
+    # or it is the wrong file. There is no `window.__VIEW__` to assert any more:
+    # the server used to hand the SPA a starting view because all six URLs were
+    # the same document, which is the arrangement this whole migration removed.
+    for path, headline in (("/oferta", "Dinos qué quieres"),
+                           ("/lista", "Te avisamos cuando se abra tu cupo"),
+                           ("/cursos", "Todo lo que puedes estudiar"),
+                           ("/login", "Entra y sigue donde lo dejaste")):
         code, body = fetch(base + path)
         check(f"{path} serves", code == 200, f"got {code}")
-        check(f"{path} names its view", want_view in body)
+        check(f"{path} is its own page", headline in _strip_scripts(body),
+              "served a different page's HTML, or an empty shell")
         check(f"{path} has a real <title>", "<title>" in body and "Rumbo" in body)
         check(f"{path} has an og:description", 'property="og:description"' in body)
 
     code, body = fetch(f"{base}/curso/{DEMO_SLUG}")
     check("/curso/<slug> serves", code == 200, f"got {code}")
     check("/curso/<slug> titles the real course", "Meta Ads" in body)
-    check("/curso/<slug> passes the slug", f'"{DEMO_SLUG}"' in body)
+    check("/curso/<slug> names its deliverable", "Plan de campaña" in _strip_scripts(body),
+          "the page argues the document first; without it this is a table of contents")
 
-    # An unknown slug is a visitor's typo, never a 500.
-    code, _ = fetch(f"{base}/curso/no-existe-este-curso")
+    # An unknown slug is a visitor's typo, never a 500 and never a dead end: it
+    # redirects to the catalog, which urllib follows.
+    code, body = fetch(f"{base}/curso/no-existe-este-curso")
     check("/curso/<unknown> does not error", code == 200, f"got {code}")
+    check("/curso/<unknown> lands on the catalog",
+          "Todo lo que puedes estudiar" in _strip_scripts(body))
 
     # ---- the pages carry their CONTENT, not just their metadata ------------
     # Every public page used to serve exactly eleven characters of body text —
@@ -186,9 +226,12 @@ def main(argv: list[str]) -> int:
     # metadata was never the thing that was missing.
     for path, needle, why, markup in (
         ("/", "tutora", "the landing's argument", False),
-        ("/cursos", '<a href="/curso/', "links a crawler can walk to the temarios", True),
+        # Attribute order, not the link, is what an `<a href=` needle actually
+        # tests — and it changed the moment these became components.
+        ("/cursos", 'href="/curso/', "links a crawler can walk to the temarios", True),
         (f"/curso/{DEMO_SLUG}", "Módulo 1", "the modules", False),
-        ("/oferta", "aviso de trabajo", "what the analyser does", False),
+        ("/oferta", "oferta de trabajo que te interesa", "what the analyser does", False),
+        ("/", "SMART", "the real lesson, not a description of one", False),
     ):
         _, body = fetch(base + path)
         hay = _no_scripts(body) if markup else _strip_scripts(body)
@@ -214,20 +257,26 @@ def main(argv: list[str]) -> int:
           f"only {body.count('/curso/')} course URLs")
     check("sitemap uses the public base url", "ponrumbo.com" in body or "localhost" in body)
 
-    # ---- mermaid is off the critical path ----------------------------------
-    # It used to be an eager import in <head>: ~215 KB over 19 requests on every
-    # page load, from a floating major tag, for a landing whose lesson has no
-    # diagram at all.
-    _, body = fetch(base + "/")
-    check("mermaid is not eagerly imported", "import mermaid from" not in body,
-          "back on the critical path — 215 KB on every page load")
-    check("mermaid is pinned to an exact version", "mermaid@11.4.1" in body,
-          "a floating tag lets a bad release arrive on its own")
+    # ---- the public site ships no CDN dependency at all --------------------
+    # Static pages have no runtime library to fetch. A CDN <script> reappearing
+    # here means a component reached for one, and that is a third party on the
+    # critical path of the page strangers arrive on.
+    for path in ("/", "/cursos", "/oferta"):
+        _, body = fetch(base + path)
+        check(f"{path} loads no CDN script", "cdn.jsdelivr.net" not in body,
+              "a third-party script on the public critical path")
 
-    # ---- the app still serves ---------------------------------------------
+    # ---- the app is behind a session ---------------------------------------
+    # These two used to fetch /aprende and read the SPA. They now silently read
+    # the LANDING, because a request with no cookie is redirected there and
+    # urllib follows it — so both passed while asserting nothing about the app.
+    # What is worth checking over HTTP is the redirect itself; the app's markup
+    # is asserted offline above, against the file.
     code, body = fetch(base + "/aprende")
     check("/aprende serves", code == 200, f"got {code}")
-    check("/aprende is branded Rumbo", "Rumbo" in body and "Aprende IA" not in body)
+    check("/aprende sends a visitor with no session to the public site",
+          "Todo lo que puedes" in body or "Haz una clase" in body,
+          "a stranger reached the learner app instead of the landing")
 
     # ---- the free lesson (docs/11) ----------------------------------------
     code, body = fetch(base + "/api/learn/public/demo")

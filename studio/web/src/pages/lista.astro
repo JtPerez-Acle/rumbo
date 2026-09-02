@@ -1,0 +1,30 @@
+---
+/* The waitlist. Access is invite-gated and this is the queue.
+ *
+ * The heading promises a cupo, so the copy has to stay honest about what the
+ * queue is: an alpha with a real person reading every submission, opening
+ * slowly on purpose.
+ */
+import Public from '../layouts/Public.astro';
+import WaitlistForm from '../components/WaitlistForm.svelte';
+import { SITE_NAME } from '../lib/site.js';
+---
+<Public
+  title={`Pide tu acceso — ${SITE_NAME}`}
+>
+  <div>
+    <div class="eyebrow">Lista de espera</div>
+    <h1 style="margin-top:10px">Te avisamos cuando se abra tu cupo.</h1>
+    <p class="muted" style="margin-top:8px">
+      Estamos en fase alfa con acceso por invitación. Déjanos tu correo y
+      cuéntanos qué quieres aprender.
+    </p>
+    <p class="muted" style="margin-top:8px">
+      Mientras tanto puedes hacer <a class="doorlink" href="/">una clase completa
+      sin cuenta</a>, y leer el temario entero de
+      <a class="doorlink" href="/cursos">cualquier curso</a>.
+    </p>
+  </div>
+
+  <WaitlistForm client:load />
+</Public>

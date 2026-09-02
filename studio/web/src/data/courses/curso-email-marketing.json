@@ -1,0 +1,194 @@
+{
+  "description": "Monta el email de tu tienda: flujos automatizados, entregabilidad y campañas que venden",
+  "doc_type": "Programa de email marketing",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Podrás decidir el mix de canales para tu tienda documentando el tamaño actual de tu lista, ticket promedio y ciclo de recompra.",
+          "position": 1,
+          "title": "El email no está muerto en LatAm: tu canal propio"
+        },
+        {
+          "objectives": "Sabrás comparar costos proyectados a 18-24 meses según tu lista y frecuencia, y detectarás que el plan gratuito de Brevo escala de verdad.",
+          "position": 2,
+          "title": "Los 4 modelos de cobro y los planes gratuitos reales"
+        },
+        {
+          "objectives": "Crearás tu cuenta gratuita en Brevo o Klaviyo, conectarás tu tienda y sabrás cuánto pagarás cuando crezcas.",
+          "position": 3,
+          "title": "Elige tu plataforma con el árbol de decisión"
+        },
+        {
+          "objectives": "Redactarás el texto de consentimiento que cumple con las leyes de LatAm y ubicarás en tu plataforma la evidencia de cada opt-in para exportarla.",
+          "position": 4,
+          "title": "Captura legal y consentimiento en 2026"
+        },
+        {
+          "objectives": "Instalarás un popup con temporizador correcto, activarás el opt-in de checkout y etiquetarás a cada contacto por fuente de alta.",
+          "position": 5,
+          "title": "Mecánicas de captura que sí funcionan"
+        },
+        {
+          "objectives": "Ejecutarás las primeras semanas de envío solo a tus clientes más recientes para construir reputación sin disparar spam.",
+          "position": 6,
+          "title": "Calentamiento: tus primeros envíos seguros"
+        }
+      ],
+      "module_description": "Elegirás plataforma con números reales a 24 meses, crearás tu cuenta y dejarás una lista de contactos legal, etiquetada y con un envío de calentamiento corriendo.",
+      "module_no": 1,
+      "module_title": "Cimientos: plataforma y lista"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Podrás explicar con números cuánto cae la colocación en bandeja de entrada sin autenticación y cómo afecta a tu programa.",
+          "position": 7,
+          "title": "Por qué la entregabilidad es lo primero"
+        },
+        {
+          "objectives": "Distinguirás los tres protocolos con una sola analogía y sabrás qué registro DNS publicar en cada caso.",
+          "position": 8,
+          "title": "SPF, DKIM y DMARC sin tecnicismos"
+        },
+        {
+          "objectives": "Crearás un subdominio para marketing, publicarás SPF, DKIM y DMARC en modo monitoreo, y validarás la configuración.",
+          "position": 9,
+          "title": "Subdominio y autenticación paso a paso"
+        },
+        {
+          "objectives": "Verificarás que tus correos muestran el botón nativo de cancelar suscripción en Gmail y entenderás el requisito RFC 8058.",
+          "position": 10,
+          "title": "El botón de baja en un clic que exige Gmail"
+        },
+        {
+          "objectives": "Activarás Google Postmaster Tools, leerás tu tasa de spam real y sabrás cómo reaccionar si supera el umbral de 0,10%.",
+          "position": 11,
+          "title": "Postmaster Tools y monitor de reputación"
+        },
+        {
+          "objectives": "Programarás la supresión automática de rebotes duros y contactos inactivos, y mantendrás la tasa de rebote bajo el 2%.",
+          "position": 12,
+          "title": "Higiene de lista y protección diaria"
+        }
+      ],
+      "module_description": "Autenticarás tu dominio con SPF, DKIM y DMARC, activarás la baja en un clic que exigen Gmail y Yahoo, y vigilarás tu reputación con Postmaster Tools.",
+      "module_no": 2,
+      "module_title": "Entregabilidad: que llegue a la bandeja"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Compararás el RPR y la tasa de pedido de flujos contra campañas y definirás las reglas de gobierno para que no se pisen.",
+          "position": 13,
+          "title": "Por qué los flujos primero y no las campañas"
+        },
+        {
+          "objectives": "Montarás la secuencia completa con el código en el primer correo, objeciones en el cuarto y urgencia real al final.",
+          "position": 14,
+          "title": "Flujo de bienvenida: 5 correos en 10 días"
+        },
+        {
+          "objectives": "Configurarás los tres correos del flujo sin poner descuento en el primero, atacando el costo de envío y las cuotas en el segundo.",
+          "position": 15,
+          "title": "Carrito abandonado, el rey del ROI"
+        },
+        {
+          "objectives": "Programarás la confirmación, el aviso de despacho y el pedido de reseña, y calcularás el timing para cross-sell solo tras la entrega.",
+          "position": 16,
+          "title": "Post-compra: reduce ansiedad y siembra recompra"
+        },
+        {
+          "objectives": "Definirás el umbral de inactividad con el ciclo de recompra real de tu tienda y montarás la secuencia de 4 correos que termina en supresión.",
+          "position": 17,
+          "title": "Winback: recupera clientes dormidos"
+        },
+        {
+          "objectives": "Construirás el flujo de navegación con un disparador de dos visitas y mencionarás la activación futura de back-in-stock.",
+          "position": 18,
+          "title": "Browse abandonment y los flujos que vienen después"
+        }
+      ],
+      "module_description": "Construirás y activarás los cinco flujos de bienvenida, carrito, post-compra, winback y navegación, dejando cada uno corriendo con sus reglas de salida y prioridad.",
+      "module_no": 3,
+      "module_title": "Flujos que venden mientras duermes"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Redactarás asuntos de 30-50 caracteres con el valor en los primeros 30, medirás los tuyos y entenderás por qué la personalización va en el detalle, no en el nombre.",
+          "position": 19,
+          "title": "Asuntos que se ven completos en móvil"
+        },
+        {
+          "objectives": "Esbozarás emails de una sola columna con un CTA repetido, texto vivo sobre imágenes y un botón de al menos 44 px que se toca sin hacer zoom.",
+          "position": 20,
+          "title": "Estructura de un cuerpo que convierte"
+        },
+        {
+          "objectives": "Ajustarás el voseo o tuteo según tu mercado, mostrarás cuotas sin interés donde convierten más que un descuento, y planificarás las campañas del Hot Sale local y CyberMonday.",
+          "position": 21,
+          "title": "Adaptación al español LatAm y fechas locales"
+        },
+        {
+          "objectives": "Definirás cuántos correos enviar por semana a cada segmento de engagement sin quemar la lista, distinguiendo entre promoción, contenido y lanzamiento.",
+          "position": 22,
+          "title": "Campañas: tipos y frecuencia que funciona"
+        },
+        {
+          "objectives": "Diseñarás un calendario de 30 días con campañas y flujos, llenarás un pilar de contenido y activarás tu primer test A/B de asunto.",
+          "position": 23,
+          "title": "Planificación: tu primer mes de email"
+        },
+        {
+          "objectives": "Configurarás un test simple de línea de asunto, generarás 15 variantes con IA y elegirás tres candidatas para tu primer experimento real.",
+          "position": 24,
+          "title": "Pruebas A/B y variantes con IA"
+        }
+      ],
+      "module_description": "Escribirás asuntos que se lean completos en móvil, cuerpos con un solo CTA y tu primer calendario mensual de campañas adaptado a las fechas comerciales de LatAm.",
+      "module_no": 4,
+      "module_title": "Copywriting y campañas que abren"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Seleccionarás RPR, tasa de pedido, tasa de clic y porcentaje de ingreso total como tu tablero, y descartarás la tasa de apertura como KPI por la inflación de Apple Mail.",
+          "position": 25,
+          "title": "Las 4 métricas que sí importan y las que ignorar"
+        },
+        {
+          "objectives": "Calcularás el ingreso atribuido contra el costo de plataforma más tu tiempo, y proyectarás el retorno de cada flujo con los RPR de referencia escalados a tu ticket.",
+          "position": 26,
+          "title": "Cálculo del ROI real de tu email"
+        },
+        {
+          "objectives": "Dividirás tu lista en activos, semi-activos e inactivos y excluirás a estos últimos de las campañas para proteger tu reputación de inmediato.",
+          "position": 27,
+          "title": "Segmentación por engagement: lo mínimo que no falla"
+        },
+        {
+          "objectives": "Exportarás los pedidos, construirás una tabla RFM con tres niveles y crearás los seis segmentos accionables, desde campeones hasta perdidos.",
+          "position": 28,
+          "title": "RFM desde cero con tu propia tienda"
+        },
+        {
+          "objectives": "Armarás una hoja con las 4 métricas, registrarás el primer mes como baseline y establecerás las metas de los siguientes 60 días.",
+          "position": 29,
+          "title": "Tu tablero de control y baseline propio"
+        },
+        {
+          "objectives": "Revisarás tu programa con la rúbrica de 70 puntos, corregirás los 16 errores más comunes y dejarás tus cinco flujos activos con el tablero listo.",
+          "position": 30,
+          "title": "Auditoría final y puesta en marcha"
+        }
+      ],
+      "module_description": "Construirás tu tablero de 4 métricas, calcularás tu ROI real, aplicarás segmentación RFM y dejarás tu programa operativo con una auditoría final de 70 puntos.",
+      "module_no": 5,
+      "module_title": "Métricas, segmentación y puesta en marcha"
+    }
+  ],
+  "slug": "curso-email-marketing",
+  "title": "Email marketing",
+  "total": 30
+}

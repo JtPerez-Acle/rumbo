@@ -1,0 +1,194 @@
+{
+  "description": "De cero a campañas que convierten en Google: Search, Performance Max, Demand Gen y Shopping",
+  "doc_type": "Plan de campaña en Google Ads",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Podrás identificar los ocho tipos de campaña activos, explicar la estructura Power Pack recomendada por Google y calcular qué porcentaje de presupuesto asignar a cada una según el negocio.",
+          "position": 1,
+          "title": "El tablero en 2026: tipos de campaña, Power Pack y cómo se gana la subasta"
+        },
+        {
+          "objectives": "Configurarás un contenedor de GTM, publicarás la etiqueta de Google en tu sitio y verificarás que dispara en todas las páginas con el modo vista previa.",
+          "position": 2,
+          "title": "Instala Google Tag y Google Tag Manager sin romper nada"
+        },
+        {
+          "objectives": "Crearás una acción de conversión primaria en Google Ads, asignarás un valor aproximado y activarás las conversiones mejoradas para recuperar datos perdidos por cookies.",
+          "position": 3,
+          "title": "Define conversiones primarias, secundarias y Enhanced Conversions"
+        },
+        {
+          "objectives": "Vincularás GA4 con Google Ads, importarás eventos clave como conversiones secundarias y leerás los informes de tráfico post-clic para detectar páginas problema.",
+          "position": 4,
+          "title": "Enlaza GA4 y entiende las métricas que importan (no solo clics)"
+        },
+        {
+          "objectives": "Implementarás el Consent Mode en GTM, configurarás los estados de consentimiento para ad_user_data y ad_personalization, y comprobarás que las señales fluyen incluso cuando el usuario rechaza cookies.",
+          "position": 5,
+          "title": "Consent Mode v2 y privacidad: por qué tu tracking puede estar roto en silencio"
+        },
+        {
+          "objectives": "Evaluarás el nivel de calidad de tus futuros anuncios, identificarás los tres componentes que lo suben (CTR esperado, relevancia y experiencia de página) y diseñarás la estructura de cuenta para tu negocio.",
+          "position": 6,
+          "title": "Ad Rank y Quality Score: la nota que decide cuánto pagas"
+        }
+      ],
+      "module_description": "Tendrás la cuenta configurada con tracking fiable (GTM, GA4, Consent Mode), conversiones que miden lo que importa y la estructura de campañas correcta para no quemar presupuesto.",
+      "module_no": 1,
+      "module_title": "Fundamentos y medición: prepara la cuenta para que todo funcione"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Crearás una lista de palabras clave para tu negocio usando el planificador, elegirás el tipo de concordancia según tu historial de conversiones y explicarás por qué broad solo funciona con medición sólida.",
+          "position": 7,
+          "title": "Concordancias en 2026: broad, frase, exacta y negativas sin quemar presupuesto"
+        },
+        {
+          "objectives": "Configurarás una campaña de búsqueda con presupuesto diario, ubicación, idioma y rotación de anuncios, y la dejarás lista para recibir los RSAs de la siguiente lección.",
+          "position": 8,
+          "title": "Tu primera campaña de Search paso a paso"
+        },
+        {
+          "objectives": "Redactarás 15 títulos y 4 descripciones con ángulos variados (beneficio, precio, urgencia, prueba social) y alcanzarás fortaleza 'buena' o 'excelente' en tu primer anuncio.",
+          "position": 9,
+          "title": "Escribe Responsive Search Ads (RSA) que la máquina y el cliente aman"
+        },
+        {
+          "objectives": "Añadirás enlaces de sitio, textos destacados, extractos estructurados, llamada y ubicación a tu campaña, y calcularás el impacto en la tasa de clics usando la vista previa de la plataforma.",
+          "position": 10,
+          "title": "Recursos (antes extensiones): lo más rentable que puedes añadir hoy"
+        },
+        {
+          "objectives": "Revisarás el informe de términos de búsqueda, añadirás palabras negativas a nivel de campaña y crearás listas negativas compartidas para 'gratis', empleos y tu propia marca.",
+          "position": 11,
+          "title": "Negativas y términos de búsqueda: el control manual que salva cuentas"
+        },
+        {
+          "objectives": "Auditarás tu página de destino con las métricas de GA4 y Google Ads, corregirás la coherencia entre anuncio y página, y medirás la velocidad móvil con herramientas gratuitas.",
+          "position": 12,
+          "title": "Página de destino: cómo no matar tu anuncio en el último segundo"
+        }
+      ],
+      "module_description": "Crearás campañas de Search con anuncios RSA de alta calidad, extensiones, palabras clave afinadas y páginas de destino rápidas que no matan la conversión.",
+      "module_no": 2,
+      "module_title": "Campañas de Búsqueda: el arte del texto que vende"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Decidirás si tu negocio está listo para PMax evaluando tu volumen de conversiones mensual, tipo de producto y presupuesto, y entenderás los canales donde va a aparecer tu anuncio.",
+          "position": 13,
+          "title": "Qué es PMax, cuándo sí y cuándo no (todavía)"
+        },
+        {
+          "objectives": "Montarás un grupo de activos con los textos obligatorios (títulos, descripciones, CTA), subirás imágenes en formato horizontal 1.91:1, cuadrado 1:1 y logo, y aprobarás los requisitos mínimos de la campaña.",
+          "position": 14,
+          "title": "Crea tu primer asset group: textos, imágenes y logos que cumplen las reglas"
+        },
+        {
+          "objectives": "Grabarás un video vertical 9:16 de al menos 10 segundos con tu producto o servicio, lo subirás como recurso y evitarás que Google genere uno automático con tus imágenes.",
+          "position": 15,
+          "title": "Video en PMax: por qué necesitas grabar 10 segundos verticales tú mismo"
+        },
+        {
+          "objectives": "Cargarás al menos una lista de datos propios, un segmento personalizado por búsquedas y tres temas de búsqueda en tu asset group para guiar el aprendizaje inicial de PMax.",
+          "position": 16,
+          "title": "Señales de audiencia y temas de búsqueda: dile a la máquina por dónde empezar"
+        },
+        {
+          "objectives": "Vincularás tu Merchant Center a PMax, seleccionarás los productos del feed que quieres promocionar y entenderás cómo PMax elige entre mostrar un producto de Shopping o un creativo visual.",
+          "position": 17,
+          "title": "PMax con feed de productos: la campaña que reemplazó Smart Shopping"
+        },
+        {
+          "objectives": "Analizarás el rendimiento por canal (Search, Shopping, Video, Display) desde los informes de PMax, excluirás ubicaciones no rentables y configurarás exclusiones de marca para no canibalizar tráfico propio.",
+          "position": 18,
+          "title": "Informes por canal y controles: deja de ver PMax como una caja negra"
+        }
+      ],
+      "module_description": "Montarás PMax con sus activos completos (video, imágenes, textos), señales de audiencia y feed, y sabrás analizar cada canal para controlar el gasto.",
+      "module_no": 3,
+      "module_title": "Performance Max: la campaña todo en uno con creatividad potente"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Producirás un video vertical 9:16 de 15 segundos con gancho en los primeros 3 segundos, una imagen cuadrada promocional y un carrusel de 5 tarjetas con títulos de 40 caracteres.",
+          "position": 19,
+          "title": "Demand Gen en 2026: video vertical para Shorts, imagen, carrusel y specs exactas"
+        },
+        {
+          "objectives": "Crearás un segmento similar (lookalike) a partir de tu lista de clientes, configurarás segmentos personalizados por intereses y palabras clave, y elegirás la opción de optimización por conversiones para mid-funnel.",
+          "position": 20,
+          "title": "Audiencias en Demand Gen: lookalikes, segmentos personalizados y datos propios"
+        },
+        {
+          "objectives": "Compararás ambos tipos de campaña con un caso práctico de e-commerce y uno de servicios, y decidirás cuál usar según la etapa del funnel y el control creativo que necesitas.",
+          "position": 21,
+          "title": "Demand Gen vs PMax: la decisión que define tu presupuesto visual"
+        },
+        {
+          "objectives": "Crearás una cuenta de Merchant Center, subirás un feed con los atributos obligatorios (id, título, precio, disponibilidad, imagen, GTIN) y corregirás los errores de diagnóstico más comunes.",
+          "position": 22,
+          "title": "Merchant Center Next: da de alta tu feed de productos sin errores de aprobación"
+        },
+        {
+          "objectives": "Reescribirás los títulos de 10 productos aplicando la fórmula Marca + Producto + Talla/Color/Material, y usarás los primeros 70 caracteres para incluir los términos que la gente escribe cuando compra.",
+          "position": 23,
+          "title": "Títulos de producto que venden: estructura Marca + Atributos clave"
+        },
+        {
+          "objectives": "Configurarás una campaña de Shopping estándar para un grupo de productos, ajustarás pujas por producto y analizarás los términos de búsqueda visibles para decidir cuándo migrar a PMax.",
+          "position": 24,
+          "title": "Campañas de Shopping estándar vs PMax con feed: aprende a controlar productos"
+        }
+      ],
+      "module_description": "Lanzarás Demand Gen con formatos visuales reales y Shopping con un feed sin errores y títulos que venden, decidiendo cuál campaña usar según tu embudo.",
+      "module_no": 4,
+      "module_title": "Demand Gen y Shopping: formatos visuales y catálogo de productos"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Seleccionarás la estrategia de puja correcta según el momento de tu campaña (aprendizaje, escalado, rentabilidad) y establecerás un objetivo de tCPA o tROAS realista basado en datos históricos.",
+          "position": 25,
+          "title": "Estrategias de puja en 2026: Maximizar clics, conversiones, tCPA y tROAS"
+        },
+        {
+          "objectives": "Calcularás el presupuesto mínimo viable para arrancar, aplicarás cambios de presupuesto de ±20% sin reiniciar el aprendizaje y respetarás los días de 'no tocar' tras un ajuste grande.",
+          "position": 26,
+          "title": "Presupuesto diario y fase de aprendizaje: cómo no sabotear tus propias campañas"
+        },
+        {
+          "objectives": "Ejecutarás la rutina semanal: revisar términos de búsqueda para negativas, comparar conversiones con la semana anterior, evaluar fortaleza de anuncio y reponderar activos, y mover presupuesto hacia lo que convierte.",
+          "position": 27,
+          "title": "Rutina semanal de optimización: 5 pasos en 30 minutos (lunes)"
+        },
+        {
+          "objectives": "Identificarás activos con rendimiento 'bajo' en los reportes de PMax y Demand Gen, y rotarás 1-2 piezas cada 4 semanas manteniendo los históricos que cargan aprendizaje.",
+          "position": 28,
+          "title": "Fatiga creativa: cada cuánto cambiar imágenes y textos sin romper nada"
+        },
+        {
+          "objectives": "Crearás columnas personalizadas de costo por conversión, tasa de conversión y ROAS en Google Ads, y cruzarás esos datos con el informe de embudos de GA4 para detectar fugas post-clic.",
+          "position": 29,
+          "title": "Analizar rendimiento con columnas personalizadas y GA4 (no métricas de vanidad)"
+        },
+        {
+          "objectives": "Lanzarás la campaña real de tu negocio con estructura, medición y creatividades completas, y auditarás los 10 errores típicos de principiante para evitarlos en los primeros 30 días de operación.",
+          "position": 30,
+          "title": "Proyecto final: tu campaña viva, checklist de errores y próximos pasos"
+        }
+      ],
+      "module_description": "Optimizarás campañas vivas con una rutina semanal de 30 minutos, pujas sin sabotajes, rotación de creativos y análisis con métricas propias y GA4.",
+      "module_no": 5,
+      "module_title": "Pujas, presupuesto y operación semanal: de campañas vivas a resultados"
+    }
+  ],
+  "slug": "curso-google-ads",
+  "title": "Google Ads",
+  "total": 30
+}

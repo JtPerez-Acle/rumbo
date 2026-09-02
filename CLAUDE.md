@@ -77,13 +77,17 @@ roughly seventy times faster than it learns.
     `course_factory.py`, `check_job_matcher.py` (matcher calibration),
     `check_tutor.py` (**tutor calibration**), `upload_videos.py`, `invites.py`,
     `backup_db.py`, `producer/publisher/scheduler.py` (dormant), `entrypoint.py`.
-  - `dashboard/` — `app.py` (admin API + token gate + share pages),
-    `learn_routes.py` (**the entire learner API**), `admin_paths.py` (the admin
-    allowlist predicate), `prerender.py` (**server-rendered bodies for the public
-    surfaces** — both are dependency-free so they can be audited and tested under
-    any interpreter), `check_job_render.js` + `check_how_section.js` (**frontend
-    checks — no bundler, no test runner**),
-    `static/{index,learn,doc,caso,ruta}.html`.
+  - `dashboard/` — `app.py` (admin API + token gate + share pages + the six
+    public routes), `learn_routes.py` (**the entire learner API**),
+    `admin_paths.py` (the admin allowlist predicate), `public_site.py` (where the
+    built public pages live, who is redirected past them, robots + sitemap) —
+    both are dependency-free so they can be audited under any interpreter —
+    `static/{index,doc,caso,ruta}.html` (**`index.html` is the admin panel and
+    the last vanilla page left**).
+  - `web/` — **the whole frontend**: Astro pages, Svelte components, 128 vitest
+    assertions. Built in Docker stage 1 and served by FastAPI; **no Node in
+    production**. `src/styles/tokens.css` is the design system's single source
+    of truth and `src/styles/app.css` the component layer.
   - `channels/*.toml` — course profiles. **Single source of truth** for learner copy.
   - `research/*.md` — grounding material for generation. `fixtures/` — matcher fixtures.
   - `output/`, `queue/` — rendered videos and render queue (**git-ignored**).
@@ -99,8 +103,13 @@ roughly seventy times faster than it learns.
   volume at `/app/studio/output`.
 - **Learner app:** https://estudio-production-1b8c.up.railway.app/aprende
 - **Admin dashboard:** same host `/panel` — gated by `DASHBOARD_TOKEN`.
-- **Public site:** the root `/` (docs/11). It used to 401: the dashboard held
-  the most valuable URL in the product and served it to an audience of one.
+- **Public site:** the root `/` (docs/11) — plus `/cursos`, `/curso/<slug>`,
+  `/oferta`, `/lista`, `/login`. **Static files built by Astro** in Docker stage
+  1 from `studio/web/src/data/*.json`; FastAPI serves them and redirects any
+  visitor holding a session into the app instead. A new course therefore
+  appears on **deploy**, not on the database write — run `export_web.py` first.
+  The root used to 401: the dashboard held the most valuable URL in the product
+  and served it to an audience of one.
 - **Secrets are NOT in this repo.** Read at runtime: `railway variables --kv`, and
   `railway variables --service Postgres --kv` (`DATABASE_PUBLIC_URL` is how a local
   script reaches the cloud DB). Never hardcode keys, tokens, or invite codes.
@@ -130,11 +139,12 @@ python studio/cloud/check_job_matcher.py    # matcher, 5 fixtures, ~15 min (real
 python studio/cloud/check_tutor.py          # tutor, 6 properties, ~5 min (real LLM)
 python studio/cloud/check_cv_matcher.py     # CV matcher; reads REAL CVs from ./cvs (git-ignored)
 python studio/cloud/check_public_surface.py [base_url]   # HTTP: public routes + every admin gate
-node studio/dashboard/check_job_render.js studio/dashboard/static/learn.html \
-     studio/fixtures/job-postings/sample-analysis.json
-node studio/dashboard/check_how_section.js
-node studio/dashboard/check_cv_render.js studio/dashboard/static/learn.html
-node studio/dashboard/check_demo_render.js studio/dashboard/static/learn.html
+cd studio/web && npm test     # builds, then runs 128 assertions — before ANY frontend edit
+cd studio/web && npm run build   # Astro static build; Docker stage 1 runs this
+
+# The public pages are built from exported data, so after adding a course:
+python studio/cloud/export_web.py           # write studio/web/src/data/*.json
+python studio/cloud/export_web.py --check   # exit 1 if that export is stale
 
 # Offsite backup (all 20 tables) — before anything risky:
 DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
@@ -212,8 +222,21 @@ DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
 - **Every learner-authored string reaching a model goes through `writer._fenced()`**
   and the system prompt carries `UNTRUSTED_RULE`. Without it a submission could
   dictate its own grade — verified at 100/100 on garbage before the fix.
-- **Untrusted Markdown renders through `renderMD()`** (marked → DOMPurify), never
-  straight to `innerHTML`. That was a stored-XSS sink on the public paper pages.
+- **Untrusted Markdown renders through `renderMarkdownUntrusted()`** (marked →
+  DOMPurify, `lib/untrusted.js`), never straight to `innerHTML`. That was a
+  stored-XSS sink on the public paper pages. On the **public** pages it is
+  rendered at BUILD time with markdown-it and `html:false`, which never parses
+  raw HTML at all — strictly stronger, and it ships no sanitiser to a phone.
+- **Nothing loads from a CDN any more.** marked, DOMPurify and mermaid are
+  bundled from `node_modules`, so their versions are pinned in the lockfile and
+  `script-src` carries no third-party origin. `'unsafe-inline'` is still there
+  for two reasons and only two: the admin panel is still a single inline-script
+  file, and Astro emits a small inline bootstrap per island.
+- **An island's props are serialized into the HTML.** Handing a Svelte island a
+  whole payload ships every field of it twice, once rendered and once inside an
+  `<astro-island props="…">` attribute. Pass only the fields the component
+  reads — and never assert page content without stripping that attribute first,
+  or a test passes on words the page does not render.
 - **Portfolio compilers only see real work** (`MIN_PORTFOLIO_SCORE`, 3 distinct
   items). Fed a non-attempt they do not produce a short document — they **fabricate**.
 

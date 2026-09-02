@@ -1,0 +1,194 @@
+{
+  "description": "Aparece en Google y en las respuestas de la IA (ChatGPT, Perplexity): SEO y AEO con método y sin humo",
+  "doc_type": "Auditoría SEO + AEO",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Identificar en qué superficies (Google clásico, AI Overviews, ChatGPT, Perplexity) aparece tu sitio o tu competencia para una consulta de tu negocio, y registrar el resultado en una planilla.",
+          "position": 1,
+          "title": "Dónde se toman las decisiones de compra hoy"
+        },
+        {
+          "objectives": "Explicar con tus palabras cómo un motor de respuesta recupera, lee y cita fuentes, y detectar al menos una consulta donde tu contenido responde al 'fan-out' pero no a la consulta original.",
+          "position": 2,
+          "title": "RAG y query fan-out: por qué Google y ChatGPT citan lo que citan"
+        },
+        {
+          "objectives": "Leer la guía 'Optimizing for generative AI features' de Google y listar qué tácticas declara textualmente que se pueden ignorar.",
+          "position": 3,
+          "title": "La guía oficial de Google que nadie leyó (mayo 2026)"
+        },
+        {
+          "objectives": "Clasificar 5 afirmaciones sobre SEO o AEO que circulan en blogs y redes según su nivel de evidencia (Primaria, Vendor, No verificable) usando la documentación oficial y los papers del curso.",
+          "position": 4,
+          "title": "No toda cifra es verdad: niveles de evidencia P, V y X"
+        },
+        {
+          "objectives": "Interpretar datos de CTR con AI Overviews presentes (Seer, Ahrefs) y calcular, para una consulta de tu sitio, si la caída de clics es estructural o recuperable.",
+          "position": 5,
+          "title": "AI Overviews no son el enemigo: los números reales de tráfico"
+        },
+        {
+          "objectives": "Auditar tu sitio o el de un competidor y detectar si está invirtiendo tiempo en alguna de las tácticas que Google declara innecesarias (llms.txt, chunking, reescritura 'para IA').",
+          "position": 6,
+          "title": "Lo que Google descartó: llms.txt, chunking y markup para IA"
+        }
+      ],
+      "module_description": "Diagnosticarás dónde aparece tu sitio en Google, ChatGPT y Perplexity, separarás la evidencia real de los mitos y dejarás de invertir tiempo en tácticas que Google descartó.",
+      "module_no": 1,
+      "module_title": "El tablero real: cómo funciona la búsqueda en 2026"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Mapear los 4 motores principales (Google AI Mode, ChatGPT, Gemini, Perplexity) a su índice de recuperación real y deducir una consecuencia operativa para tu sitio.",
+          "position": 7,
+          "title": "Cada motor, su índice: ChatGPT no usa el índice de Google"
+        },
+        {
+          "objectives": "Verificar tu sitio en Bing Webmaster Tools, enviar el sitemap y activar IndexNow en menos de 25 minutos.",
+          "position": 8,
+          "title": "Bing Webmaster Tools: la verificación que abre dos motores a la vez"
+        },
+        {
+          "objectives": "Configurar IndexNow en tu sitio (plugin o manual) y confirmar que las URLs nuevas se indexan en Bing en menos de un día.",
+          "position": 9,
+          "title": "IndexNow: indexar en minutos, no en semanas"
+        },
+        {
+          "objectives": "Auditar tu robots.txt y distinguir el bot de rastreo-entrenamiento (GPTBot) del bot de recuperación para respuestas (OAI-SearchBot), corrigiendo bloqueos que eliminan tu sitio de ChatGPT.",
+          "position": 10,
+          "title": "robots.txt bot por bot: a quién dejas pasar y a quién bloqueas"
+        },
+        {
+          "objectives": "Buscar tu marca en Gemini para 3 consultas de tu sector y distinguir entre menciones sin enlace y citaciones con enlace, registrando la diferencia en tu planilla de monitoreo.",
+          "position": 11,
+          "title": "Gemini menciona pero no cita: el riesgo de ser nombrado sin enlace"
+        },
+        {
+          "objectives": "Verificar si tu sitio recibe tráfico desde Copilot en GA4 y comparar tu presencia en Copilot vs ChatGPT para las mismas 5 consultas.",
+          "position": 12,
+          "title": "Copilot: el 88% de sus citaciones son exclusivas de su plataforma"
+        }
+      ],
+      "module_description": "Abrirás tu sitio a todos los motores: verificarás Bing, configurarás IndexNow y controlarás con precisión el acceso de cada bot para aparecer en ChatGPT y Copilot.",
+      "module_no": 2,
+      "module_title": "Los motores de respuesta y sus índices: abre todas las puertas"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Aplicar las tres técnicas del paper de Princeton (estadísticas, citas textuales, fuentes enlazadas) a una sección de un artículo de tu sitio y medir si la visibilidad cambia en tu set de prompts.",
+          "position": 13,
+          "title": "El paper de Princeton: +40% de visibilidad añadiendo citas y estadísticas"
+        },
+        {
+          "objectives": "Explicar por qué el escenario multi-actor de C-SEO Bench reduce las ganancias de GEO y recalcular tu expectativa de visibilidad asumiendo que al menos 3 competidores aplican lo mismo que tú.",
+          "position": 14,
+          "title": "C-SEO Bench: cuando todos optimizan, casi nada funciona"
+        },
+        {
+          "objectives": "Leer las correlaciones de Ahrefs (menciones en YouTube, menciones de marca, backlinks, páginas del sitio) y decidir en qué dedicas tu hora semanal de autoridad según tu tipo de negocio.",
+          "position": 15,
+          "title": "Correlación no es receta: las 3 señales que sí importan y las 2 que no"
+        },
+        {
+          "objectives": "Reescribir un artículo o ficha aplicando el checklist de 7 prácticas (respuesta primero, una afirmación por encabezado, cifras con fuente y fecha, fuentes primarias enlazadas, autor con bio, experiencia de primera mano, tablas para datos comparables).",
+          "position": 16,
+          "title": "Formato citable: las 7 prácticas que la evidencia sostiene"
+        },
+        {
+          "objectives": "Identificar qué artículos o fichas de tu sitio son 'commodity' (intercambiables con los de cualquier competidor) y planear cómo añadir experiencia de primera mano a al menos uno de ellos.",
+          "position": 17,
+          "title": "Contenido no-commodity: lo que Google premió en los core updates de 2026"
+        },
+        {
+          "objectives": "Decidir, con base en los datos de Ahrefs (97% de archivos con cero solicitudes) y la postura de Google, si necesitas o no un llms.txt para tu negocio.",
+          "position": 18,
+          "title": "llms.txt: caso cerrado con datos de 137.000 sitios"
+        }
+      ],
+      "module_description": "Reescribirás contenido con técnicas que realmente aumentan la visibilidad en IA, basadas en evidencia, y sabrás qué tácticas ignorar aunque todos las recomienden.",
+      "module_no": 3,
+      "module_title": "Evidencia real de AEO: qué funciona, qué no y por qué"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Clasificar 30 consultas de tu negocio en informacional, comercial, transaccional, navegacional o local usando solo la SERP de Google en incógnito, sin herramientas de pago.",
+          "position": 19,
+          "title": "Intención de búsqueda: una consulta, un tipo de página"
+        },
+        {
+          "objectives": "Crear un mapa de keywords que combine tus datos reales de Search Console (export 16 meses) con un set de 20 prompts largos de comprador, agrupados por intención y localizados al léxico de tu país.",
+          "position": 20,
+          "title": "Keyword research con IA: dos listas, no una"
+        },
+        {
+          "objectives": "Escribir títulos HTML de 50-60 caracteres y H1 naturales para un artículo y una ficha de producto, usando las palabras exactas del comprador y sin relleno de keywords que ChatGPT va a reescribir igual.",
+          "position": 21,
+          "title": "Títulos que sobreviven a la reescritura de la IA"
+        },
+        {
+          "objectives": "Auditar el informe de Páginas no indexadas de Search Console, diagnosticar la causa raíz de al menos 3 URLs y aplicar una solución (corregir noindex, canonical o mejorar contenido).",
+          "position": 22,
+          "title": "Indexación: los 3 motivos reales por los que Google no indexa tus páginas"
+        },
+        {
+          "objectives": "Medir LCP, INP y CLS de tu sitio en campo (CrUX) por plantilla, no por URL, y priorizar 3 fixes con base en datos reales, no en el score de Lighthouse.",
+          "position": 23,
+          "title": "Core Web Vitals sin mitos: los umbrales no cambiaron en 2026"
+        },
+        {
+          "objectives": "Implementar Product schema en una ficha con precio, stock y availability sincronizados con lo que muestra la página, y validarlo con la herramienta de Google.",
+          "position": 24,
+          "title": "Schema sin dogmas: lo que Google exige y lo que solo recomienda"
+        }
+      ],
+      "module_description": "Crearás páginas que Google indexa y los resúmenes de IA citan: dominarás la intención de búsqueda, datos estructurados y los arreglos técnicos que más impactan.",
+      "module_no": 4,
+      "module_title": "SEO on-page y técnico: lo que decide si entras al conjunto de candidatos"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Renombrar una categoría y 5 fichas de producto usando las palabras reales del comprador, extraídas del autocompletado de Mercado Libre y Amazon del país objetivo.",
+          "position": 25,
+          "title": "Nombrar con palabras de compra: el método Mercado Libre"
+        },
+        {
+          "objectives": "Reescribir una categoría de producto con 150-300 palabras útiles (criterios de elección reales, no relleno), enlaces a subcategorías y productos top, y breadcrumbs.",
+          "position": 26,
+          "title": "La categoría es más importante que la ficha para consultas sin marca"
+        },
+        {
+          "objectives": "Determinar si tu tienda ya está en ChatGPT Shopping (vía Shopify, feed directo o web abierta) y decidir si necesitas un feed directo según si eres el vendedor principal de tu propia marca.",
+          "position": 27,
+          "title": "ChatGPT Shopping: las 3 puertas de entrada y la que ya tienes abierta"
+        },
+        {
+          "objectives": "Configurar el monitoreo semanal de Generative AI Performance en Search Console y AI Performance en Bing WMT, y registrar tus citaciones y grounding queries en una planilla.",
+          "position": 28,
+          "title": "Medir sin pagar: los dos informes nuevos de 2026 que sí importan"
+        },
+        {
+          "objectives": "Crear un set de 20-40 prompts de comprador real, correrlos en ChatGPT, Gemini y Perplexity, y registrar si aparece tu marca, quién aparece en su lugar y qué fuentes se citan.",
+          "position": 29,
+          "title": "Baseline manual de prompts: tu termómetro sin herramientas de pago"
+        },
+        {
+          "objectives": "Armar tu calendario semanal personalizado (lectura de datos, producción, e-commerce, autoridad, técnico) y comprometer el primer mes de ejecución con puntos de control semanales.",
+          "position": 30,
+          "title": "La rutina de 6 horas semanales que ejecuta todo el curso"
+        }
+      ],
+      "module_description": "Mantendrás un sistema semanal de 6 horas para crear contenido que vende, medir tu presencia en IA sin pagar herramientas y hacer crecer tu visibilidad en e-commerce.",
+      "module_no": 5,
+      "module_title": "E-commerce, medición y rutina semanal: el sistema completo"
+    }
+  ],
+  "slug": "curso-seo-aeo",
+  "title": "SEO + AEO",
+  "total": 30
+}

@@ -1,0 +1,847 @@
+/* El Taller Nocturno — the component layer.
+ *
+ * One stylesheet again. It was two for the length of the migration: a
+ * byte-for-byte copy of learn.html's inline <style>, held identical by a parity
+ * test, plus a file for everything the rebuilt interface added. learn.html is
+ * gone, so the copy is not a copy of anything and the two have merged.
+ *
+ * tokens.css stays separate and stays the single source of truth for values.
+ * A visual change belongs there; this file consumes tokens and should not
+ * define them.
+ */
+
+  /* ============================================================
+     EL TALLER NOCTURNO — design tokens.
+     One rule: the interface is grotesk (Archivo), the work is
+     serif (Fraunces) and glows paper-white in the dark studio.
+     Change values here; components below only consume tokens.
+     ============================================================ */
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ink);color:var(--text);font-family:var(--sans);line-height:1.5;
+    font-size:var(--fs-base);-webkit-font-smoothing:antialiased}
+
+  /* ---- the parts we did not draw ----
+     Selection, caret, scrollbar and focus ring ship with browser defaults that
+     belong to no design system. In a room this dark, a stock blue selection is
+     the loudest thing on the page. */
+  ::selection{background:rgba(240,164,60,.28);color:var(--text)}
+  html{scrollbar-color:var(--line-strong) var(--ink);accent-color:var(--amber);
+    -webkit-tap-highlight-color:rgba(240,164,60,.18)}
+  input,textarea{caret-color:var(--amber)}
+  a{text-underline-offset:3px;text-decoration-thickness:1px}
+  /* An anchor wearing a component class IS that component, not a link.
+     Buttons, cards, the brand row and the lesson rows became <a> so they would
+     be focusable, crawlable and middle-clickable — and every one then inherited
+     the UA's #0000EE, which on a dark panel is 1.9:1 and is what made the
+     course list look "highlighted". Colour comes from the component or from the
+     surrounding text; never from :link. */
+  a.card,a.brandrow,a.lrow,a.cluster{color:inherit;text-decoration:none}
+
+  /* THE focus ring. There was none: inputs set outline:none and signalled focus
+     only by tinting a 1px border, and every other control is a div. A keyboard
+     or switch user had no idea where they were on any screen in the product. */
+  :focus-visible{outline:2px solid var(--amber-hi);outline-offset:3px;border-radius:var(--r-sm)}
+  .btn:focus-visible,.tabbar button:focus-visible{outline-offset:3px}
+  input:focus-visible,textarea:focus-visible{outline:2px solid rgba(240,164,60,.5);outline-offset:2px}
+  /* Rows, cards and the paper mock are divs that behave like buttons; the
+     observer below makes them reachable, and this makes the reach visible. */
+  .clickable:focus-visible,.back:focus-visible,.cluster:focus-visible,
+  .opt:focus-visible{outline:2px solid var(--amber-hi);outline-offset:2px}
+  /* the lamp: one warm glow from above, plus a whisper of grain */
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(640px 420px at 50% -120px, rgba(240,164,60,.10), transparent 65%)}
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")}
+  .app{position:relative;z-index:1;max-width:560px;margin:0 auto;min-height:100svh;
+    padding:var(--s5) var(--s4) calc(84px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;gap:var(--s4)}
+  /* staged page-enter: one orchestrated rise per view, nothing scattered */
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .app>*{animation:rise var(--dur) var(--ease) both}
+  .app>:nth-child(2){animation-delay:.04s}.app>:nth-child(3){animation-delay:.08s}
+  .app>:nth-child(4){animation-delay:.12s}.app>:nth-child(5){animation-delay:.16s}
+  .app>:nth-child(6){animation-delay:.20s}.app>:nth-child(7){animation-delay:.24s}
+  .app>:nth-child(n+8){animation-delay:.28s}
+
+  /* ---- type ---- */
+  h1,h2{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.08;text-wrap:balance}
+  h1{font-size:var(--fd-lg)} h2{font-size:var(--fd-md)}
+  h3{font-size:var(--fs-lg);font-weight:700;letter-spacing:-.015em;line-height:1.2}
+  .eyebrow{font-size:var(--fs-xs);font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+  .microlabel{font-size:var(--fs-xs);letter-spacing:.13em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  .muted{color:var(--dim)} .faint{color:var(--faint)}
+  .t-sm{font-size:var(--fs-sm)} .t-base{font-size:var(--fs-base)} .t-md{font-size:var(--fs-md)}
+  .serifnum{font-family:var(--serif);font-weight:600;font-variant-numeric:tabular-nums}
+
+  /* ---- icons ---- */
+  .ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+  .ic-s{width:15px;height:15px} .ic-l{width:24px;height:24px}
+
+  /* ---- buttons ---- */
+  button{font-family:inherit;cursor:pointer;border:none;color:inherit;background:none}
+  .btn{display:flex;align-items:center;justify-content:center;gap:var(--s2);width:100%;
+    font-weight:700;font-size:var(--fs-md);border-radius:var(--r-full);padding:14px 22px;
+    transition:transform .15s var(--ease),box-shadow .2s}
+  .btn:active{transform:scale(.98)}
+  /* There was no rule for this at all: during a 25-35s evaluation the primary
+     button kept its full gradient, glow and pointer cursor while inert. */
+  .btn:disabled{opacity:.5;box-shadow:none;cursor:default;transform:none}
+  .btn-primary{background:linear-gradient(140deg,var(--amber-hi),var(--amber));color:var(--amber-ink);box-shadow:var(--glow-amber)}
+  .btn-primary:hover{box-shadow:0 14px 40px -10px rgba(240,164,60,.62)}
+  .btn-paper:hover{box-shadow:0 12px 38px -12px rgba(241,230,206,.4)}
+  .btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--line-strong)}
+  .btn-paper{background:linear-gradient(150deg,var(--paper-hi),var(--paper));color:var(--paper-ink);box-shadow:var(--glow-paper)}
+  .btn-sm{width:auto;font-size:var(--fs-sm);padding:9px 14px;font-weight:700;min-height:44px}
+
+  /* ---- surfaces: three tiers ---- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s4)}
+  .card-hero{background:linear-gradient(165deg,var(--raised),var(--panel));border:1px solid rgba(240,164,60,.35);
+    border-radius:var(--r-lg);padding:var(--s5) var(--s4);box-shadow:var(--glow-amber)}
+  .card-paper{background:var(--panel);border:1px solid rgba(241,230,206,.3);border-radius:var(--r-lg);
+    padding:var(--s4);box-shadow:var(--glow-paper)}
+  .card-spot{background:linear-gradient(160deg,var(--raised),var(--panel));border:1px solid var(--amber);
+    border-radius:var(--r-lg);padding:var(--s4);box-shadow:var(--glow-amber)}
+  .quiet{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s3) var(--s4)}
+
+  /* ---- forms ---- */
+  input,textarea{width:100%;font-family:inherit;font-size:var(--fs-md);color:var(--text);
+    background:var(--raised);border:1px solid var(--line);border-radius:var(--r-md);padding:14px;outline:none;
+    transition:border-color .2s}
+  input:focus,textarea:focus{border-color:var(--amber)}
+  textarea{resize:vertical;min-height:74px}
+  label{font-size:var(--fs-sm);color:var(--dim);font-weight:600;display:block;margin-bottom:var(--s1)}
+
+  /* ---- brand / topbar ---- */
+  .brandrow{display:flex;align-items:center;gap:11px}
+  .brandmark{width:32px;height:32px;border-radius:var(--r-sm);position:relative;flex:none;
+    background:linear-gradient(150deg,var(--amber-hi),var(--amber-deep));box-shadow:0 0 22px rgba(240,164,60,.5)}
+  .brandmark::after{content:"";position:absolute;inset:9px;border-radius:3px;background:var(--ink)}
+  .brandname{font-weight:800;font-size:var(--fs-md);letter-spacing:-.01em}
+  .brandname small{display:block;font-size:var(--fs-xs);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .topbar{display:flex;justify-content:space-between;align-items:center}
+  .back{color:var(--dim);font-size:var(--fs-sm);cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-weight:600;
+    min-height:44px;margin-left:-2px}
+  .back:hover{color:var(--text)}
+
+  /* ---- streak flame: ember → lit → roaring ---- */
+  .flame{display:flex;align-items:center;gap:6px;font-weight:800;font-size:var(--fs-base);
+    padding:6px 12px;border-radius:var(--r-full);font-variant-numeric:tabular-nums;border:1px solid var(--line);color:var(--faint);background:var(--panel)}
+  .flame.lit{color:var(--amber);border-color:rgba(240,164,60,.35);background:rgba(240,164,60,.10)}
+  .flame.hot{color:var(--amber-hi);border-color:rgba(240,164,60,.55);background:rgba(240,164,60,.14);box-shadow:0 0 18px -4px rgba(240,164,60,.55)}
+
+  /* ---- progress ---- */
+  .prog{height:7px;border-radius:var(--r-full);background:var(--raised);overflow:hidden;border:1px solid var(--line)}
+  /* Revealed with clip-path, not width. Animating width relayouts the page on
+     every frame and these bars sit inside cards in a scrolling column; scaleX
+     avoids that but squashes the 99px end caps into ellipses at any fill under
+     100%. clip-path does neither: the element keeps its geometry and only the
+     visible region moves. */
+  .prog>i{display:block;height:100%;width:100%;border-radius:var(--r-full);background:linear-gradient(90deg,var(--amber-deep),var(--amber-hi));
+    transition:clip-path .8s var(--ease)}
+
+  .row{display:flex;align-items:center;gap:10px}
+
+  /* ---- catalog clusters: tap to expand; the relevant one starts open ---- */
+  .cluster{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);cursor:pointer;
+    background:var(--raised);border:1px solid var(--line);border-radius:var(--r-md);color:var(--amber)}
+  .cluster .ct{flex:1;font-weight:800;font-size:var(--fs-md);letter-spacing:-.01em;color:var(--text);margin:0}
+  .cluster .cn{font-size:var(--fs-xs);color:var(--faint);font-weight:700;letter-spacing:.06em}
+  .cluster .chev{display:flex;color:var(--faint);transition:transform .25s var(--ease)}
+  .cluster.open .chev{transform:rotate(90deg)}
+  .cluster-body{display:flex;flex-direction:column;gap:var(--s4)}
+
+  /* ---- catalog cards: title / promise / deliverable / progress / meta ---- */
+  .course-card{cursor:pointer;position:relative;overflow:hidden}
+  /* Amber is the lamp: it means "lit", and DESIGN.md allows exactly one.
+     Ringing all fourteen catalogue cards in it made the accent decoration —
+     fourteen highlighted boxes, so nothing highlighted. The cards take the
+     ordinary hairline; amber returns on hover and focus, where it means
+     "this one", which is what an accent is for. */
+  .course-card{border-color:var(--line);transition:border-color .18s var(--ease),
+    background .18s var(--ease)}
+  .course-card:not(.soon):hover{border-color:rgba(240,164,60,.45);background:var(--raised)}
+  .course-card:not(.soon):focus-visible{border-color:var(--amber)}
+  .course-card.soon{cursor:default;opacity:.7}
+  .course-card h3{margin-bottom:var(--s1);padding-right:70px}
+  .course-card .desc{font-size:var(--fs-sm);color:var(--dim);margin:0 0 var(--s2);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .delivers{font-size:var(--fs-sm);color:var(--paper);margin:0 0 var(--s3);display:flex;align-items:center;gap:7px;font-weight:600}
+  .course-card .meta{display:flex;justify-content:space-between;align-items:center;margin-top:var(--s3);font-size:var(--fs-sm);color:var(--faint)}
+
+  /* ---- pills ---- */
+  .pill{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:var(--r-full)}
+  .pill.soon{background:var(--raised);color:var(--faint);border:1px solid var(--line)}
+  .pill.go{background:rgba(240,164,60,.16);color:var(--amber)}
+  .pill.st-new{background:var(--raised);color:var(--dim);border:1px solid var(--line)}
+  .pill.st-reviewing{background:rgba(240,164,60,.16);color:var(--amber)}
+  .pill.st-building{background:rgba(241,230,206,.12);color:var(--paper)}
+  .pill.st-published{background:rgba(169,196,143,.16);color:var(--sage)}
+  .pill.st-rejected{background:var(--raised);color:var(--faint);border:1px solid var(--line)}
+
+  .req-row{display:flex;align-items:center;gap:10px;padding:var(--s3) var(--s4);border:1px solid var(--line);
+    border-radius:var(--r-md);background:var(--panel);margin-bottom:var(--s2)}
+  .req-row .rt{flex:1;font-size:var(--fs-base);font-weight:600;line-height:1.3}
+  .req-row .rd{font-size:var(--fs-xs);color:var(--faint);margin-top:2px}
+  .req-row.ready{border-color:rgba(169,196,143,.45);cursor:pointer}
+
+  /* ---- evaluation ---- */
+  .scorepill{flex:none;min-width:46px;text-align:center;font-weight:800;font-size:var(--fs-base);
+    padding:6px 10px;border-radius:var(--r-sm);font-variant-numeric:tabular-nums}
+  .scorepill.hi{background:rgba(169,196,143,.16);color:var(--sage);border:1px solid rgba(169,196,143,.4)}
+  .scorepill.mid{background:rgba(240,164,60,.15);color:var(--amber);border:1px solid rgba(240,164,60,.4)}
+  .scorepill.lo{background:rgba(229,130,94,.14);color:var(--terra);border:1px solid rgba(229,130,94,.35)}
+  .scorebig{font-family:var(--serif);font-weight:700;font-size:var(--fd-num);line-height:1;
+    font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  /* Comprehension verdicts: states of understanding, never school grades. */
+  .verdict{font-family:var(--serif);font-weight:600;font-size:var(--fs-xl);line-height:1;letter-spacing:-.01em;flex:none}
+  .verdict.lo_tienes{color:var(--sage)} .verdict.casi{color:var(--amber-hi)} .verdict.todavia_no{color:var(--terra)}
+  .vchip{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 10px;border-radius:var(--r-full);flex:none}
+  .vchip.lo_tienes{background:rgba(169,196,143,.16);color:var(--sage);border:1px solid rgba(169,196,143,.4)}
+  .vchip.casi{background:rgba(240,164,60,.15);color:var(--amber);border:1px solid rgba(240,164,60,.4)}
+  .vchip.todavia_no{background:rgba(229,130,94,.14);color:var(--terra);border:1px solid rgba(229,130,94,.35)}
+  .scorebig.hi{color:var(--sage)} .scorebig.mid{color:var(--amber-hi)} .scorebig.lo{color:var(--terra)}
+  .note{font-size:var(--fs-sm);border-radius:var(--r-sm);padding:var(--s3);margin-top:var(--s2);line-height:1.5}
+  .note-warn{color:var(--amber-hi);background:rgba(240,164,60,.08);border:1px solid rgba(240,164,60,.3)}
+  .note-goal{color:var(--dim);background:rgba(241,230,206,.05);border:1px solid rgba(241,230,206,.18)}
+  .note-goal b{color:var(--paper)}
+  .dimrow{display:flex;align-items:center;gap:var(--s2);margin-top:5px}
+  .dimrow span:first-child{font-size:var(--fs-xs);color:var(--dim);width:78px;flex:none}
+  .dimrow span:last-child{font-size:var(--fs-xs);color:var(--dim);width:42px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
+  .dimrow .prog{flex:1;height:5px}
+  /* la tutora está leyendo: anticipation, not a dead button */
+  .reading{display:flex;flex-direction:column;gap:var(--s3)}
+  .readline{height:3px;border-radius:var(--r-full);background:var(--raised);overflow:hidden}
+  .readline i{display:block;height:100%;width:40%;border-radius:var(--r-full);
+    background:linear-gradient(90deg,transparent,var(--amber),transparent);animation:sweep 1.4s var(--ease) infinite}
+  @keyframes sweep{from{transform:translateX(-100%)}to{transform:translateX(350%)}}
+
+  /* ---- job analysis: a two-minute wait, told honestly ----
+     The analysis really does take ~2 min (the model reasons over 35 module
+     contracts). We name the wait up front, show what is actually happening at
+     each stage, and run a real elapsed clock instead of a fake percentage. */
+  .jstage{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) 0;
+    border-bottom:1px solid var(--line);opacity:.4;transition:opacity var(--dur) var(--ease)}
+  .jstage:last-child{border-bottom:0}
+  .jstage.done,.jstage.now{opacity:1}
+  .jdot{flex:none;width:18px;height:18px;border-radius:var(--r-full);border:1.7px solid var(--line-strong);
+    margin-top:2px;display:grid;place-items:center;color:transparent}
+  .jstage.done .jdot{border-color:var(--sage);color:var(--sage)}
+  .jstage.now .jdot{border-color:var(--amber);box-shadow:0 0 0 4px rgba(240,164,60,.13)}
+  .jstage .jtxt{flex:1;font-size:var(--fs-base);color:var(--dim)}
+  .jstage.now .jtxt{color:var(--text)}
+  .jstage.done .jtxt{color:var(--dim)}
+  .jstage .jsub{display:none;margin-top:6px}
+  .jstage.now .jsub{display:block}
+  .jclock{font-variant-numeric:tabular-nums;color:var(--faint);font-size:var(--fs-sm)}
+  .jslow{margin-top:var(--s3)}
+  /* coverage read-out on the result */
+  .covbar{height:8px;border-radius:var(--r-full);background:var(--raised);overflow:hidden;margin-top:var(--s2)}
+  .covbar i{display:block;height:100%;width:100%;border-radius:var(--r-full);background:var(--amber);
+    transition:clip-path .9s var(--ease)}
+  .gaprow{display:flex;gap:var(--s2);align-items:flex-start;padding:var(--s2) 0;
+    font-size:var(--fs-sm);color:var(--dim)}
+  .gaprow .gx{flex:none;color:var(--terra);margin-top:1px}
+  .jcourse{border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);
+    padding:var(--s3) var(--s4);margin-bottom:var(--s2)}
+  .jcourse .jtitle{font-weight:700;font-size:var(--fs-md)}
+  .jcourse .jdepth{font-size:var(--fs-xs);color:var(--amber);letter-spacing:.04em;
+    text-transform:uppercase;margin-top:2px}
+  .jcourse .jwhy{font-size:var(--fs-sm);color:var(--dim);margin-top:var(--s2)}
+  .phasehead{font-size:var(--fs-sm);font-weight:800;color:var(--amber);letter-spacing:.04em;
+    margin:var(--s4) 0 var(--s2)}
+  .phasehead.later{color:var(--faint)}
+
+  .caprow{border-color:rgba(240,164,60,.4)!important;background:linear-gradient(140deg,rgba(240,164,60,.08),var(--panel))}
+  .pf-row{border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);
+    padding:var(--s3) var(--s4);margin-bottom:var(--s2);cursor:pointer}
+  .pf-row .fb{display:none;font-size:var(--fs-sm);color:var(--dim);margin-top:var(--s2);white-space:pre-wrap}
+  .pf-row.open .fb{display:block}
+
+  /* ---- temario rows ---- */
+  .modhead{font-size:var(--fs-sm);font-weight:800;color:var(--amber);letter-spacing:.04em;margin:var(--s4) 0 var(--s2)}
+  .lrow{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border:1px solid var(--line);
+    border-radius:var(--r-md);background:var(--panel);margin-bottom:var(--s2)}
+  .lrow.done{border-color:rgba(169,196,143,.3)} .lrow.current{border-color:rgba(240,164,60,.5)}
+  .lrow.locked,.lrow.coming{opacity:.55} .lrow.clickable{cursor:pointer}
+  .lrow .num{width:28px;height:28px;flex:none;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;
+    font-size:var(--fs-sm);font-weight:800;background:var(--ink);border:1px solid var(--line);color:var(--dim)}
+  .lrow.done .num{background:var(--sage);color:var(--sage-ink);border-color:var(--sage)}
+  .lrow.current .num{background:var(--amber);color:var(--amber-ink);border-color:var(--amber)}
+  .lrow .lt{flex:1;font-size:var(--fs-base);font-weight:600;line-height:1.25}
+  .lrow .st{font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
+  .lrow .obj{flex-basis:100%;font-size:var(--fs-sm);color:var(--dim);padding-top:var(--s1)}
+
+  /* ---- lesson ---- */
+  video{width:100%;border-radius:var(--r-lg);background:#000;aspect-ratio:9/16;max-height:60svh;object-fit:contain}
+  .lesson-head{display:flex;justify-content:space-between;align-items:center}
+  .navbtns{display:flex;gap:var(--s2)}
+  .navbtns button{flex:1;font-size:var(--fs-sm);font-weight:700;padding:11px;border-radius:var(--r-sm);
+    background:var(--panel);border:1px solid var(--line);color:var(--text)}
+  .navbtns button:disabled{opacity:.35}
+  .seg{display:flex;gap:var(--s2)}
+  .seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:var(--fs-sm);font-weight:700;
+    padding:11px;border-radius:var(--r-full);background:var(--panel);border:1px solid var(--line);color:var(--dim);transition:all .2s}
+  .seg button.on{color:var(--amber);border-color:var(--amber);background:rgba(240,164,60,.08)}
+  .opt{width:100%;text-align:left;font-size:var(--fs-base);color:var(--text);background:var(--panel);
+    border:1px solid var(--line);border-radius:var(--r-md);padding:14px;display:flex;gap:11px;align-items:center;transition:border-color .15s}
+  .opt .key{width:24px;height:24px;flex:none;border-radius:var(--r-sm);background:var(--ink);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:var(--fs-sm);font-weight:800;color:var(--dim)}
+  .opt.correct{border-color:var(--sage);background:rgba(169,196,143,.10)} .opt.correct .key{background:var(--sage);color:var(--sage-ink)}
+  .opt.wrong{border-color:var(--terra);background:rgba(229,130,94,.09)} .opt.wrong .key{background:var(--terra);color:var(--terra-ink)}
+  .explain{font-size:var(--fs-sm);color:var(--dim);background:rgba(241,230,206,.05);border:1px solid rgba(241,230,206,.16);
+    border-radius:var(--r-sm);padding:var(--s3);margin-top:var(--s2)}
+  .qblock{display:flex;flex-direction:column;gap:9px} .qblock h4{font-size:var(--fs-md);font-weight:700;line-height:1.3}
+
+  /* ---- taller tag (was ai-tag): the workshop label, paper-toned ---- */
+  .ai-tag{display:inline-flex;align-items:center;gap:7px;font-size:var(--fs-xs);font-weight:800;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--paper)}
+  .ai-tag .dot{width:6px;height:6px;border-radius:var(--r-full);background:var(--paper);box-shadow:0 0 8px rgba(241,230,206,.8)}
+  .ai-card{border-color:rgba(241,230,206,.28)}
+  .prompt{font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-xs);color:var(--paper);background:var(--ink);
+    border:1px solid rgba(241,230,206,.2);border-radius:var(--r-sm);padding:var(--s3);line-height:1.6;white-space:pre-wrap;margin-top:var(--s2)}
+  .copybtn{margin-top:9px;display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-xs);font-weight:700;
+    color:var(--paper);background:rgba(241,230,206,.08);border:1px solid rgba(241,230,206,.25);border-radius:var(--r-sm);padding:8px 12px}
+
+  /* ---- written guide ---- */
+  .written h2{font-family:var(--serif);font-size:var(--fs-lg);margin:var(--s4) 0 var(--s2)}
+  .written h3{font-size:var(--fs-md);margin:var(--s3) 0 var(--s1)}
+  .written p{font-size:var(--fs-base);margin:var(--s2) 0}
+  .written ul,.written ol{margin:var(--s2) 0 var(--s2) 20px;font-size:var(--fs-base)} .written li{margin-bottom:6px}
+  .written table{width:100%;border-collapse:collapse;margin:var(--s3) 0;font-size:var(--fs-sm)}
+  .written th,.written td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+  .written th{background:var(--raised);color:var(--amber);font-weight:700}
+  /* 5px, and NOT --r-sm: a code span is ~20px tall, so a 10px radius rounds
+     it into a pill — and a pill in this system is a status badge (.pill go,
+     .pill soon). The second sanctioned break from the three-radius rule,
+     alongside the document mock's 6px. Compared side by side before
+     keeping it. */
+  .written code{background:var(--raised);padding:2px 5px;border-radius:5px;font-size:var(--fs-sm)}
+  .diagram{background:#fff;border-radius:var(--r-md);padding:var(--s4);margin:var(--s3) 0;overflow-x:auto}
+  .diagram-title{font-size:var(--fs-sm);font-weight:700;color:var(--amber);margin-bottom:var(--s2)}
+
+  /* ---- celebration ---- */
+  .celebrate{text-align:center;display:flex;flex-direction:column;align-items:center;gap:var(--s2);padding-top:var(--s5)}
+  .medal{width:92px;height:92px;border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 35% 30%,var(--amber-hi),var(--amber-deep));
+    box-shadow:0 0 54px rgba(240,164,60,.55);color:var(--amber-ink);animation:pop .55s cubic-bezier(.22,1,.36,1)}
+  .medal .ic{width:40px;height:40px;stroke-width:2}
+  @keyframes pop{0%{transform:scale(0) rotate(-12deg)}100%{transform:scale(1) rotate(0)}}
+  .bigstreak{font-family:var(--serif);font-weight:700;font-size:var(--fd-streak);line-height:1;margin-top:var(--s2);
+    font-variant-numeric:tabular-nums;color:var(--amber-hi)}
+
+  /* ---- bottom nav ---- */
+  .tabbar{position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(16,13,23,.9);backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);display:flex;justify-content:space-around;
+    padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+  .tabbar button{color:var(--faint);font-size:var(--fs-xs);font-weight:700;display:flex;flex-direction:column;
+    align-items:center;gap:3px;padding:6px 14px;min-height:44px;justify-content:center;letter-spacing:.02em;
+    transition:color .18s var(--ease)}
+  .tabbar button .ic{width:21px;height:21px}
+  .tabbar button.on{color:var(--amber)}
+
+  /* ---- public navigation ----
+     The public surface had none: a visitor who did not want to do the lesson
+     had to scroll all of it to reach anything, and the catalog and the analyser
+     were only reachable from the doors at the very bottom. */
+  .sitenav{display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap;
+    padding-bottom:var(--s3);border-bottom:1px solid var(--line)}
+  .sitenav .brandrow{margin-right:auto;min-height:44px;text-decoration:none;color:inherit}
+  /* :not(.btn) because this rule was written for the TEXT links beside the
+     button. It is (0,1,1); .btn-primary is (0,1,0). When the nav CTA became an
+     anchor this quietly won and painted --dim grey lettering onto the amber
+     fill: 1.08:1, unreadable, on all five public routes.
+     min-height 44px: these were 32.8px at every breakpoint on a phone-first
+     product. */
+  .sitenav a:not(.btn){color:var(--dim);font-weight:700;font-size:var(--fs-sm);text-decoration:none;cursor:pointer;
+    min-height:44px;display:inline-flex;align-items:center;
+    padding:6px 2px;border-bottom:2px solid transparent;transition:color .18s var(--ease)}
+  .sitenav a.btn{width:auto;text-decoration:none}
+  .sitenav a:not(.btn):hover{color:var(--text)}
+  .sitenav a:not(.btn).on{color:var(--amber);border-bottom-color:var(--amber)}
+  .sitenav .navlinks{display:flex;gap:var(--s4);align-items:center}
+  @media(max-width:600px){
+    .sitenav{gap:var(--s3)}
+    .sitenav .navlinks{width:100%;gap:var(--s4);order:3}
+  }
+
+  /* ---- the public surface, on a real screen ----
+     The One Column Rule holds for the app: one decision per screen, on a phone,
+     in stolen time. It does not hold for a page a stranger opens on a laptop,
+     where a 560px column in the middle of a dark field reads as unfinished.
+     Only body.wide opens up, and only the landing sets it. */
+  /* Width is now the grid's job (see THE GRID below), not a max-width plus a
+     list of exceptions. What stays here is only what the grid cannot express. */
+  @media(min-width:900px){
+    body.wide .lessonsplit{display:grid}
+    body.wide .lessonsplit video{max-height:none}
+    body.wide .lessonsplit .videoplate{max-height:none}
+  }
+
+  /* ================= EL TALLER, A ESCALA =================
+     The One Column Rule governs the app: one decision per screen, on a phone,
+     in stolen time. The landing is a different room. A stranger opens it on a
+     laptop and decides in about four seconds whether this looks like something
+     serious, and until now `body.wide` widened the shell to 1000px and then
+     capped every child at 840px — so a 1440px screen showed an 840px stack
+     floating in a dark field. Not a desktop page: the phone layout, stretched.
+
+     What follows composes the field rather than filling it. One lamp, one
+     bench, and sections that differ in WEIGHT instead of repeating. The
+     material vocabulary is unchanged and this adds no new colour: the whole
+     effect is the amber we already had, used as light rather than as a button.
+
+     Everything here is >=900px. The phone layout above is untouched, and the
+     app (which never sets body.wide) never sees any of it. */
+
+  /* La lámpara. One warm source, high and centred, falling off fast. This is
+     the single highest-leverage element on the page: it turns a flat dark
+     rectangle into a lit room, and it costs one gradient. */
+  /* Only the public surface is lit. body.wide is set server-side on the public
+     routes and removed by route() for every app view, so this gates on it —
+     otherwise the workshop lamp would burn inside the learner's app too. */
+  .lamp,.grain{position:fixed;inset:0;pointer-events:none;z-index:0;display:none}
+  body.wide .lamp,body.wide .grain{display:block}
+  .lamp{background:
+    radial-gradient(64rem 40rem at 50% -16rem, rgba(240,164,60,.15), transparent 66%),
+    radial-gradient(90rem 60rem at 50% 120%, rgba(241,230,206,.035), transparent 70%)}
+  /* El polvo del taller. Fine grain so the ground reads as a surface with
+     tooth, not as #100D17. Two percent opacity is the whole trick — visible as
+     texture, invisible as noise. */
+  .grain{opacity:.55;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E")}
+  .app{position:relative;z-index:1}
+  /* The tab bar is FIXED, and it took a rewrite to notice it was not.
+     `.app,.tabbar{position:relative}` sat here and quietly beat the
+     `position:fixed` forty lines above it, so the app's primary navigation
+     scrolled away with the page — on a phone, below a lesson, that is a
+     navigation you have to hunt for. The 84px of bottom padding on .app has
+     been reserving space for a fixed bar the whole time, which is the proof
+     this was a collision and not a decision. */
+  .tabbar{z-index:41}
+
+  /* ---- THE GRID ----
+     Three widths, one grid, sections opt in. Replaces the previous scheme of a
+     max-width on the shell plus a `:not()` chain of exceptions plus a negative
+     margin trick for full-bleed — which collided with itself the first time a
+     band was added (a 100vw section silently clamped to 840px, every card
+     inside it 132px wide).
+
+     Comeau's named-column pattern: the row is always full width and the columns
+     do the work, so `grid-column:full` needs no negative margins and cannot be
+     clamped by a parent. Default is text measure; a section says `u-wide` or
+     `u-full` to take more. Capped at --w-wide: past 1280px the page stops
+     growing and the gutters absorb the rest, because a 1900px measure is not a
+     better page, it is a harder one to read. */
+  @media(min-width:900px){
+    body.wide .app{
+      display:grid;max-width:none;padding-left:0;padding-right:0;
+      row-gap:var(--s4);
+      grid-template-columns:
+        [full-start] minmax(var(--gutter),1fr)
+        [wide-start] minmax(0,calc((var(--w-wide) - var(--w-text))/2))
+        [text-start] min(var(--w-text),100% - var(--gutter)*2) [text-end]
+        minmax(0,calc((var(--w-wide) - var(--w-text))/2)) [wide-end]
+        minmax(var(--gutter),1fr) [full-end];
+    }
+    body.wide .app>*{grid-column:text}
+    body.wide .app>.u-wide{grid-column:wide}
+    body.wide .app>.u-full{grid-column:full}
+
+    /* A full-bleed section paints its own floor and re-establishes the grid
+       inside itself, so its content lines up with everything above it. */
+    body.wide .u-full{display:grid;padding:var(--s6) 0;
+      grid-template-columns:inherit;grid-template-columns:
+        [full-start] minmax(var(--gutter),1fr)
+        [wide-start] minmax(0,calc((var(--w-wide) - var(--w-text))/2))
+        [text-start] min(var(--w-text),100% - var(--gutter)*2) [text-end]
+        minmax(0,calc((var(--w-wide) - var(--w-text))/2)) [wide-end]
+        minmax(var(--gutter),1fr) [full-end]}
+    body.wide .u-full>*{grid-column:text}
+    body.wide .u-full>.u-wide{grid-column:wide}
+
+    body.wide .band-hi{background:var(--band-hi)}
+    body.wide .band-lo{background:var(--band-lo)}
+    body.wide .band-deep{background:var(--band-deep)}
+
+    /* El encabezado. Headline stays at text measure and the block centres;
+       Fraunces at display scale is the one place the serif is allowed to be
+       loud. */
+    body.wide .hero{padding:calc(var(--s6)*2) 0 calc(var(--s6)*1.75);row-gap:var(--s5)}
+    body.wide .hero h1{font-size:var(--fh-hero);line-height:1.02;
+      letter-spacing:-.032em;max-width:none;margin-top:var(--s4)}
+    body.wide .hero .lede{font-size:var(--fs-lg);line-height:1.5;
+      margin-top:var(--s5);color:var(--dim)}
+    body.wide .hero .eyebrow{color:var(--amber)}
+    /* Headline left, the product's own voice right. */
+    body.wide .herogrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,480px);
+      gap:var(--s6);align-items:center}
+    /* The hero's right column is now the visitor's own box, not a specimen of
+       someone else's. It carries the lit treatment because it IS the action. */
+    body.wide #heroask .demoq{margin:0}
+    body.wide #heroask h3{font-size:var(--fs-lg);line-height:1.25}
+
+    /* The bench. Equal-height columns so the guide and the video finish level. */
+    body.wide .lessonsplit{grid-template-columns:minmax(0,440px) minmax(0,1fr);
+      gap:var(--s6);align-items:stretch}
+    body.wide .lessonsplit>*{display:flex;flex-direction:column}
+    body.wide .lessonsplit .guidewrap{flex:1}
+
+    body.wide .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4)}
+    body.wide .takeaways{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);align-items:stretch}
+    body.wide .takeaways>*{margin:0}
+    /* Three across so fourteen courses never leave an orphan on a row of two. */
+    body.wide .cluster-body{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);align-items:stretch}
+    body.wide .cluster-body>*{margin-bottom:0}
+    body.wide .doors{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s4)}
+
+    body.wide .threshold{padding:calc(var(--s6)*1.75) 0}
+    body.wide .threshold h2{font-size:var(--fh-section);line-height:1.08;
+      letter-spacing:-.02em}
+  }
+
+  .navcta{display:flex;align-items:center;gap:var(--s5)}
+  @media(min-width:900px){
+    body.wide .sitenav{padding-top:var(--s5);padding-bottom:var(--s4);flex-wrap:nowrap}
+    body.wide .sitenav .navlinks{gap:var(--s5)}
+  }
+  .navlink-quiet{color:var(--dim);font-weight:600;font-size:var(--fs-sm);
+    text-decoration:none;cursor:pointer;white-space:nowrap;
+    min-height:44px;display:inline-flex;align-items:center}
+  .navlink-quiet:hover{color:var(--text);text-decoration:underline}
+  .doorlink{color:var(--dim);font-weight:600;font-size:var(--fs-base);
+    text-decoration:underline;text-underline-offset:4px;cursor:pointer;
+    min-height:44px;display:inline-flex;align-items:center}
+  .doorlink:hover{color:var(--text)}
+
+  h2.askq{font-size:var(--fs-lg);line-height:1.3;letter-spacing:-.01em}
+  /* The pre-hydration stand-in for the textarea. Looks like the box, is not one:
+     for the ~300ms before the real control exists, a working <textarea> would
+     accept typing that nothing is listening for. */
+  .preask-box{margin-top:var(--s3);min-height:120px;border-radius:var(--r-md);
+    border:1px solid var(--line-strong);background:var(--ink);padding:14px;
+    color:var(--faint);font-size:var(--fs-md)}
+  h2.lessontitle{font-size:var(--fs-lg);line-height:1.25;letter-spacing:-.01em}
+
+  /* ---- the tutor panel: the product's own voice, shown not described ---- */
+  /* No drop shadow, per DESIGN.md's No-Shadow Rule: the only two shadows in
+     this system are the glows that mean "lit", and depth is tonal. This panel
+     carried the single generic box-shadow in the stylesheet — a -30px spread
+     under a 60px blur, so it barely escaped the element at all. Removed and
+     compared side by side: indistinguishable. The border and the gradient were
+     doing the work, which is what the rule says they should. */
+  .tutorpanel{border:1px solid var(--line-strong);border-radius:var(--r-md);
+    background:linear-gradient(180deg,#1B1626,#171320);padding:var(--s5);margin:0}
+  .tutorpanel .microlabel{color:var(--faint)}
+  .tp-who{font-size:var(--fs-xs);font-weight:700;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--faint)}
+  .tp-said{margin-top:var(--s4);padding-left:var(--s4);border-left:2px solid var(--line-strong)}
+  .tp-said p{font-family:var(--serif);font-size:var(--fs-md);line-height:1.45;
+    color:var(--dim);margin-top:var(--s2)}
+  .tp-verdict{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s5)}
+  .tp-badge{font-size:var(--fs-xs);font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+    background:var(--amber);color:var(--amber-ink);padding:4px 10px;border-radius:var(--r-full)}
+  .tp-fb{font-size:var(--fs-base);line-height:1.55;color:var(--text);margin-top:var(--s3)}
+  .tp-gaps{margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid var(--line)}
+  .tp-gap{display:flex;gap:var(--s2);align-items:flex-start;margin-top:var(--s2);
+    font-size:var(--fs-sm);line-height:1.5;color:var(--dim)}
+  .tp-gap .ic{color:var(--amber);flex:none;margin-top:2px}
+  .tp-foot{font-size:var(--fs-xs);color:var(--faint);margin-top:var(--s4)}
+
+  .tp-misc{display:flex;gap:var(--s2);align-items:flex-start;margin-top:var(--s4);
+    padding:var(--s3);border-radius:var(--r-sm);background:rgba(240,164,60,.08);
+    border:1px solid rgba(240,164,60,.22);font-size:var(--fs-sm);line-height:1.5;color:var(--text)}
+  .tp-misc .ic{color:var(--amber);flex:none;margin-top:1px}
+  @media(min-width:900px){
+    body.wide .afterq{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+      gap:var(--s5);align-items:start;margin-top:var(--s5)}
+    body.wide .afterq-note{padding-top:var(--s6)}
+  }
+  .afterq{margin-top:var(--s5)}
+  .afterq-note p{max-width:46ch}
+
+  /* The deliverable, on paper: in this system paper is reserved for the
+     learner's own work, which is exactly what this card is promising. */
+  /* .card-paper is --panel with a paper-tinted border and a paper glow — it is
+     NOT a cream surface. Writing --paper-ink (#26200F) on it gave 1.11:1 on
+     every line of this card. On a dark ground the serif reads in --paper, which
+     is the token that means "the learner's work" here anyway. */
+  .deliverable{margin-top:var(--s4)}
+  .delivername{font-family:var(--serif);font-weight:600;font-size:var(--fs-xl);
+    line-height:1.15;color:var(--paper);margin-top:var(--s2)}
+  .delivernote{font-size:var(--fs-sm);line-height:1.5;color:var(--dim);
+    margin-top:var(--s2)}
+  h2.modhead{font-size:var(--fs-md);font-weight:700;font-family:var(--sans)}
+  @media(min-width:900px){
+    body.wide .outlinehead h1{font-size:var(--fh-page);line-height:1.06;
+      letter-spacing:-.025em}
+    body.wide .deliverable{max-width:none}
+  }
+
+  /* ---- founder note ---- */
+  .founder{display:flex;gap:var(--s4);align-items:flex-start;margin-top:var(--s5);
+    padding-top:var(--s5);border-top:1px solid var(--line)}
+  .founder-face{width:52px;height:52px;flex:none;border-radius:var(--r-full);overflow:hidden;
+    background:var(--raised);border:1px solid var(--line-strong);
+    display:flex;align-items:center;justify-content:center;color:var(--faint)}
+  .founder-face img{width:100%;height:100%;object-fit:cover;display:block}
+  .founder-text{font-family:var(--serif);font-size:var(--fs-md);line-height:1.5;color:var(--dim)}
+  /* The turn the whole note exists for. It reads as the takeaway, so it gets
+     its own line and the paper colour — the token that means "the work". */
+  .founder-line{color:var(--paper);margin-top:var(--s3)}
+  @media(min-width:900px){ body.wide .founder-text{max-width:62ch} }
+  .founder-who{font-size:var(--fs-xs);font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--faint);margin-top:var(--s2)}
+  /* A real name pointing at a real profile is the cheapest credibility on the
+     page, and it stands in for the photo until there is one. */
+  .founder-link{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-deep);
+    display:inline-flex;align-items:center;min-height:44px}
+  .founder-link:hover{color:var(--amber-hi)}
+
+  /* The step numeral. On a phone it is the compact amber chip the One Column
+     Rule wants beside its title. On a laptop, four across, the number IS the
+     structure, so it becomes the serif numeral and the title drops below it. */
+  .stephead{display:flex;align-items:center;gap:10px}
+  .stepnum{width:26px;height:26px;flex:none;border-radius:var(--r-sm);display:flex;
+    align-items:center;justify-content:center;font-size:var(--fs-sm);font-weight:800;
+    background:var(--amber);color:var(--amber-ink)}
+  @media(min-width:900px){
+    body.wide .stephead{display:block}
+    body.wide .stepnum{width:auto;height:auto;border-radius:0;background:none;display:block;
+      font-family:var(--serif);font-weight:700;font-size:var(--fd-num);line-height:1;
+      color:var(--amber-deep);font-variant-numeric:tabular-nums;margin-bottom:var(--s2)}
+    body.wide .steps .card,body.wide .takeaways .card{height:100%}
+    /* Four short takeaways read as a block at 1176px, not a list. */
+    body.wide .kpgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2) var(--s6)}
+  }
+
+  /* No page-enter animation on the public surface, deliberately.
+     `.app>*{animation:rise}` above is right for the app: a learner moves
+     between views and each one arrives. It is wrong for a server-rendered page.
+     The visitor already sees the real content in the first paint; when
+     hydration rebuilds the same sections and fades them in, the animation
+     re-announces something they have already read, and the page reads as
+     having loaded twice. Motion earns its place by revealing something new —
+     here it was arguing with the prerender. */
+  body.wide .app>*{animation:none}
+  @media(prefers-reduced-motion:reduce){
+    .lamp,.grain{display:none}
+  }
+  /* The live lesson: the one place a stranger meets the product working. */
+  /* The lesson plate: a real frame from the lesson, our play affordance, and
+     no <video> element until someone wants one.
+     Chrome would not paint a poster on an element it had already buffered, and
+     with preload="metadata" it buffered 5.4 MB on every visit to a marketing
+     page aimed at people on metered mobile data. Fighting the poster heuristic
+     was the wrong fix: the browser's default video chrome is a control surface
+     nobody designed, and the frame deserves better than being a fallback. */
+  .doors{display:flex;flex-direction:column;gap:var(--s2)}
+  .videoplate{position:relative;border-radius:var(--r-lg);overflow:hidden;background:var(--ink);
+    cursor:pointer;aspect-ratio:9/16;border:1px solid var(--line);
+    /* Same cap the <video> carries, so swapping one for the other on click does
+       not drop the page ~160px on a phone. */
+    max-height:60svh}
+  .videoplate img{width:100%;height:100%;object-fit:cover;display:block}
+  .videoplate::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(to top,rgba(16,13,23,.82),rgba(16,13,23,.05) 42%)}
+  .playbtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+    width:66px;height:66px;border-radius:var(--r-full);display:grid;place-items:center;
+    background:linear-gradient(140deg,var(--amber-hi),var(--amber));color:var(--amber-ink);
+    box-shadow:var(--glow-amber);transition:transform .2s var(--ease)}
+  .playbtn .ic{width:26px;height:26px;stroke-width:2;margin-left:3px}
+  .videoplate:hover .playbtn{transform:translate(-50%,-50%) scale(1.07)}
+  .videoplate:focus-visible{outline:2px solid var(--amber-hi);outline-offset:3px}
+  .plate-meta{position:absolute;left:var(--s4);right:var(--s4);bottom:var(--s4);z-index:2}
+  /* The written guide on the landing: masked preview, never a scroll region.
+     A nested scrollable card mid-page steals the wheel — the first scroll over
+     it emptied the card and left the page where it was. */
+  /* The collapsed guide used to fade out over whatever happened to be at 560px,
+   which on this lesson is the middle of a table row — it read as a broken
+   render, not as "there is more". A real scroll cuts on nothing and lets a
+   reader who wants the rest have it without the expand. */
+  .guidewrap{position:relative;max-height:560px;overflow-y:auto;
+    scrollbar-width:thin;overscroll-behavior:contain}
+  .guidewrap.open{max-height:none;overflow:visible}
+  /* (the fade is gone: see .guidewrap above) */
+  .demoq{background:linear-gradient(160deg,var(--raised),var(--panel));
+    border:1px solid rgba(240,164,60,.35);border-radius:var(--r-lg);padding:var(--s5) var(--s4);
+    box-shadow:var(--glow-amber)}
+  .demoq textarea{background:var(--ink);min-height:120px;margin-top:var(--s3)}
+  .nextup{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) 0;border-bottom:1px solid var(--line)}
+  .nextup:last-child{border-bottom:0}
+  .nextup .nn{flex:none;width:26px;height:26px;border-radius:var(--r-sm);background:var(--ink);
+    border:1px solid var(--line);color:var(--amber);display:grid;place-items:center;
+    font-size:var(--fs-sm);font-weight:800}
+  .hide{display:none!important}
+  a.textlink{color:var(--amber);font-weight:700;text-decoration:none}
+  .center{text-align:center}
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    /* ...but a wait still has to read as a wait. */
+    .readline i{width:100%;background:var(--amber);opacity:.55}
+    .jstage{opacity:1}
+  }
+
+
+
+/* ---------------------------------------------------------------------------
+   The catalog accordion, as <details>/<summary>.
+   The SPA built it from a div with a click handler and a sibling it toggled
+   `.hide` on: not keyboard-operable, not announced as a disclosure, and closed
+   sections stayed invisible to browser find-in-page. The disclosure element
+   does all three for free. These rules only restore the same appearance.
+--------------------------------------------------------------------------- */
+.cluster-wrap {
+  display: block;
+}
+/* The default triangle, in both engines. */
+.cluster-wrap > summary {
+  list-style: none;
+}
+.cluster-wrap > summary::-webkit-details-marker {
+  display: none;
+}
+.cluster-wrap[open] > .cluster .chev {
+  transform: rotate(90deg);
+}
+/* .cluster-body used to be a grid child in its own right; inside <details> its
+   parent is, so the multi-column rule has to be re-established here. Same
+   breakpoint and same three columns as body.wide .cluster-body. */
+.cluster-wrap > .cluster-body {
+  margin-top: var(--s4);
+}
+@media (min-width: 900px) {
+  body.wide .cluster-wrap > .cluster-body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s4);
+    align-items: stretch;
+  }
+  body.wide .cluster-wrap > .cluster-body > * {
+    margin-bottom: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The written guide's "seguir leyendo".
+   Not a disclosure: the guide stays visible and readable at all times, and this
+   only lifts the 560px cap. `.guidewrap.open` did exactly this under the SPA's
+   click handler; the island sets the class on a wrapper instead, so the rule
+   moves one level out and nothing else about the guide changes.
+--------------------------------------------------------------------------- */
+.guide-open .guidewrap {
+  max-height: none;
+  overflow: visible;
+}
+
+/* ---------------------------------------------------------------------------
+   Islands, before they hydrate.
+   A Svelte island renders its markup at build time and becomes interactive a
+   moment later. Anything that would look broken in that window — a control
+   whose handler is not attached yet — says so instead of lying about being
+   ready. Nothing here changes size, so hydration moves no pixels.
+--------------------------------------------------------------------------- */
+.island-idle {
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Perfil's avatar. It was a 400-character inline `style` attribute inside a
+   template literal, which is where CSS goes to stop being reviewable.
+--------------------------------------------------------------------------- */
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--r-full);
+  margin: 0 auto 12px;
+  background: linear-gradient(150deg, var(--amber-hi), var(--amber-deep));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: var(--fd-md);
+  font-weight: 700;
+  color: var(--amber-ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Portafolio rows, as <details>.
+   Each row hides the tutor's feedback until it is opened, which is the point of
+   the row — and it was a div with a click handler: no tab stop, no Enter key,
+   and a screen reader announcing an unlabelled block of text. The disclosure
+   element gives all three away for free, and browser find-in-page can now open
+   a closed row to reveal a match inside it.
+--------------------------------------------------------------------------- */
+.pf-row > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.pf-row > summary::-webkit-details-marker {
+  display: none;
+}
+.pf-row[open] .fb {
+  display: block;
+}
+
+/* ---------------------------------------------------------------------------
+   Rows and cards that are BUTTONS now.
+   Half this interface was built as `<div onclick>`: the temario row, the
+   catalog card, the cluster header, the quiz option, the portfolio row, the
+   route step. That is fine for a thumb and invisible to a keyboard or a switch —
+   no tab stop, no Enter, and a screen reader announcing nothing at all. A
+   MutationObserver used to stamp roles onto them as they entered the DOM, which
+   worked and was a workaround for markup that could simply be right.
+   They are real buttons now, so these rules only strip the UA styling a button
+   arrives with. The observer is gone with them.
+--------------------------------------------------------------------------- */
+button.lrow,
+button.card,
+button.course-card,
+button.req-row,
+button.back,
+.tabbar button {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+}
+button.card,
+button.course-card {
+  display: block;
+}
+button.back {
+  width: auto;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* An inline control inside a sentence. It was a <u> with a click handler in the
+   exercise's "define tu proyecto" nudge — underlined text that looked like a
+   link, was not one, and could not be reached by keyboard. */
+.linklike {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Progress toward a deliverable, as pips. Was three inline-styled spans built
+   in a template literal with the colour decided in JavaScript. */
+.pip {
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.14);
+}
+.pip.on {
+  background: var(--amber);
+}

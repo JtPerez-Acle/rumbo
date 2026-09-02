@@ -3,6 +3,24 @@
 *Written for the next coding agent. Everything here was learned by breaking
 something. Read it before your first edit; it will save you a session.*
 
+## Astro swallows the whitespace before an expression
+
+**Rule: never break the line between prose and `{expression}`.** Astro trims
+whitespace at a line boundary next to an interpolation, so
+
+```astro
+  ... y qué le falta — no una nota. La misma
+  {TUTOR} que lee el trabajo ...
+```
+
+renders as **"La mismaVera"**. It compiles, no test catches it, and it is
+invisible in a diff because the source looks correctly spaced. Keep the value on
+the same line as the word it follows, or write `{' '}` explicitly.
+
+Found once, on the landing, by reading a screenshot — which is the only reason
+it was found at all. Svelte does not do this, so the habit does not transfer
+between the two file types in `studio/web/`.
+
 ## The verification ritual (non-negotiable)
 
 Every change follows the same loop. Skipping a step is how the bugs below
@@ -10,7 +28,11 @@ reached production in the first place.
 
 1. **Compile-check** — `python -m py_compile` on touched Python; for the
    single-file frontends, extract the last `<script>` block and `node --check`
-   it (there is no bundler to catch syntax errors for you).
+   it (nothing else catches a syntax error in a file with no build step).
+   For anything under `studio/web/`, `npm run build` is the compile-check.
+1b. **Run the frontend suite** — `cd studio/web && npm test` (134 assertions).
+   It builds first, then asserts against the built pages, so it catches a page
+   that stopped rendering its content as well as one that stopped compiling.
 2. **Run locally against the real cloud DB** — `preview_start` with the
    `learner-app` launch config (see doc 05).
 3. **Test with real data**, then **delete your test rows** (they live in the
@@ -192,7 +214,7 @@ the same edit that adds the route, and curl it without a token before deploying.
 course-shaped product for weeks after the goal engine shipped, and still used
 "pregunta de defensa" wording retired months earlier. Nothing was broken, so
 nothing complained. *Rule: user-facing promises need assertions too —
-`check_how_section.js` now tests them, including regression guards on retired
+`studio/web/tests/how-section.test.js` now tests them, including guards on retired
 wording.*
 
 **An empty input does not produce an empty output — it produces a fabricated

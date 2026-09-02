@@ -1,0 +1,194 @@
+{
+  "description": "Automatiza tu marketing con Make, Zapier o n8n: flujos reales, costos reales, sin saber programar",
+  "doc_type": "Plan de automatización con IA",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Registrar tareas repetitivas durante una semana, identificar la que más horas consume y decidir si conviene automatizarla.",
+          "position": 1,
+          "title": "Por qué automatizar: auditoría de tiempo"
+        },
+        {
+          "objectives": "Definir flujo, disparador, paso, API, token, webhook, polling, self-hosted, VPS, rate limit y human in the loop con ejemplos de marketing.",
+          "position": 2,
+          "title": "Glosario en español simple: los 10 términos que necesitas"
+        },
+        {
+          "objectives": "Comparar los tres modelos (por acción, por paso, por flujo completo) y calcular tu consumo mensual estimado con un ejemplo de 5 pasos y 900 pedidos.",
+          "position": 3,
+          "title": "Zapier, Make o n8n: el modelo de cobro que define tu factura"
+        },
+        {
+          "objectives": "Cotizar el costo real de un resumen semanal y 200 variaciones de copy usando precios por millón de tokens y decidir entre plan gratuito o pago.",
+          "position": 4,
+          "title": "Cuánto cuesta la IA de verdad: tokens, modelos y planes gratuitos"
+        },
+        {
+          "objectives": "Usar un árbol de decisión basado en volumen de pasos y perfil técnico para elegir entre $0 (Sheets+Apps Script), $8-12 (n8n self-hosted) o $35-45 (Make Cloud).",
+          "position": 5,
+          "title": "Elige tu plataforma y tu escenario de presupuesto"
+        },
+        {
+          "objectives": "Crear una cuenta gratuita en la plataforma elegida, conectar Google Sheets y obtener una clave de API de IA gratuita o de bajo costo.",
+          "position": 6,
+          "title": "Prepara tu entorno: cuentas, accesos y primera conexión"
+        }
+      ],
+      "module_description": "Medirás tu tiempo real para elegir qué automatizar primero y entenderás cuánto cuesta la IA de verdad, sin estimaciones vagas.",
+      "module_no": 1,
+      "module_title": "Semana 1: Mide antes de automatizar"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Crear un proyecto en Google Cloud, activar la Analytics Data API y generar una cuenta de servicio con archivo de credenciales.",
+          "position": 7,
+          "title": "Habilita la API de Google Analytics 4 sin ser programador"
+        },
+        {
+          "objectives": "Configurar un disparador por horario (lunes 8 AM) y pedir solo sesiones, usuarios y conversiones por canal, evitando el ruido de 15 métricas.",
+          "position": 8,
+          "title": "Disparador semanal y las 3 métricas que importan"
+        },
+        {
+          "objectives": "Diseñar un paso que busque la fila correspondiente a la semana y la sobreescriba, para que un reintento no duplique tus datos.",
+          "position": 9,
+          "title": "Escribe en Sheets actualizando la fila de la fecha, sin duplicar"
+        },
+        {
+          "objectives": "Redactar un prompt que le pida a la IA exactamente: qué cambió, por qué y una sola acción recomendada, sin adjetivos entusiastas.",
+          "position": 10,
+          "title": "Prompt estructurado: tu analista de marketing en 3 párrafos"
+        },
+        {
+          "objectives": "Configurar el envío automático del resumen a un canal de Slack o a una lista de correo, con formato limpio y sin enredos.",
+          "position": 11,
+          "title": "Entrega del reporte por email o Slack"
+        },
+        {
+          "objectives": "Ejecutar el flujo completo, leer los registros de error, ajustar reintentos y verificar cuántos créditos consumió realmente.",
+          "position": 12,
+          "title": "Prueba, errores y rate limits: lo que pasa en producción"
+        }
+      ],
+      "module_description": "Construirás el flujo de mayor retorno real: un reporte semanal desde Google Analytics, escrito por IA, que ahorra entre 3 y 4 horas por cliente al mes.",
+      "module_no": 2,
+      "module_title": "Semana 2: Tu primer flujo: reporte automático"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Revisar las ejecuciones reales de la semana, multiplicar por 4 y comparar con los límites de tu plan; decidir si necesitas subir de nivel.",
+          "position": 13,
+          "title": "Lee tu panel de consumo y proyecta el mes completo"
+        },
+        {
+          "objectives": "Reconocer cuándo un trigger usa polling y cambiarlo por un webhook siempre que la herramienta lo soporte, ahorrando hasta 8.640 verificaciones al mes.",
+          "position": 14,
+          "title": "Webhook vs polling: deja de pagar por preguntar '¿hay algo nuevo?'"
+        },
+        {
+          "objectives": "Construir un flujo que reciba un formulario, asigne segmento según datos existentes (nuevo, recurrente, VIP) y envíe un correo distinto a cada uno.",
+          "position": 15,
+          "title": "Flujo de leads: captura, filtra, segmenta y avisa"
+        },
+        {
+          "objectives": "Configurar una consulta diaria a un servicio de datos de búsqueda, normalizar URLs para evitar falsos positivos y pedir a la IA que filtre solo los cambios accionables.",
+          "position": 16,
+          "title": "Monitoreo de competencia baratísimo: solo las alertas que sirven"
+        },
+        {
+          "objectives": "Reubicar condiciones de descarte antes de cualquier acción que consuma créditos, bajando el gasto mensual un 30% sin cambiar el resultado.",
+          "position": 17,
+          "title": "Optimiza tus flujos: pon los filtros al principio"
+        },
+        {
+          "objectives": "Comparar el tiempo que dedicabas antes y ahora a reportar y enrutar leads, y calcular el retorno en horas mensuales liberadas.",
+          "position": 18,
+          "title": "Mide el ahorro real: de horas de trabajo a minutos de supervisión"
+        }
+      ],
+      "module_description": "Medirás cuánto gasta tu flujo en créditos o ejecuciones, optimizarás los pasos caros y añadirás un flujo de enrutamiento de leads con impacto directo en ingresos.",
+      "module_no": 3,
+      "module_title": "Semana 3: Mide tu consumo real y suma un segundo flujo"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Armar una planilla de entrada con ángulo, público y oferta; llamar a la IA para que devuelva título, texto, descripción y CTA en columnas separadas; guardar en borrador.",
+          "position": 19,
+          "title": "Generador de variaciones de anuncios con planilla y un clic"
+        },
+        {
+          "objectives": "Verificar el nivel de acceso de tu app de Meta, entender la cuota de puntos y por qué solo puedes crear unos 10 anuncios antes de esperar, y configurar campañas en pausa por defecto.",
+          "position": 20,
+          "title": "Meta Ads API: qué puedes hacer sin que te bloqueen la cuenta"
+        },
+        {
+          "objectives": "Evaluar las limitaciones reales de cada API social (costo en X, solo JPEG en Instagram, partner en LinkedIn, auditoría en TikTok) y decidir si usar un servicio unificado o programar a mano.",
+          "position": 21,
+          "title": "Publicación automática en redes: el campo minado de 2026"
+        },
+        {
+          "objectives": "Agregar una columna de estado (borrador, aprobado, rechazado) en Sheets y condicionar el siguiente paso solo a lo que tú marcas manualmente.",
+          "position": 22,
+          "title": "Diseña human-in-the-loop: de borrador a aprobado en un cambio de estado"
+        },
+        {
+          "objectives": "Identificar contexto repetido (guía de marca) para usar caché al 10% del costo y mandar trabajo nocturno por lotes para pagar la mitad en generación masiva.",
+          "position": 23,
+          "title": "Ahorra hasta la mitad con caché y procesamiento por lotes"
+        },
+        {
+          "objectives": "Auditar tus flujos buscando filtros tarde, polling innecesario, filas duplicadas y dependencia de cuotas gratuitas que cambian, y corregirlos antes de escalar.",
+          "position": 24,
+          "title": "Errores caros: por qué la mayoría subestima su consumo por 3 veces"
+        }
+      ],
+      "module_description": "Generarás variaciones de anuncios con revisión humana obligatoria, entenderás por qué publicar automáticamente en redes es la peor inversión y evitarás los errores más caros.",
+      "module_no": 4,
+      "module_title": "Semana 4: Flujos de alto valor y el arte de no romper nada"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Comparar tu auditoría de tiempo de la semana 1 con lo que ya tienes automatizado y elegir el proceso de mayor impacto que aún no has tocado.",
+          "position": 25,
+          "title": "Dónde estás ahora: revisión de tu plan de 30 días"
+        },
+        {
+          "objectives": "Elegir un proceso real (propio o de una marca como ejemplo), listar cada paso, los datos que entran y salen, y decidir dónde pondrás al humano para aprobar.",
+          "position": 26,
+          "title": "Define el alcance y mapea disparadores, pasos y salidas"
+        },
+        {
+          "objectives": "Montar en la plataforma disparador, acciones core, paso de IA, escritura segura en Sheets y entrega; probar con datos de mentira antes de conectar los reales.",
+          "position": 27,
+          "title": "Construye tu flujo: del primer nodo al mensaje final"
+        },
+        {
+          "objectives": "Ejecutar el flujo en baja frecuencia, anotar los créditos o ejecuciones reales, y decidir si mantienes el plan actual o necesitas un margen de seguridad.",
+          "position": 28,
+          "title": "Mide el consumo real durante una semana y ajusta el plan"
+        },
+        {
+          "objectives": "Aplicar aprendizajes de filtros tempranos, webhooks, caché y batch a tu proyecto, y diseñar un disparador de alerta si el flujo deja de correr.",
+          "position": 29,
+          "title": "Optimiza según los datos y escala sin romper nada"
+        },
+        {
+          "objectives": "Poner el flujo en producción con monitoreo básico, documentar cómo actualizarlo cuando una API cambie y decidir cuál será tu siguiente automatización en 30 días.",
+          "position": 30,
+          "title": "Lanzamiento, mantenimiento y próximos pasos"
+        }
+      ],
+      "module_description": "Aplicarás todo el curso a un proceso real de tu negocio (o de una marca conocida) para entregar una automatización completa, con medición de consumo y plan de mejora.",
+      "module_no": 5,
+      "module_title": "Semana final: Tu proyecto y plan de mantenimiento"
+    }
+  ],
+  "slug": "curso-automatizacion-ia",
+  "title": "Automatización con IA",
+  "total": 30
+}

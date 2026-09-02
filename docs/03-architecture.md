@@ -213,8 +213,9 @@ public branch at first, which made the "Pega tu oferta" button inside
 element styles.
 
 There is no bundler and no test runner. Two Node checks stand in, run against
-the extracted script block: `check_job_render.js` (the analysis result page,
-25 assertions) and `check_how_section.js` (the landing's promises, 13). Both are
+the extracted script block. They now live in `studio/web/tests/` and run under
+vitest — **110 assertions across four suites** — sharing one harness instead of
+four near-identical copies of the DOM shim. They are
 DOM-shim based — the browser pane wedges often enough that `docs/07` names this
 as the fallback.
 

@@ -239,7 +239,7 @@ DATABASE_URL=… OPENROUTER_API_KEY=… LLM_MODEL=… \
   python studio/cloud/check_job_matcher.py
 
 # the result page renders (fast, no network — DOM shim per docs/07)
-node studio/dashboard/check_job_render.js \
+cd studio/web && npm test    # job-render.test.js \
   studio/dashboard/static/learn.html \
   studio/fixtures/job-postings/sample-analysis.json
 ```

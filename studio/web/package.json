@@ -1,0 +1,13 @@
+{
+  "name": "rumbo-web",
+  "private": true,
+  "type": "module",
+  "description": "Rumbo's frontend. Currently: the test suite that guards the vanilla frontends during the Astro migration. Later: the Astro app itself.",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  }
+}

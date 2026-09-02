@@ -74,3 +74,9 @@ Thumbs.db
 # The rendered video embeds them (ordinary use of a bundled asset); the raw
 # tracks are not ours to republish. See brag-output/README.md to restore them.
 brag-output/composition/assets/audio/
+
+# The frontend workspace (studio/web): the test suite now, the Astro app next.
+# The lockfile IS tracked — the Docker build stage must be reproducible.
+studio/web/node_modules/
+studio/web/dist/
+studio/web/.astro/

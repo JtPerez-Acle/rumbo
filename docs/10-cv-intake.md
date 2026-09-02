@@ -230,7 +230,7 @@ other people's names and employment history.
 ```bash
 DATABASE_URL=… OPENROUTER_API_KEY=… LLM_MODEL=… \
   python studio/cloud/check_cv_matcher.py [cv_dir]      # real CVs, ~1 min each
-node studio/dashboard/check_cv_render.js studio/dashboard/static/learn.html
+cd studio/web && npm test    # cv-render.test.js
 ```
 
 Run the matcher suite after any edit to `CV_MATCH_SYSTEM`, `CV_JSON_SPEC` or

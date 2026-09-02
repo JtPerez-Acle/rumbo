@@ -192,7 +192,7 @@ the same edit that adds the route, and curl it without a token before deploying.
 course-shaped product for weeks after the goal engine shipped, and still used
 "pregunta de defensa" wording retired months earlier. Nothing was broken, so
 nothing complained. *Rule: user-facing promises need assertions too —
-`check_how_section.js` now tests them, including regression guards on retired
+`studio/web/tests/how-section.test.js` now tests them, including guards on retired
 wording.*
 
 **An empty input does not produce an empty output — it produces a fabricated

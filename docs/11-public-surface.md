@@ -189,11 +189,11 @@ pinned to `11.4.1`. Two things not to redo:
 ## Checks
 
 ```bash
-node studio/dashboard/check_demo_render.js studio/dashboard/static/learn.html  # 34 assertions
-node studio/dashboard/check_how_section.js          # the landing's promises, 13 assertions
+cd studio/web && npm test    # demo-render.test.js, 36 assertions
+#   (how-section.test.js covers the landing's promises, 15 assertions)
 ```
 
-`check_demo_render.js` guards this surface's **argument**, not its layout: that a
+`demo-render.test.js` guards this surface's **argument**, not its layout: that a
 real lesson renders, that the question is asked, that the verdict is a word and
 never a number, that what follows is this module's real exercise and reto, that
 both door sets exist (the finish review found the page had **no** call to action
@@ -201,7 +201,7 @@ until a verdict rendered), that a failed demo still offers somewhere to go, and
 that nothing claims a testimonial, a price or a real learner document — because
 `PRODUCT.md` records that none of those exist.
 
-`check_how_section.js` still guards the "Cómo funciona" block, which survives
+`how-section.test.js` still guards the "Cómo funciona" block, which survives
 below the lesson.
 
 `check_public_surface.py` asserts what the **server serves**, which the three

@@ -81,8 +81,8 @@ roughly seventy times faster than it learns.
     `learn_routes.py` (**the entire learner API**), `admin_paths.py` (the admin
     allowlist predicate), `prerender.py` (**server-rendered bodies for the public
     surfaces** — both are dependency-free so they can be audited and tested under
-    any interpreter), `check_job_render.js` + `check_how_section.js` (**frontend
-    checks — no bundler, no test runner**),
+    any interpreter), **`web/`** (the frontend
+    test suite — 110 assertions under vitest, and the future Astro app),
     `static/{index,learn,doc,caso,ruta}.html`.
   - `channels/*.toml` — course profiles. **Single source of truth** for learner copy.
   - `research/*.md` — grounding material for generation. `fixtures/` — matcher fixtures.
@@ -130,11 +130,7 @@ python studio/cloud/check_job_matcher.py    # matcher, 5 fixtures, ~15 min (real
 python studio/cloud/check_tutor.py          # tutor, 6 properties, ~5 min (real LLM)
 python studio/cloud/check_cv_matcher.py     # CV matcher; reads REAL CVs from ./cvs (git-ignored)
 python studio/cloud/check_public_surface.py [base_url]   # HTTP: public routes + every admin gate
-node studio/dashboard/check_job_render.js studio/dashboard/static/learn.html \
-     studio/fixtures/job-postings/sample-analysis.json
-node studio/dashboard/check_how_section.js
-node studio/dashboard/check_cv_render.js studio/dashboard/static/learn.html
-node studio/dashboard/check_demo_render.js studio/dashboard/static/learn.html
+cd studio/web && npm test    # 110 frontend assertions (vitest) — run before ANY frontend edit
 
 # Offsite backup (all 20 tables) — before anything risky:
 DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14

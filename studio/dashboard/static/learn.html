@@ -419,7 +419,11 @@
   /* La lámpara. One warm source, high and centred, falling off fast. This is
      the single highest-leverage element on the page: it turns a flat dark
      rectangle into a lit room, and it costs one gradient. */
-  .lamp,.grain{position:fixed;inset:0;pointer-events:none;z-index:0}
+  /* Only the public surface is lit. body.wide is set server-side on the public
+     routes and removed by route() for every app view, so this gates on it —
+     otherwise the workshop lamp would burn inside the learner's app too. */
+  .lamp,.grain{position:fixed;inset:0;pointer-events:none;z-index:0;display:none}
+  body.wide .lamp,body.wide .grain{display:block}
   .lamp{background:
     radial-gradient(64rem 40rem at 50% -16rem, rgba(240,164,60,.15), transparent 66%),
     radial-gradient(90rem 60rem at 50% 120%, rgba(241,230,206,.035), transparent 70%)}
@@ -530,6 +534,12 @@
   .doorlink:hover{color:var(--text)}
 
   h2.askq{font-size:var(--fs-lg);line-height:1.3;letter-spacing:-.01em}
+  /* The pre-hydration stand-in for the textarea. Looks like the box, is not one:
+     for the ~300ms before the real control exists, a working <textarea> would
+     accept typing that nothing is listening for. */
+  .preask-box{margin-top:var(--s3);min-height:120px;border-radius:var(--r-md);
+    border:1px solid var(--line-strong);background:var(--ink);padding:14px;
+    color:var(--faint);font-size:var(--fs-md)}
   h2.lessontitle{font-size:var(--fs-lg);line-height:1.25;letter-spacing:-.01em}
 
   /* ---- the tutor panel: the product's own voice, shown not described ---- */
@@ -744,6 +754,8 @@
  FORM: "La lección, en vivo" — index 4 of 7, the dealt lead.
  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 -->
+<div class="lamp" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 <main class="app" id="app"><div class="center muted" style="margin-top:40px">Cargando…</div></main>
 <div class="tabbar hide" id="tabbar"></div>
 

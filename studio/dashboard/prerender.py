@@ -28,6 +28,20 @@ RULES
 - Dependency-free on purpose (see `admin_paths.py` for the same reasoning): it
   renders from plain dicts, so it can be tested under any interpreter without
   importing FastAPI or opening a database connection.
+- The first viewport USES THE SPA'S OWN CLASSES, and that is a reversal. This
+  module originally used inline styles only, reasoning that a block replaced
+  within a second must not depend on class names the SPA might rename. The cost
+  of that decoupling was a visible discontinuity reported three times: the
+  pre-hydration paint was a plain 900px article with no nav, no lamp, no hero
+  and a different headline, and hydration then swapped in the designed page. It
+  read as the page loading twice, and no amount of making the swap FASTER helped
+  because the swap was between two unrelated pictures.
+  The stylesheet is already inline in the document this lands in, so the header
+  and hero here are built from `.sitenav`, `.hero`, `.herogrid`, `.eyebrow` and
+  `.demoq` — the same classes the SPA rebuilds a moment later. Renaming one of
+  those now breaks this file, which is the trade that was made deliberately.
+  `check_public_surface.py` asserts the prerendered content, so the break is
+  loud.
 - Everything interpolated goes through `_esc`. The inputs are our own course
   copy today, but this lands in a document that is served to strangers.
 - Real `<a href>` anchors, never JS navigation. The point is that a crawler can
@@ -118,14 +132,51 @@ def landing_html(courses: list[dict] | None = None,
     )
     catalog = (f'<h2 style="{_H2}">Los cursos</h2><ul style="padding-left:18px;margin:0 0 14px">{items}</ul>'
                if items else "")
-    return f"""<div style="{_WRAP}">
-{_nav()}
-<h1 style="{_H1}">Dinos qué quieres ser y te decimos qué te falta</h1>
+    # The first viewport is built from the SAME classes the SPA uses, so the
+    # paint before hydration and the paint after it are the same picture. See
+    # the module docstring: this is the whole reason the "inline styles only"
+    # rule was dropped.
+    ask = ""
+    if demo and demo.get("explain_prompt"):
+        ask = (
+            f'<div class="demoq">'
+            f'<div class="eyebrow">Ahora tú</div>'
+            f'<h2 class="askq" style="margin:8px 0 4px">{_esc(demo["explain_prompt"])}</h2>'
+            f'<p class="muted t-sm" style="margin-top:6px">Con tus palabras, como se lo '
+            f'explicarías a alguien. No hay nota: esto se responde con <b>Lo tienes</b>, '
+            f'<b>Casi</b> o <b>Todavía no</b>, y con lo que te falta.</p>'
+            # A styled stand-in, never a real <textarea>: for the ~300ms before
+            # hydration it must look like the box without being one, or someone
+            # types into a field whose submit handler does not exist yet.
+            f'<div class="preask-box" aria-hidden="true">Escribe aquí tu explicación…</div>'
+            f'<p class="faint t-sm" style="margin-top:8px">Guardamos lo que escribes, '
+            f'sin tu nombre ni tu correo, solo para saber si la lección enseña.</p>'
+            f'<div class="btn btn-primary" aria-hidden="true" style="margin-top:var(--s3)">Que la tutora lo lea</div>'
+            f'</div>'
+        )
+    return f"""<header class="sitenav u-wide">
+  <a class="brandrow" href="/"><div class="brandmark"></div><div class="brandname">Rumbo<small>Dinos qué quieres ser</small></div></a>
+  <nav class="navlinks" aria-label="Principal">
+    <a href="/" class="on" aria-current="page">La clase</a>
+    <a href="/oferta">Tu ruta</a>
+    <a href="/cursos">Qué enseñamos</a>
+  </nav>
+  <span class="navcta"><a class="navlink-quiet" href="/login">Tengo una invitación</a>
+  <a class="btn btn-primary btn-sm" href="/oferta">Dinos qué quieres ser</a></span>
+</header>
+<section class="u-full band-hi hero">
+  <div class="u-wide herogrid">
+    <div>
+      <div class="eyebrow">Una clase de verdad, ahora, sin cuenta</div>
+      <h1>No te contamos cómo funciona. Haz una clase.</h1>
+      <p class="muted lede">Primera lección del curso de Marketing con IA, entera. Explícala con tus palabras y Vera te contesta de verdad — antes de pedirte nada, y sin cuenta.</p>
+    </div>
+    {ask}
+  </div>
+</section>
+<div class="u-wide" style="margin-top:var(--s5)">
 <p style="{_P}">Pega la oferta de trabajo que te interesa, o solo el nombre del puesto. Te armamos la ruta — qué módulos, en qué orden — y te decimos con nombre y apellido <b>lo que ese puesto pide y nosotros no enseñamos</b>. Casi nadie te dice eso.</p>
-<p style="{_P}">Cada lección es un video corto con el porqué, una guía escrita con el cómo, y un ejercicio donde pegas el trabajo que hiciste de verdad. Tu tutora lo lee, te puntúa, te dice qué te falta para llegar a 100 y te hace una pregunta que solo puede contestar quien hizo el trabajo. Reintentas sin límite y siempre se queda tu mejor intento.</p>
 <p style="{_P}">No damos certificados. Damos el trabajo que hiciste, con tu nombre: una estrategia, un plan de campaña, una auditoría — con enlace para compartir y PDF para imprimir.</p>
-<h2 style="{_H2}">Haz una clase ahora, sin cuenta</h2>
-<p style="{_P}">La primera lección del curso de Marketing con IA está abierta en esta página, entera. Mira el video, lee la guía y explícala con tus palabras: Vera, tu tutora, te responde de verdad antes de pedirte nada.</p>
 {lesson}
 {catalog}
 <p style="{_SMALL}"><a href="/oferta" style="{_LINK}">Arma tu ruta desde una oferta de trabajo</a> · <a href="/login" style="{_LINK}">Ya tengo una invitación</a></p>

@@ -839,8 +839,15 @@ button.back {
 .pip {
   width: 22px;
   height: 4px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.14);
+  /* --r-full, not 2px: on a 4px-tall bar the browser clamps the radius to half
+     the height anyway, so these render identically and the literal buys
+     nothing. */
+  border-radius: var(--r-full);
+  /* --line-strong rather than a white overlay. It is the palette's visible
+     neutral, it sits on --panel here (card-paper is a dark panel with a paper
+     BORDER, not a cream surface), and compared side by side against --raised,
+     --line and the old rgba it is the one that still reads as a track. */
+  background: var(--line-strong);
 }
 .pip.on {
   background: var(--amber);

@@ -81,15 +81,31 @@ says "esto no lo cubrimos" is the one people trust about what it does cover.
 
 ## Capabilities and Constraints
 
-- **No build step, and this is deliberate.** Both frontends are single vanilla-JS
-  HTML files with no bundler, no framework, and no test runner. A visual change
-  belongs in the CSS token layer in `:root`, never in element styles.
-- **CSP requires `'unsafe-inline'` for scripts** because of the single-file
-  frontends, so DOMPurify — not CSP — is the real XSS control. Untrusted Markdown
-  renders through `renderMD()` (marked → DOMPurify), never straight to
-  `innerHTML`. CDN libraries are pinned to exact versions with SRI.
-- **Three DOM-shim checks stand in for a test runner** and assert user-facing
-  *promises*, not layout: the landing's "cómo funciona" block (13 assertions), the
+- **There is a build step as of 2026-09-02, and that reverses a deliberate
+  choice.** This document said "no build step, and this is deliberate" for the
+  life of the product, and the reasoning held: a solo maintainer, no team, and a
+  deploy that was one Python process. What changed it was a bug rather than a
+  preference — server-rendering the public pages by hand produced a visible seam
+  between the served document and the hydrated one that survived four attempted
+  fixes, because the two were never the same document. A framework makes that
+  class of bug impossible instead of fixed.
+  **Astro + Svelte islands, static output, built in a Docker stage.** Node runs
+  at build time only; production is still one Python process serving files, with
+  no second service. The migration is phased and reversible — see the plan and
+  `docs/03`.
+- **A visual change still belongs in the token layer**, which is now a real file
+  (`studio/web/src/styles/tokens.css`) rather than a `:root` block inside a
+  3,192-line HTML file. It was true by convention before and is true by
+  construction now; `tokens.test.js` fails on drift while both copies exist.
+- **CSP still requires `'unsafe-inline'` for scripts** while the vanilla
+  frontends are the ones being served, so DOMPurify — not CSP — remains the real
+  XSS control. Untrusted Markdown renders through `renderMD()` (marked →
+  DOMPurify), never straight to `innerHTML`. CDN libraries are pinned to exact
+  versions with SRI. **The build step is what finally allows `'unsafe-inline'`
+  to be dropped, but not until the pages carrying inline script are gone** —
+  removing it earlier would break the live product to buy a header.
+- **114 assertions run under vitest** (`cd studio/web && npm test`) and assert
+  user-facing *promises*, not layout: the landing's "cómo funciona" block, the
   job-analysis result page (25), and the CV screen (37). They exist because copy
   here has aged silently before. Any overhaul keeps them green or changes them
   deliberately.

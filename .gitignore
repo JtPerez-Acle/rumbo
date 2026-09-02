@@ -80,3 +80,6 @@ brag-output/composition/assets/audio/
 studio/web/node_modules/
 studio/web/dist/
 studio/web/.astro/
+
+# Frontend build output copied into the image by Docker stage 1.
+studio/dashboard/static/web/

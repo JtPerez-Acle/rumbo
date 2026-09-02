@@ -1,0 +1,21 @@
+---
+/* A build canary, and the only page phase 1 emits.
+ *
+ * Phase 1 wires the toolchain without moving any user-visible route, so without
+ * one real page the build compiles nothing and "the build works" stays an
+ * assumption. This page exercises the whole chain for real: the Astro config,
+ * the Svelte integration, and the token stylesheet as a genuine import.
+ *
+ * DELETE IT IN PHASE 2, the moment a real page exists. A stray route in
+ * production is untidy, and a canary that outlives its purpose is just litter.
+ */
+import '../styles/tokens.css';
+import Canary from '../components/Canary.svelte';
+---
+<html lang="es">
+  <head><meta charset="utf-8" /><title>build canary</title></head>
+  <body>
+    <p>rumbo web toolchain ok</p>
+    <Canary client:load />
+  </body>
+</html>

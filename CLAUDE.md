@@ -81,9 +81,10 @@ roughly seventy times faster than it learns.
     `learn_routes.py` (**the entire learner API**), `admin_paths.py` (the admin
     allowlist predicate), `prerender.py` (**server-rendered bodies for the public
     surfaces** — both are dependency-free so they can be audited and tested under
-    any interpreter), **`web/`** (the frontend
-    test suite — 110 assertions under vitest, and the future Astro app),
-    `static/{index,learn,doc,caso,ruta}.html`.
+    any interpreter), `static/{index,learn,doc,caso,ruta}.html`.
+  - `web/` — **the Astro + Svelte frontend** and its 114 vitest assertions. Static
+    output, built in Docker stage 1, served by FastAPI; **no Node in production**.
+    `src/styles/tokens.css` is the design system's single source of truth.
   - `channels/*.toml` — course profiles. **Single source of truth** for learner copy.
   - `research/*.md` — grounding material for generation. `fixtures/` — matcher fixtures.
   - `output/`, `queue/` — rendered videos and render queue (**git-ignored**).
@@ -130,7 +131,8 @@ python studio/cloud/check_job_matcher.py    # matcher, 5 fixtures, ~15 min (real
 python studio/cloud/check_tutor.py          # tutor, 6 properties, ~5 min (real LLM)
 python studio/cloud/check_cv_matcher.py     # CV matcher; reads REAL CVs from ./cvs (git-ignored)
 python studio/cloud/check_public_surface.py [base_url]   # HTTP: public routes + every admin gate
-cd studio/web && npm test    # 110 frontend assertions (vitest) — run before ANY frontend edit
+cd studio/web && npm test     # 114 frontend assertions (vitest) — before ANY frontend edit
+cd studio/web && npm run build   # Astro static build; Docker stage 1 runs this
 
 # Offsite backup (all 20 tables) — before anything risky:
 DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14

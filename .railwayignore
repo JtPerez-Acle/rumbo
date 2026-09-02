@@ -8,3 +8,9 @@ studio/output
 studio/queue/done
 .claude
 **/__pycache__
+
+# The frontend workspace: source is copied into the Node build stage, but
+# node_modules and dist are produced there and must never ship from the host.
+studio/web/node_modules
+studio/web/dist
+studio/web/.astro

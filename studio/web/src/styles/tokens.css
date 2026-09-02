@@ -1,0 +1,56 @@
+/* El Taller Nocturno — the design tokens, and the single source of truth.
+ *
+ * DESIGN.md has always said "a visual change belongs in the CSS token layer in
+ * :root, never in element styles". Until now that layer lived inside a 3,192-line
+ * HTML file, which made it true by convention rather than by construction. It is
+ * a real file now, and the Astro app imports it.
+ *
+ * DUPLICATION, DELIBERATE AND TEMPORARY: studio/dashboard/static/learn.html still
+ * carries its own inline copy, because it is still the shipped frontend until
+ * phase 3. tokens.test.js asserts the two agree, so drift fails the suite instead
+ * of reaching a screen. When learn.html is deleted this note goes with it.
+ *
+ * The room: warm darkness, one amber lamp, and the learner's own work glowing
+ * paper-white as the only light that matters. Amber means "lit" and is used once
+ * per view; paper is reserved for work the learner produced.
+ */
+
+:root{
+    /* night */
+    --ink:#100D17; --panel:#191521; --raised:#221D2E;
+    --line:#2F2839; --line-strong:#453B54;
+    /* text */
+    /* --faint has now been raised twice for the same reason. #7E7589 was
+       4.39:1 on the workshop ground; #8B8296 fixed that but still measured
+       4.47:1 against the RAISED surface (#221D2E) that cards use — 0.03 short,
+       on ".. CURSOS" counts and the privacy line under the textarea. #948B9F
+       clears AA on both grounds. Measure against the surface the text actually
+       sits on, not the page background. */
+    --text:#F2EFE9; --dim:#B2AABB; --faint:#948B9F;
+    /* la lámpara (brand) */
+    --amber:#F0A43C; --amber-hi:#FFC670; --amber-deep:#AD7423; --amber-ink:#241603;
+    /* el papel (the work) */
+    --paper:#F1E6CE; --paper-dim:#CFC3A8; --paper-ink:#26200F;
+    /* semantics (earth, not neon) */
+    --sage:#A9C48F; --sage-ink:#1C2A12;
+    --terra:#E5825E; --terra-ink:#33170C;
+    /* type scale — six sizes, no more */
+    --fs-xs:11px; --fs-sm:12.5px; --fs-base:14px; --fs-md:15.5px; --fs-lg:18px; --fs-xl:22px;
+    --fd-md:26px; --fd-lg:31px; --fd-num:42px; --fd-streak:56px;
+    /* space scale */
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+    /* radii */
+    --r-sm:10px; --r-md:14px; --r-lg:20px;
+    --sans:"Archivo",-apple-system,"Segoe UI",system-ui,sans-serif;
+    --serif:"Fraunces",Georgia,serif;
+    --glow-amber:0 12px 34px -12px rgba(240,164,60,.5);
+    --glow-paper:0 10px 32px -14px rgba(241,230,206,.28);
+    --dur:.38s; --ease:cubic-bezier(.22,.9,.3,1);
+  }
+
+:root{--w-text:640px; --w-wide:1280px; --gutter:var(--s6);
+    /* The ground, in four steps. Sections differ by floor, not by rule. */
+    --band-hi:#16121F;      /* hero — lifted toward the lamp */
+    --band-lo:#0C0913;      /* los cuatro pasos — one step under the base */
+    --band-deep:#08060F;    /* fase alfa — the far end of the room */
+  }

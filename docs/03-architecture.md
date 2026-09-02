@@ -198,7 +198,15 @@ JS. `/aprende/doc/{token}` serves **both** per-course and goal documents
 
 ## Frontend
 
-Both UIs are **single vanilla-JS files, no build step**.
+Both UIs are still **single vanilla-JS files**, and both are being replaced.
+**There is a build step as of 2026-09-02** — Astro emitting static files from
+`studio/web/`, run in Docker stage 1, copied into the image. Node exists at build
+time only; production is the same single Python process it always was. The cause
+was a bug, not a preference: hand-written server-side prerendering produced a
+visible seam between the served document and the hydrated one, because the two
+were never the same document, and four fixes did not close it. See PRODUCT.md for
+the decision and its cost, and the phased plan for what has actually moved.
+Phase 1 (the scaffold) ships the pipeline and **moves no route**.
 
 `learn.html` is the learner SPA: a **CSS token layer** (`:root` — colors, a
 six-step type scale, spacing, radii, motion) plus component classes, an inline
@@ -212,12 +220,15 @@ public branch at first, which made the "Pega tu oferta" button inside
 `#/objetivo` a dead end. Visual changes belong in the token block, never in
 element styles.
 
-There is no bundler and no test runner. Two Node checks stand in, run against
-the extracted script block. They now live in `studio/web/tests/` and run under
-vitest — **110 assertions across four suites** — sharing one harness instead of
-four near-identical copies of the DOM shim. They are
-DOM-shim based — the browser pane wedges often enough that `docs/07` names this
-as the fallback.
+The tests live in `studio/web/tests/` and run under vitest — **114 assertions**,
+`cd studio/web && npm test`. Four suites cover the vanilla SPA by extracting its
+script block and running it against a shared DOM shim (`harness.js`); a fifth
+(`tokens.test.js`) fails the build if `learn.html`'s inline `:root` drifts from
+`src/styles/tokens.css` while both copies exist, and is deleted with `learn.html`.
+The shim asserts its own substitution succeeded — a silently-empty harness once
+reported a clean pass, which is the failure mode `docs/07` warns about. They are
+DOM-shim rather than browser based because the browser pane wedges often enough
+that `docs/07` names this as the fallback.
 
 The lesson **step deep-links exist for a reason**: a pending conversation shown
 on Hoy must land exactly on the step where it can be answered. Without them,
@@ -294,7 +305,8 @@ exposed directly, `_client_ip` becomes attacker-controlled.
 | **`rubric_version` on every evaluation** | Comparing scores across rubric versions made the tutor contradict itself in front of a learner |
 | **Best attempt always wins** (submissions, quiz scores, conversation bonus) | Retrying must never be a gamble, or "try again" is dishonest |
 | **Videos canonical per lesson; personalization in the path** | Marginal cost per learner ≈ 0 |
-| **Single-file vanilla-JS frontends + CSS token layer** | No build step, no framework drift; a visual change is one token edit |
+| **Astro + Svelte islands, static output, built in Docker stage 1** | Replaces hand-written prerendering, whose served and hydrated documents could never be made identical; Node stays out of production |
+| **Tokens in one real stylesheet** (`studio/web/src/styles/tokens.css`) | A visual change is still one token edit — now by construction rather than by convention |
 | **Evaluations formative; gates on engagement, not passing** | Completion is the metric that kills edutainment products |
 | **Reward appropriation, don't police AI** | AI detection is unreliable and contradicts a curriculum that teaches AI use |
 | **Verification = counting rows, not exit codes** | A pipeline once reported success while producing zero lessons |

@@ -10,7 +10,11 @@ reached production in the first place.
 
 1. **Compile-check** — `python -m py_compile` on touched Python; for the
    single-file frontends, extract the last `<script>` block and `node --check`
-   it (there is no bundler to catch syntax errors for you).
+   it (nothing else catches a syntax error in a file with no build step).
+   For anything under `studio/web/`, `npm run build` is the compile-check.
+1b. **Run the frontend suite** — `cd studio/web && npm test` (114 assertions).
+   It reads `learn.html` through a DOM shim, so it also catches an edit that
+   changed the shape the shim depends on.
 2. **Run locally against the real cloud DB** — `preview_start` with the
    `learner-app` launch config (see doc 05).
 3. **Test with real data**, then **delete your test rows** (they live in the

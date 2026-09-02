@@ -93,7 +93,11 @@ studio/cloud/             The engine.
 studio/dashboard/         The application.
   app.py                  FastAPI: admin API, token gate, share pages
   learn_routes.py         The entire learner API
-  static/learn.html       The learner app — one file, no build step
+  static/learn.html       The learner app — one vanilla file, being replaced
+
+studio/web/               The frontend build. Astro + Svelte islands, static
+                          output, compiled in Docker stage 1 and served by
+                          FastAPI. `npm test` runs 114 assertions.
 
 studio/channels/*.toml    Course definitions. Single source of truth for anything
                           a learner sees.

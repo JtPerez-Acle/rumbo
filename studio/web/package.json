@@ -5,9 +5,15 @@
   "description": "Rumbo's frontend. Currently: the test suite that guards the vanilla frontends during the Astro migration. Later: the Astro app itself.",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build": "astro build",
+    "dev": "astro dev",
+    "preview": "astro preview"
   },
   "devDependencies": {
-    "vitest": "^2.1.8"
+    "@astrojs/svelte": "^9.0.1",
+    "astro": "^7.2.10",
+    "svelte": "^5.57.0",
+    "vitest": "^4.1.11"
   }
 }

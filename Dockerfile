@@ -1,3 +1,29 @@
+# ---------------------------------------------------------------------------
+# Stage 1 — the frontend build.
+#
+# Node exists HERE and only here. Astro emits static files, the Python stage
+# copies them, and production runs exactly what it ran before: one Python
+# process. No Node runtime, no second service, no new way for a product run by
+# one person to break unattended. That was the deciding constraint when this
+# stack was chosen, and this stage is where it is kept.
+# ---------------------------------------------------------------------------
+FROM node:22-slim AS web
+
+WORKDIR /build
+
+# Manifests first, so a source-only change does not re-resolve the dependency
+# tree. `npm ci` installs the lockfile exactly — the lockfile is tracked for
+# this reason, and a build that quietly resolves different versions than the
+# machine it was tested on is not a build anyone can reason about.
+COPY studio/web/package.json studio/web/package-lock.json ./
+RUN npm ci
+
+COPY studio/web/ ./
+RUN npm run build
+
+# ---------------------------------------------------------------------------
+# Stage 2 — the application, unchanged from before this file grew a first stage.
+# ---------------------------------------------------------------------------
 FROM python:3.11-slim-bullseye
 
 WORKDIR /app
@@ -29,6 +55,13 @@ RUN pip install --no-cache-dir --retries 3 --timeout 60 -r requirements.txt \
 RUN mkdir -p /app/MoneyPrinterTurbo
 
 COPY studio ./studio
+
+# The built frontend, from stage 1. It lands beside the vanilla frontends rather
+# than replacing them: phase 1 wires the pipeline and moves no route, so nothing
+# serves out of here yet. `.dockerignore` keeps the host's own dist/ and
+# node_modules out of the context, so this is always the artifact stage 1 just
+# produced and never a stale copy from someone's laptop.
+COPY --from=web /build/dist ./studio/dashboard/static/web
 
 # Renders and their approve/publish state live on the Railway volume, which the
 # platform mounts at /app/studio/output (configured on the service, not here).

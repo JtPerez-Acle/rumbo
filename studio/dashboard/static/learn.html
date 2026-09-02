@@ -958,7 +958,15 @@ async function route(){
   else viewToday();
 }
 async function boot(){
-  const me=await api('/me');
+  /* The session check comes from the server when it can.
+     This awaited GET /api/learn/me before route() was ever called, so nothing
+     rendered until a round trip returned — 147ms live. The prerendered page sat
+     on screen for that whole window and was then replaced, and that gap is what
+     "it loads twice" actually was. Every previous attempt made the swap look
+     better or arrive sooner; none of them removed the wait.
+     apiBoot falls back to the real request when the payload is absent (the SPA
+     preview, /aprende, any route that does not prerender). */
+  const me=await apiBoot('me','/me');
   AUTH=!!me.authenticated;
   STATE.me=me;   // carries the declared project; the exercise step and Perfil read it
   // A route analysed before signing up is the reason many people sign up at all.

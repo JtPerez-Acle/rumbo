@@ -20,7 +20,7 @@ import threading
 import tomllib
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Cookie, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -743,7 +743,7 @@ def panel():
 
 
 @app.get("/")
-def site_home():
+def site_home(learner_session: str | None = Cookie(default=None)):
     """The public site. This is what a stranger gets when they type the domain,
     and until now it was a 401 from a dashboard nobody but the operator can use.
 
@@ -757,7 +757,7 @@ def site_home():
                         "video, lee la guía y explícalo con tus palabras. Tu "
                         "tutora te responde de verdad."),
     }, prerender=prerender.landing_html(_courses, _demo), wide=True,
-       boot={"catalog": _courses, "demo": _demo})
+       boot={"catalog": _courses, "demo": _demo, "me": _me_data(learner_session)})
 
 
 # ---- Learner app (Rumbo) ----
@@ -891,6 +891,24 @@ def _catalog_data() -> list[dict]:
         return []
 
 
+def _me_data(learner_session: str | None) -> dict:
+    """The session check, done server-side.
+
+    boot() awaited GET /api/learn/me before it called route(), so NOTHING
+    rendered until a network round trip came back — 147ms on the live site. The
+    prerendered page sat on screen for that whole window and was then replaced,
+    which is the "it loads twice" nobody could shake. Every other fix attacked
+    what the swap LOOKED like; this removes the wait that made a swap visible at
+    all. Calls the endpoint function itself so the two can never disagree.
+    """
+    try:
+        import learn_routes
+        return learn_routes.me(learner_session)
+    except Exception as exc:
+        print(f"prerender me skipped: {exc}", file=sys.stderr)
+        return {"authenticated": False}
+
+
 def _demo_data() -> dict | None:
     """The free lesson, for the landing's server-rendered body. Same endpoint
     the SPA calls, so the two can never describe different lessons."""
@@ -986,7 +1004,7 @@ def public_login():
 
 
 @app.get("/cursos")
-def public_cursos():
+def public_cursos(learner_session: str | None = Cookie(default=None)):
     """The whole catalog at its own address. It used to exist only as a section
     below a full lesson on the landing, reachable by scrolling past all of it."""
     courses = _catalog_data()
@@ -999,11 +1017,11 @@ def public_cursos():
         "description": ("Los módulos que tu ruta puede tomar, con el temario "
                         "abierto entero y el documento con el que termina cada uno."),
     }, view="cursos", prerender=prerender.catalog_html(courses), wide=True,
-       boot={"catalog": courses})
+       boot={"catalog": courses, "me": _me_data(learner_session)})
 
 
 @app.get("/curso/{slug}")
-def public_curso(slug: str):
+def public_curso(slug: str, learner_session: str | None = Cookie(default=None)):
     """A course temario at its own address. docs/02 calls the browsable temarios
     marketing content: 14 courses and 420 lesson objectives, all real, and until
     now invisible to search because they lived behind a fragment."""
@@ -1019,7 +1037,8 @@ def public_curso(slug: str):
         body = prerender.course_html(course)
     return _spa_shell("learn.html", meta, view="explora", arg=slug,
                       prerender=body, wide=True,
-                      boot={"course": course} if course else None)
+                      boot={"course": course, "me": _me_data(learner_session)}
+                           if course else {"me": _me_data(learner_session)})
 
 
 @app.get("/aprende/caso/{token}")

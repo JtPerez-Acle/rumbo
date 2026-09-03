@@ -26,6 +26,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 import tomllib
 from pathlib import Path
 
@@ -41,6 +42,125 @@ PENDING_DIR = STUDIO / "queue" / "pending"
 
 # Set by main() from the CLI slug argument.
 COURSE_SLUG = "curso-marketing-ia"
+
+
+# ---------------------------------------------------------------------------
+# Progress reporting.
+#
+# `all` runs for two to three hours across ten phases, and the person who
+# started it is watching a terminal. Loguru's default line says the level and
+# the message and nothing about WHERE the run is — so a healthy thirty-lesson
+# compile and a wedged one look identical for forty minutes. Everything below
+# exists to answer three questions at a glance: which phase, how far into it,
+# and how much longer.
+#
+# Times are wall clock and elapsed-since-start together: wall clock is what you
+# compare against "when did I start this", elapsed is what you compare against
+# the estimate.
+# ---------------------------------------------------------------------------
+_RUN_STARTED = time.monotonic()
+_PHASE_TIMES: list[tuple[str, float]] = []
+
+
+def _elapsed(since: float | None = None) -> str:
+    secs = int(time.monotonic() - (since if since is not None else _RUN_STARTED))
+    h, rem = divmod(secs, 3600)
+    m, s = divmod(rem, 60)
+    return f"{h}:{m:02d}:{s:02d}" if h else f"{m:02d}:{s:02d}"
+
+
+def _setup_logging() -> None:
+    """One line per event, carrying the clock and the elapsed time.
+
+    stderr, unbuffered, no colour codes when the output is redirected — a log
+    piped to a file should be readable without stripping escape sequences.
+    """
+    # Windows consoles default to a codepage that cannot encode the accents this
+    # output is full of, and loguru escapes what it cannot write — turning a rule
+    # into a row of ─ and an accented title into noise. Ask for UTF-8 and
+    # carry on if the stream will not take it.
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+    logger.remove()
+    logger.add(
+        sys.stderr,
+        format=("<dim>{time:HH:mm:ss}</dim> <cyan>{extra[run]:>7}</cyan> "
+                "<level>{level: <7}</level> {message}"),
+        colorize=sys.stderr.isatty(),
+        level="INFO",
+        enqueue=False,
+    )
+    logger.configure(extra={"run": "00:00"})
+
+
+def _phase(index: int, total: int, name: str, detail: str = "") -> float:
+    """Announce a phase and return its start time, for `_phase_done`."""
+    logger.configure(extra={"run": _elapsed()})
+    logger.info("-" * 68)
+    logger.info(f"FASE {index}/{total} · {name}" + (f" — {detail}" if detail else ""))
+    logger.info("-" * 68)
+    return time.monotonic()
+
+
+def _phase_done(name: str, started: float) -> None:
+    took = time.monotonic() - started
+    _PHASE_TIMES.append((name, took))
+    logger.configure(extra={"run": _elapsed()})
+    logger.success(f"FASE {name} lista en {_elapsed(started)}")
+
+
+class Progress:
+    """Per-item progress with a running estimate.
+
+    The estimate is the mean of what has actually happened, not a guess: on a
+    thirty-lesson compile where each call to the model takes 40-90 seconds, an
+    average over the finished ones is the only honest number available, and it
+    is the difference between "this is working" and "is this stuck?".
+    """
+
+    def __init__(self, total: int, unit: str = "lección", plural: str = "lecciones"):
+        self.total, self.unit, self.plural = total, unit, plural
+        self.done = self.failed = 0
+        self.started = time.monotonic()
+
+    def _eta(self) -> str:
+        if not self.done:
+            return "—"
+        per = (time.monotonic() - self.started) / self.done
+        left = int(per * (self.total - self.done - self.failed))
+        return f"~{left // 60}m {left % 60}s" if left >= 60 else f"~{left}s"
+
+    def _prefix(self) -> str:
+        n = self.done + self.failed + 1
+        return f"[{min(n, self.total):>2}/{self.total}]"
+
+    def ok(self, message: str) -> None:
+        logger.configure(extra={"run": _elapsed()})
+        p = self._prefix()
+        self.done += 1
+        logger.info(f"{p} {message}  ·  quedan {self._eta()}")
+
+    def fail(self, message: str) -> None:
+        logger.configure(extra={"run": _elapsed()})
+        p = self._prefix()
+        self.failed += 1
+        logger.error(f"{p} {message}")
+
+    def skip(self, message: str) -> None:
+        logger.configure(extra={"run": _elapsed()})
+        p = self._prefix()
+        self.done += 1
+        logger.info(f"{p} {message}")
+
+    def summary(self) -> None:
+        logger.configure(extra={"run": _elapsed()})
+        line = f"{self.done}/{self.total} {self.plural} en {_elapsed(self.started)}"
+        if self.failed:
+            logger.warning(f"{line} · {self.failed} con error (re-ejecuta: es idempotente)")
+        else:
+            logger.info(line)
 
 
 def _profile() -> dict:
@@ -165,6 +285,12 @@ def cmd_compile(limit: int | None = None) -> None:
         drafts = db.course_nodes(conn, course["id"], status="draft")
     if limit:
         drafts = drafts[:limit]
+    if not drafts:
+        logger.info("no hay lecciones en borrador — nada que compilar")
+        return
+    logger.info(f"{len(drafts)} lecciones por escribir · cada una es una llamada al "
+                f"modelo (~40-90 s) · total estimado {len(drafts) * 65 // 60} min")
+    bar = Progress(len(drafts))
     for node in drafts:
         try:
             spec = writer.write_lesson(profile, node, research=research)
@@ -194,10 +320,13 @@ def cmd_compile(limit: int | None = None) -> None:
                                written=spec.get("written", ""), diagrams=spec.get("diagrams", []),
                                explain_prompt=spec.get("explain_prompt", ""))
                 conn.commit()
-            logger.info(f"lesson {node['position']:02d} scripted: {spec['title']}")
+            bar.ok(f"L{node['position']:02d} escrita · {spec['title'][:52]} · "
+                   f"quiz {len(spec.get('quiz') or [])}p · "
+                   f"guía {len(spec.get('written', ''))} chars")
         except Exception as exc:
-            logger.error(f"lesson {node['position']} ({node['slug']}) failed: {exc}")
+            bar.fail(f"L{node['position']:02d} ({node['slug']}) falló: {exc}")
             continue
+    bar.summary()
 
 
 def cmd_backfill_text() -> None:
@@ -231,6 +360,11 @@ def cmd_backfill_text() -> None:
 
 
 def cmd_render() -> None:
+    # generate_batch owns its own output; this is the one phase whose progress
+    # is not ours to report, so say where it went rather than going quiet.
+    logger.info(f"delegando en generate_batch.py · el render escribe en "
+                f"{STUDIO / 'output' / COURSE_SLUG} · Pexels limita a 200 req/h, "
+                f"así que >30 videos puede necesitar varias pasadas")
     subprocess.run(
         [sys.executable, str(STUDIO / "generate_batch.py"), "--channel", COURSE_SLUG],
         check=False,
@@ -239,9 +373,12 @@ def cmd_render() -> None:
 
 def cmd_reconcile() -> None:
     output_dir = STUDIO / "output" / COURSE_SLUG
+    matched = 0
     with db.connect() as conn:
         course = db.ensure_course(conn, COURSE_SLUG, *_course_meta())
-        for node in db.course_nodes(conn, course["id"], status="scripted"):
+        pending = db.course_nodes(conn, course["id"], status="scripted")
+        logger.info(f"{len(pending)} lecciones esperando su mp4 en {output_dir}")
+        for node in pending:
             # Rendered filenames derive from the queue entry's name, so they
             # carry the course slug now. Match the namespaced form first and
             # fall back to the legacy one for courses rendered before that.
@@ -255,7 +392,12 @@ def cmd_reconcile() -> None:
                     video_file=f"{COURSE_SLUG}/{matches[0].name}",
                 )
                 conn.commit()
-                logger.info(f"lesson {node['position']:02d} rendered: {matches[0].name}")
+                matched += 1
+                logger.info(f"[{matched:>2}/{len(pending)}] L{node['position']:02d} "
+                            f"emparejada · {matches[0].name}")
+    if matched < len(pending):
+        logger.warning(f"{len(pending) - matched} lecciones sin mp4 — revisa el render "
+                       f"y vuelve a ejecutar `reconcile` (es idempotente)")
 
 
 def cmd_fix_titles() -> None:
@@ -468,9 +610,10 @@ def cmd_capstones() -> None:
     for n in nodes:
         m = modules.setdefault(n["module_no"], {"title": n["module_title"], "lessons": []})
         m["lessons"].append(n)
+    bar = Progress(len(modules), unit="reto", plural="retos")
     for module_no in sorted(modules):
         if module_no in existing:
-            logger.info(f"module {module_no}: capstone already exists, skipping")
+            bar.skip(f"módulo {module_no}: ya tiene reto, se conserva")
             continue
         try:
             spec = writer.write_capstone(
@@ -481,9 +624,10 @@ def cmd_capstones() -> None:
                 course = db.ensure_course(conn, COURSE_SLUG, *_course_meta())
                 db.add_capstone(conn, course["id"], module_no, spec)
                 conn.commit()
-            logger.info(f"module {module_no} capstone: {spec['title']}")
+            bar.ok(f"módulo {module_no} · reto: {spec['title'][:56]}")
         except Exception as exc:
-            logger.error(f"module {module_no} capstone failed: {exc}")
+            bar.fail(f"módulo {module_no}: el reto falló: {exc}")
+    bar.summary()
 
 
 def cmd_sync() -> None:
@@ -689,6 +833,7 @@ def cmd_status() -> None:
 
 def main(argv: list[str]) -> None:
     global COURSE_SLUG
+    _setup_logging()
     # First arg is the course slug when it matches a channels/<slug>.toml; else
     # default to the marketing course (back-compat with the old single-course CLI).
     args = list(argv)
@@ -720,13 +865,47 @@ def main(argv: list[str]) -> None:
         # check it makes is one that has cost a real afternoon before.
         if cmd_preflight() != 0:
             sys.exit(1)
-        cmd_syllabus(); cmd_compile(); cmd_render(); cmd_reconcile()
-        cmd_backfill_text(); cmd_backfill_modules(); cmd_backfill_explain()
-        cmd_capstones()
-        # Prereqs feed the route matcher (docs/09); idempotent — existing
-        # extractions are kept, so re-running `all` never re-spends.
-        cmd_backfill_prereqs()
-        sys.exit(cmd_verify())
+        # Named so the terminal always says which of the ten you are in. The
+        # order is fixed: syllabus before compile, render before reconcile, and
+        # verify last because it is the only one that can say the run worked.
+        steps = [
+            ("temario", cmd_syllabus),
+            ("compilar lecciones", cmd_compile),
+            ("renderizar videos", cmd_render),
+            ("emparejar mp4 con lecciones", cmd_reconcile),
+            ("transcripts y puntos clave", cmd_backfill_text),
+            ("descripciones de módulo", cmd_backfill_modules),
+            ("preguntas de explicación", cmd_backfill_explain),
+            ("retos de módulo", cmd_capstones),
+            # Prereqs feed the route matcher (docs/09); idempotent — existing
+            # extractions are kept, so re-running `all` never re-spends.
+            ("prerrequisitos entre módulos", cmd_backfill_prereqs),
+        ]
+        logger.info(f"curso {COURSE_SLUG} · {len(steps) + 1} fases · "
+                    f"esto tarda 2-3 horas · todo es idempotente, "
+                    f"re-ejecutar es el modelo de recuperación")
+        for i, (name, fn) in enumerate(steps, start=1):
+            started = _phase(i, len(steps) + 1, name)
+            fn()
+            _phase_done(name, started)
+
+        started = _phase(len(steps) + 1, len(steps) + 1, "verificar",
+                         "contar filas; 'exit 0' no es verificación")
+        rc = cmd_verify()
+        _phase_done("verificar", started)
+
+        logger.info("=" * 68)
+        logger.info(f"RESUMEN · {COURSE_SLUG} · total {_elapsed()}")
+        for name, took in sorted(_PHASE_TIMES, key=lambda x: -x[1]):
+            mins, secs = divmod(int(took), 60)
+            logger.info(f"  {mins:>3}m {secs:02d}s  {name}")
+        logger.info("=" * 68)
+        if rc == 0:
+            logger.success("el curso está completo en la base de datos. "
+                           "Sigue: upload_videos.py, luego export_web.py, luego deploy")
+        else:
+            logger.error("incompleto — mira qué falta arriba y vuelve a ejecutar `all`")
+        sys.exit(rc)
     else:
         # Commands that return an int are checks: their exit code is the result.
         rc = dispatch.get(command, cmd_status)()

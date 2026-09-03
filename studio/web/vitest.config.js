@@ -20,5 +20,11 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: false,
+    /* tests/ only. Without this, vitest's default glob also collects
+       tests-layout/*.spec.js — the Playwright suite — and dies on the first
+       `test.beforeEach`, reporting "1 file failed, 130 tests passed", which is
+       a failure people learn to scroll past. The two runners own separate
+       directories and neither should try to run the other's work. */
+    include: ['tests/**/*.test.js'],
   },
 });

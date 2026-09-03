@@ -1,0 +1,48 @@
+# Curso: SQL para auditar datos.
+#
+# NO es un curso de sintaxis, y esa decisión es la que lo hace posible aquí.
+# La sintaxis se aprende en una tarde, una IA escribe una consulta competente en
+# tres segundos, y el formato de este producto — video de 45-60 s con voz
+# sintética — no puede narrar SQL: `SELECT * FROM ventas WHERE fecha_compra`
+# suena como ruido. Lo que sigue siendo escaso es saber si la consulta responde
+# la pregunta que de verdad se hizo.
+#
+# Por eso el curso enseña COMPRENSIÓN y la prueba con una AUDITORÍA: el alumno
+# termina con un documento sobre sus propios datos que contiene las preguntas,
+# las consultas verificadas, los hallazgos y las salvedades. Sin ese entregable
+# el resultado sería "entiendo SQL", que es un certificado con otro nombre y el
+# producto rechaza esa categoría.
+#
+# El módulo 3 es el único que pide teclado. Los otros cuatro se leen, se ejecutan
+# y se juzgan desde el teléfono, que es donde esta audiencia estudia.
+kind = "course"
+name = "SQL para auditar datos"
+slug = "curso-sql"
+niche = "Lee cualquier consulta, descubre por qué un número no cuadra y entrega la auditoría que lo prueba"
+category = "Analítica y automatización"
+audience = "Personas sin experiencia técnica en LatAm que trabajan con datos ajenos — reportes, planillas, paneles — y necesitan leerlos con criterio, detectar cuándo un número está mal y sostener su respuesta con una consulta"
+tone = "Auditora que no acepta un número sin preguntar de dónde salió: pide el grano, la población y la ventana antes que la cifra, desconfía de la consulta que corre sin error, y prefiere una salvedad honesta a una conclusión cómoda."
+cta = "Ahora hazlo tú: la lección continúa en tu ejercicio."
+course_brief = "Curso de 30 lecciones (5 módulos de 6) sobre SQL, enseñado como COMPRENSIÓN y probado como AUDITORÍA. TESIS: la gente no fracasa en SQL por la sintaxis sino porque el modelo mental está mal — piensa en bucles cuando SQL piensa en conjuntos, lee NULL como cero, y no nota que un GROUP BY cambió qué representa una fila. El hecho canónico que hay que enseñar bien: SQL se ESCRIBE SELECT-FROM-WHERE pero se EJECUTA FROM-WHERE-GROUP BY-HAVING-SELECT-ORDER BY. Además el alumno usará IA para redactar consultas (el producto lo permite y evalúa que el trabajo sea suyo, no quién escribió el primer borrador), así que la habilidad que vale 30 lecciones es VERIFICAR, no teclear. ARQUITECTURA: (1) qué pregunta pueden responder los datos — grano, población, ventana temporal, fuente; casi sin SQL; el alumno carga sus datos reales y desordenados; (2) leer antes de escribir — se le da una consulta y dice qué devuelve; conjuntos y no bucles; orden escrito contra orden de ejecución; (3) escribe las tuyas — el módulo de producción, el único que pide teclado; (4) cuando el número está mal — ES EL CORAZÓN DEL CURSO: NULL y aritmética con desconocidos, JOIN que multiplica filas, GROUP BY que cambia el grano, duplicados, zonas horarias, filtros que excluyen NULL sin querer, promedios de promedios; (5) verifica lo que te dio la máquina — contrastar contra un total conocido, probar un caso extremo, revisar el grano, comparar dos formulaciones de la misma pregunta; cierra la auditoría y sus salvedades. LOS EJERCICIOS SON DE JUICIO, NO DE TECLEO: en los módulos 1, 2, 4 y 5 la forma es 'juzga, encuentra, explica o verifica', no 'escribe una consulta'. HERRAMIENTA: la definida en el material de investigación, gratuita, sin tarjeta, sin instalar y usable desde un navegador móvil; el documento manda sobre cualquier suposición. PROYECTO TRANSVERSAL OBLIGATORIO: en la lección 1 el alumno carga datos REALES, SUYOS y DESORDENADOS — su planilla de ventas, su inventario, sus pedidos, la exportación de su tienda, el registro de su organización — y todo el curso audita ESOS datos. Una auditoría necesita algo que auditar: sin datos propios la dimensión Aplicación no tiene de qué agarrarse. ENTREGABLE: una Auditoría de datos que contiene las consultas y la verificación, no sólo las conclusiones — un hallazgo está completo cuando tiene la afirmación, la consulta que la sostiene, el número, la causa y qué decisión cambia. HONESTIDAD: el curso no cubre optimización interna del motor, administración de bases de datos, modelado dimensional a escala, procedimientos almacenados ni concurrencia, y debe decirlo. Basado en el material de investigación."
+research_file = "sql.md"
+
+[voice]
+voice_name = "es-CL-CatalinaNeural-Female"
+voice_rate = 1.05
+
+[style]
+font_name = "BeVietnamPro-Bold.ttf"
+font_size = 56
+text_fore_color = "#FFFFFF"
+stroke_color = "#336791"
+stroke_width = 2.0
+subtitle_position = "custom"
+custom_position = 72
+video_transition_mode = "fade-in"
+video_clip_duration = 4
+video_aspect = "9:16"
+bgm_volume = 0.12
+
+[publish]
+upload_post_username = ""
+platforms = []

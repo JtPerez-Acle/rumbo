@@ -712,6 +712,24 @@ PROJECT_TEMPLATES = {
             "Medición, KPIs y próximos pasos",
         ],
     },
+    "curso-sql": {
+        # An audit, and it must carry the QUERIES — not just the conclusions.
+        # The default template is already "Documento de investigación y
+        # recomendaciones" with Hallazgos and Recomendaciones, so an audit that
+        # stops at findings is the default wearing a costume. What makes this
+        # one a work product is that every claim is backed by the query that
+        # proves it, and that the limits are stated rather than implied.
+        "doc_type": "Auditoría de datos",
+        "sections": [
+            "Resumen ejecutivo",
+            "Las preguntas del negocio, definidas con precisión (grano, población, ventana, fuente)",
+            "Fuentes de datos y el estado real en que están",
+            "Hallazgos: qué número está mal, por qué, y la consulta que lo demuestra",
+            "Consultas verificadas que responden cada pregunta",
+            "Salvedades: qué no se puede afirmar con estos datos",
+            "Recomendaciones y próximos pasos",
+        ],
+    },
     "curso-meta-ads": {
         "doc_type": "Plan de campaña en Meta Ads",
         "sections": [

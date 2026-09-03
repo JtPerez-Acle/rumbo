@@ -637,7 +637,13 @@
      was the wrong fix: the browser's default video chrome is a control surface
      nobody designed, and the frame deserves better than being a fallback. */
   .doors{display:flex;flex-direction:column;gap:var(--s2)}
-  .videoplate{position:relative;border-radius:var(--r-lg);overflow:hidden;background:var(--ink);
+  /* display:block and width:100% because this is a <button> now, and a button
+     shrink-wraps where the <div> it replaced stretched. Without them the plate
+     sizes itself from the poster image — so if that image 404s (the onerror
+     handler removes it) the whole plate collapses to 22x39 and the play button
+     spills out of it. The frame should not depend on a network request. */
+  .videoplate{position:relative;display:block;width:100%;border-radius:var(--r-lg);
+    overflow:hidden;background:var(--ink);
     cursor:pointer;aspect-ratio:9/16;border:1px solid var(--line);
     /* Same cap the <video> carries, so swapping one for the other on click does
        not drop the page ~160px on a phone. */

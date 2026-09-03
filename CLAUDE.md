@@ -139,7 +139,8 @@ python studio/cloud/check_job_matcher.py    # matcher, 5 fixtures, ~15 min (real
 python studio/cloud/check_tutor.py          # tutor, 6 properties, ~5 min (real LLM)
 python studio/cloud/check_cv_matcher.py     # CV matcher; reads REAL CVs from ./cvs (git-ignored)
 python studio/cloud/check_public_surface.py [base_url]   # HTTP: public routes + every admin gate
-cd studio/web && npm test     # builds, then runs 128 assertions — before ANY frontend edit
+cd studio/web && npm test     # builds, then runs 130 assertions — before ANY frontend edit
+cd studio/web && npm run verify  # the above PLUS the Playwright layout suite — before a DEPLOY
 cd studio/web && npm run build   # Astro static build; Docker stage 1 runs this
 
 # The public pages are built from exported data, so after adding a course:
@@ -232,6 +233,11 @@ DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
   `script-src` carries no third-party origin. `'unsafe-inline'` is still there
   for two reasons and only two: the admin panel is still a single inline-script
   file, and Astro emits a small inline bootstrap per island.
+- **jsdom has no layout engine, so vitest cannot see a broken page.** /oferta,
+  /lista and /login once shipped rendering as a 32px strip with every content
+  assertion green. `npm run verify` adds a Playwright suite that loads the real
+  pages in Chromium at 320/375/768/1280 and measures — it catches BROKEN, never
+  UGLY. Run it before a deploy, not on every edit.
 - **An island's props are serialized into the HTML.** Handing a Svelte island a
   whole payload ships every field of it twice, once rendered and once inside an
   `<astro-island props="…">` attribute. Pass only the fields the component

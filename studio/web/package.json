@@ -8,10 +8,13 @@
     "test:watch": "vitest",
     "build": "astro build",
     "dev": "astro dev",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test:layout": "astro build && playwright test",
+    "verify": "astro build && vitest run && playwright test"
   },
   "devDependencies": {
     "@astrojs/svelte": "^9.0.1",
+    "@playwright/test": "^1.62.1",
     "@sveltejs/vite-plugin-svelte": "^7.3.0",
     "@testing-library/svelte": "^5.4.2",
     "astro": "^7.2.10",

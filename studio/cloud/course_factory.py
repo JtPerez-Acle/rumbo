@@ -90,7 +90,17 @@ def generate_syllabus() -> list[dict]:
             "\"lessons\": [{\"slug\": \"kebab-case-corto\", \"title\": str, "
             "\"objectives\": \"lo que el alumno PODRÁ HACER al terminar (verbos de "
             "acción, medible)\", \"angle\": \"el enfoque único de la lección en 1 "
-            "frase\"}] (6 por módulo)}]}\n"
+            "frase\"}]}]}\n"
+            "30 lecciones en total, repartidas en 5 módulos.\n"
+            # This said "(6 por módulo)" flatly, and a research document that had
+            # deliberately sized its modules 6/7/6/7/4 would have been silently
+            # flattened: the heaviest module losing a lesson and the thinnest
+            # gaining two invented ones. Nothing enforces six anywhere — verify
+            # counts totals and expects five capstones — so a number asserted in
+            # a prompt string was quietly outranking a considered arc.
+            "Si el material de investigación define cuántas lecciones lleva cada "
+            "módulo, RESPETA ese reparto: es deliberado y desparejo por una razón. "
+            "Si no lo define, usa 6 por módulo.\n"
             "Progresión estricta: cada lección asume solo lo cubierto antes.\n"
             # Platform contract (docs/02): every course opens by having the
             # learner choose the real project every later exercise builds on.

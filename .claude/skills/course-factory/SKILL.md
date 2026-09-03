@@ -95,8 +95,12 @@ generating rather than discovering it in production.
 ### 4 · Generate
 
 ```bash
-python studio/cloud/course_factory.py <slug> preflight   # gate; exits non-zero
-python studio/cloud/course_factory.py <slug> all         # runs preflight, then everything
+# NOT bare `python`: the system interpreter lacks the deps (loguru) and the
+# factory needs DATABASE_URL / OPENROUTER_API_KEY / PEXELS_API_KEY. The
+# wrapper reads them from Railway and uses the repo's venv.
+$F = "powershell -NoProfile -ExecutionPolicy Bypass -File studio/cloud/run_factory.ps1"
+$F <slug> preflight   # gate; exits non-zero
+$F <slug> all         # runs preflight, then everything
 ```
 
 `all` runs preflight → syllabus → compile → render → reconcile → backfills →

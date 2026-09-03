@@ -19,6 +19,15 @@ flowchart LR
     REC --> UP["upload_videos.py\n→ cloud volume"]
 ```
 
+> **Run these through `studio/cloud/run_factory.ps1`, not bare `python`.**
+> The system interpreter is not the one carrying the dependencies — you get
+> `ModuleNotFoundError: No module named 'loguru'` — and the factory needs
+> `DATABASE_URL`, `OPENROUTER_API_KEY` and `PEXELS_API_KEY`, which the wrapper
+> reads from Railway. The commands below are written bare for readability;
+> prefix each with:
+>
+> `powershell -NoProfile -ExecutionPolicy Bypass -File studio/cloud/run_factory.ps1`
+
 ```bash
 python studio/cloud/course_factory.py <slug> preflight   # VALIDATE FIRST — exits non-zero
 python studio/cloud/course_factory.py <slug> verify      # count rows — exits non-zero

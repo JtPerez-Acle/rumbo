@@ -126,12 +126,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File studio/dashboard/run_local.p
 # `railway deployment list` before retrying, then verify by fetching the live URL.
 railway up --detach
 
-# Add a course (judgment lives in .claude/skills/course-factory/):
-python studio/cloud/course_factory.py <slug> preflight   # validate BEFORE burning hours
-python studio/cloud/course_factory.py <slug> all         # gated by preflight, ends in verify
-python studio/cloud/course_factory.py <slug> verify      # counts rows; non-zero if incomplete
-python studio/cloud/course_factory.py <slug> backfill-written    # written guide + diagrams
-python studio/cloud/course_factory.py <slug> check-narration     # page-only devices in scripts
+# Add a course (judgment lives in .claude/skills/course-factory/).
+# USE THE WRAPPER: bare `python` is not the interpreter with the dependencies,
+# and the factory needs DATABASE_URL, OPENROUTER_API_KEY and PEXELS_API_KEY,
+# which it reads from Railway. `python course_factory.py …` fails on `loguru`.
+$F = "powershell -NoProfile -ExecutionPolicy Bypass -File studio/cloud/run_factory.ps1"
+$F <slug> preflight   # validate BEFORE burning hours
+$F <slug> all         # gated by preflight, ends in verify; 2-3 h, run detached
+$F <slug> verify      # counts rows; non-zero if incomplete
+$F <slug> backfill-written    # written guide + diagrams
+$F <slug> check-narration     # page-only devices in scripts
 DASHBOARD_TOKEN=… PUBLIC_BASE_URL=… python studio/cloud/upload_videos.py <slug>
 
 # Checks — run the relevant one BEFORE deploying a change to that area:

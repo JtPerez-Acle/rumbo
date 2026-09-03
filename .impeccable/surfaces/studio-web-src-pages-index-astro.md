@@ -1,11 +1,21 @@
 ---
 version: 1
-slug: "studio-dashboard-static-learn-html"
-primary_target: "studio/dashboard/static/learn.html"
-related_targets: []
+slug: "studio-web-src-pages-index-astro"
+primary_target: "studio/web/src/pages/index.astro"
+related_targets:
+  - "studio/web/src/layouts/Public.astro"
+  - "studio/web/src/components/DemoAsk.svelte"
+  - "studio/web/src/components/VideoPlate.svelte"
+  - "studio/web/src/components/TutorPanel.astro"
+  - "studio/web/src/styles/app.css"
 ---
 
-# Surface brief — public landing (`#/` in learn.html)
+# Surface brief — the public landing (`/`)
+
+<!-- Repointed 2026-09-02: this described `#/` inside learn.html, a 3,192-line
+     single file that no longer exists. The landing is a built Astro page now and
+     the brief below still describes it accurately — the surface did not change,
+     only the file that implements it. -->
 
 **Scope:** the unauthenticated landing, including the free lesson, the catalog
 clusters and the two doors. Not the app behind login.

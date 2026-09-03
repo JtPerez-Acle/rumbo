@@ -897,8 +897,8 @@ def public_cursos(learner_session: str | None = Cookie(default=None)):
 @app.get("/curso/{slug}")
 def public_curso(slug: str, learner_session: str | None = Cookie(default=None)):
     """A course temario at its own address. docs/02 calls the browsable temarios
-    marketing content: 14 courses and 420 lesson objectives, all real, and until
-    recently invisible to search because they lived behind a fragment."""
+    marketing content: every course and every lesson objective, all real, and
+    until recently invisible to search because they lived behind a fragment."""
     from fastapi.responses import RedirectResponse
     if learner_session and _signed_in(learner_session):
         return RedirectResponse(f"/aprende#/explora/{slug}", status_code=302)

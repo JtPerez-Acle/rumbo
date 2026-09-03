@@ -20,11 +20,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { JSDOM } from 'jsdom';
 import { REPO } from './harness.js';
+import { JOB_STAGES } from '../src/lib/route.js';
 
 const DIST = path.join(REPO, 'studio/web/dist');
 const demo = JSON.parse(
   fs.readFileSync(path.join(REPO, 'studio/web/src/data/demo.json'), 'utf8'),
 );
+const read = (name) =>
+  JSON.parse(fs.readFileSync(path.join(REPO, 'studio/web/src/data', name), 'utf8'));
+const catalog = read('catalog.json');
+const totals = read('totals.json');
 
 /** Markup with <script>, <style> and island props removed.
  *
@@ -156,16 +161,14 @@ describe('the built public site', () => {
   });
 
   it('builds one page per course in the export', () => {
-    const catalog = JSON.parse(
-      fs.readFileSync(path.join(REPO, 'studio/web/src/data/catalog.json'), 'utf8'),
-    );
     const built = fs.readdirSync(path.join(DIST, 'curso'));
     expect(built.sort()).toEqual(catalog.courses.map((c) => c.slug).sort());
   });
 
   it('ships the catalog as links, with no JavaScript at all', () => {
     const cursos = page('cursos');
-    expect((cursos.match(/href="\/curso\//g) || []).length).toBeGreaterThanOrEqual(14);
+    // Derived, not typed: this line said 14 while the catalog held 15.
+    expect((cursos.match(/href="\/curso\//g) || []).length).toBe(catalog.courses.length);
     const raw = fs.readFileSync(path.join(DIST, 'cursos/index.html'), 'utf8');
     expect(raw).not.toMatch(/<script/);
   });
@@ -250,5 +253,66 @@ describe('the wide grid places every section', () => {
     expect(topLevelIslands(wrap('<svg><path d="M0 0"></path></svg><astro-island></astro-island>'))).toBe(1);
     // And a page that is not on the grid is not this rule's business.
     expect(topLevelIslands('<body><main class="app"><astro-island></astro-island></main></body>')).toBe(0);
+  });
+});
+
+
+/* Every number the public site says about its own size.
+ *
+ * These were typed by hand and went stale the way typed numbers do: the landing
+ * said "70 módulos en 14 cursos" and the analyser's two-minute progress copy
+ * said "las 210 lecciones · 35 módulos" — a seven-course catalog's figures still
+ * on screen at fifteen courses and 450 lessons. Both now read `totals.json`,
+ * which `export_web.py` writes from the database, so the only way to be wrong
+ * is to have a stale export — and `export_web.py --check` already fails on that.
+ *
+ * This block exists so nobody types one back in. */
+describe('the catalog counts itself', () => {
+  const page = (route) => {
+    const file = path.join(DIST, route, 'index.html');
+    return fs.existsSync(file) ? noScripts(fs.readFileSync(file, 'utf8')) : '';
+  };
+
+  it('agrees with the catalog it was derived from', () => {
+    expect(totals.courses).toBe(catalog.courses.length);
+    expect(totals.modules).toBe(
+      catalog.courses.reduce((n, c) => n + c.modules, 0));
+    expect(totals.lessons).toBe(
+      catalog.courses.reduce((n, c) => n + c.total, 0));
+  });
+
+  it('is a catalog worth counting', () => {
+    // Guards the guard: every assertion here passes on an empty export.
+    expect(totals.courses).toBeGreaterThan(1);
+    expect(totals.lessons).toBeGreaterThan(totals.modules);
+    expect(totals.modules).toBeGreaterThan(totals.courses);
+  });
+
+  it('says the same size on the landing as in the data', () => {
+    const home = page('');
+    expect(home).toContain(`${totals.modules} módulos`);
+    expect(home).toContain(`en ${totals.courses} cursos`);
+  });
+
+  it('tells the analyser the same size while it waits', () => {
+    const stage = JOB_STAGES.find(([at]) => at === 34);
+    expect(stage[1]).toBe(`Cruzando con las ${totals.lessons} lecciones`);
+    expect(stage[2]).toContain(`Los ${totals.modules} módulos`);
+  });
+
+  it('leaves no seven-course-era number anywhere on the public site', () => {
+    // The actual figures that were live: 14 courses, 70/35 modules, 210/420
+    // lessons. A page may legitimately contain "420" one day; it may not
+    // contain it as a count of our lessons or modules.
+    const stale = new RegExp('\\b(?:14|15) cursos\\b|\\b(?:70|35|75) módulos\\b|\\b(?:210|420|450) lecciones\\b', 'g');
+    for (const route of ['', 'cursos', 'oferta', 'lista', 'login']) {
+      for (const hit of page(route).match(stale) || []) {
+        const [n] = hit.split(' ');
+        const ok = Number(n) === totals.courses
+          || Number(n) === totals.modules
+          || Number(n) === totals.lessons;
+        expect(ok, `/${route} says "${hit}" and the catalog does not`).toBe(true);
+      }
+    }
   });
 });

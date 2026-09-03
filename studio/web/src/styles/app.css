@@ -219,8 +219,8 @@
   @keyframes sweep{from{transform:translateX(-100%)}to{transform:translateX(350%)}}
 
   /* ---- job analysis: a two-minute wait, told honestly ----
-     The analysis really does take ~2 min (the model reasons over 35 module
-     contracts). We name the wait up front, show what is actually happening at
+     The analysis really does take ~2 min (the model reasons over every module
+     contract in the catalog). We name the wait up front, show what is happening at
      each stage, and run a real elapsed clock instead of a fake percentage. */
   .jstage{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) 0;
     border-bottom:1px solid var(--line);opacity:.4;transition:opacity var(--dur) var(--ease)}

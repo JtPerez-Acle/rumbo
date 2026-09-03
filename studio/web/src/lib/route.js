@@ -1,12 +1,24 @@
 /* The route matcher's client-side vocabulary. */
 
+/* Written by `export_web.py` from the live catalog. Imported here rather than
+   read off catalog.json because this module ships to the browser and the full
+   catalog would be every course title and description for the sake of two
+   integers. */
+import totals from '../data/totals.json';
+
 /* What the analyser is actually doing, and roughly when.
    The seconds are observed, not invented — a progress display that lies is
-   worse than none, and this product's whole pitch is that it does not. */
+   worse than none, and this product's whole pitch is that it does not.
+
+   Which is exactly why the counts are interpolated and not typed. They read
+   "210 lecciones" and "35 módulos" until 2026-09-03 — a seven-course catalog's
+   numbers, shown to every visitor for two minutes while the thing they were
+   describing crossed 450 lessons. The stage copy was lying in the one component
+   whose comment says not to. */
 export const JOB_STAGES = [
   [0, 'Leyendo la oferta completa', 'Cada requisito, incluso los que vienen escondidos en la descripción.'],
   [12, 'Separando lo que de verdad se estudia', 'Las competencias que puedes aprender, no los años de experiencia ni "ortografía impecable".'],
-  [34, 'Cruzando con las 210 lecciones', 'Los 35 módulos del catálogo, uno por uno, para ver cuál cubre cada competencia.'],
+  [34, `Cruzando con las ${totals.lessons} lecciones`, `Los ${totals.modules} módulos del catálogo, uno por uno, para ver cuál cubre cada competencia.`],
   [72, 'Decidiendo hasta dónde tienes que llegar', 'Casi nunca necesitas el curso completo: depende de lo que pida el puesto.'],
   [104, 'Escribiendo tu ruta y tu documento', 'Qué estudiar, en qué orden, y qué vas a poder llevar a la entrevista.'],
 ];

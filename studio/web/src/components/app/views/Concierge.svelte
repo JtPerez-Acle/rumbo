@@ -2,7 +2,9 @@
   /* "Pide tu curso" — and the requests a learner already made.
    *
    * This is a demand signal as much as a feature: the demand ledger
-   * (GET /api/demand) exists so course #15 is not built on intuition.
+   * (GET /api/demand) exists so the NEXT course is not built on intuition.
+   * (It said "course #15" until #15 shipped on judgment instead — docs/06
+   * records that, and the ledger is still the instrument to check first.)
    */
   import { api, toLogin } from '../../../lib/api.js';
   import { nav } from '../../../lib/router.svelte.js';

@@ -4,9 +4,9 @@
  * It used to exist only as a section below a full lesson on the landing,
  * reachable by scrolling past all of it.
  *
- * Zero JavaScript. Fourteen course links and six disclosure sections, all in
+ * Zero JavaScript. One link per course and one disclosure per category, all in
  * the HTML the server sends — which is also what a crawler gets, where before
- * hydration replaced fourteen crawlable anchors with divs.
+ * hydration replaced every crawlable anchor with a div.
  */
 import Public from '../layouts/Public.astro';
 import Catalog from '../components/Catalog.astro';
@@ -21,10 +21,10 @@ const courses = catalog.courses;
   title={`Todos los cursos — ${SITE_NAME}`}
   description="Los módulos que tu ruta puede tomar, con el temario abierto entero y el documento con el que termina cada uno."
 >
-  {/* NOT "14 cursos, 420 lecciones" in the title or description: an inventory
-      count is the marketplace's own positioning, it is the one number a
-      competitor beats trivially, and the description is what every WhatsApp
-      share of this page previews as. */}
+  {/* NO inventory count in the title or description: it is the marketplace's
+      own positioning, it is the one number a competitor beats trivially, and
+      the description is what every WhatsApp share of this page previews as.
+      The count below the list is fine — it is a footnote, not the pitch. */}
   <div class="demohead hero">
     <div class="eyebrow">La biblioteca</div>
     <h1>Todo lo que puedes estudiar aquí.</h1>

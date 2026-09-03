@@ -23,6 +23,7 @@ import GuideToggle from '../components/GuideToggle.svelte';
 import { SITE_NAME, TUTOR, STEPS, GETS } from '../lib/site.js';
 import { renderMarkdown, assertNoMermaid } from '../lib/markdown.js';
 import lesson from '../data/demo.json';
+import totals from '../data/totals.json';
 
 const guideSource = lesson.written || lesson.transcript || '';
 assertNoMermaid(guideSource, 'the landing demo lesson');
@@ -183,8 +184,8 @@ const ask = {
       course names were fourteen of the page's seventeen h3s — so the document
       outline of this homepage literally was a course catalog. */}
   <p class="muted t-sm center" style="margin:var(--s6) 0 var(--s2)">
-    Detrás de esto hay <b>70 módulos</b> en 14 cursos. Tu ruta los ordena según
-    lo que tu puesto pide, no según el índice de un curso.
+    Detrás de esto hay <b>{totals.modules} módulos</b> en {totals.courses} cursos.
+    Tu ruta los ordena según lo que tu puesto pide, no según el índice de un curso.
     <a class="doorlink" href="/cursos">Ver qué enseñamos</a>
   </p>
 </Public>

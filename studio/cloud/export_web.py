@@ -59,6 +59,29 @@ def collect() -> dict[str, object]:
     # The free lesson on the landing. It is a real lesson from a real course,
     # chosen by the same query the SPA's /public/demo uses.
     files["demo.json"] = learn_routes.demo_payload()
+
+    # Three numbers, in their own file on purpose.
+    #
+    # The landing said "70 módulos en 14 cursos" and the analyser's progress
+    # copy said "las 210 lecciones" — hardcoded, and by 2026-09-03 wrong by a
+    # course and by half the catalog respectively. The analyser one is the worse
+    # sin: that component's own comment says a progress display that lies is
+    # worse than none.
+    #
+    # Separate from catalog.json because `route.js` runs in the browser. Reading
+    # the totals off the full catalog there would ship every course title and
+    # description into the job-analyser bundle to render two integers.
+    #
+    # Counted over exactly the courses the catalog page lists, so every public
+    # number agrees with every other one — that agreement is the whole point,
+    # and it is worth more than a subtler definition that makes /cursos and the
+    # landing disagree the first time a course renders no video.
+    courses_out = catalog.get("courses", [])
+    files["totals.json"] = {
+        "courses": len(courses_out),
+        "modules": sum(c["modules"] for c in courses_out),
+        "lessons": sum(c["total"] for c in courses_out),
+    }
     return files
 
 

@@ -30,7 +30,7 @@ export function renderMarkdownUntrusted(md) {
  * It used to be an eager import in <head> from a floating `mermaid@11` tag:
  * ~215 KB over 19 chunk requests, on every page load, resolving to whatever the
  * CDN served that day. The public landing paid that on every visit for a lesson
- * containing no diagram at all — on a product that re-encodes 420 videos to
+ * containing no diagram at all — on a product that re-encodes every lesson video to
  * ~5 MB each so a learner on LatAm mobile data does not pay the difference.
  *
  * Now nothing loads until a lesson actually renders a diagram, and when it does

@@ -1,0 +1,194 @@
+{
+  "description": "Lee cualquier consulta, descubre por qué un número no cuadra y entrega la auditoría que lo prueba",
+  "doc_type": "Auditoría de datos",
+  "modules": [
+    {
+      "lessons": [
+        {
+          "objectives": "Cargar tus propios datos reales y desordenados en la herramienta, verificar que estén accesibles y comprobar si las columnas clave llegaron como texto o número.",
+          "position": 1,
+          "title": "Elige el proyecto y carga datos reales"
+        },
+        {
+          "objectives": "Identificar la tabla principal de tu proyecto, distinguir fila de observación y columna de atributo, y pedir las primeras filas con SELECT.",
+          "position": 2,
+          "title": "Qué es una tabla, fila y columna"
+        },
+        {
+          "objectives": "Definir con precisión qué representa una fila de tu tabla principal y calcular el número total de observaciones para anclar esa definición.",
+          "position": 3,
+          "title": "El grano: qué representa una fila"
+        },
+        {
+          "objectives": "Acotar exactamente quiénes y cuándo entran en tu auditoría, extrayendo la fecha mínima y máxima de tus datos.",
+          "position": 4,
+          "title": "Población y ventana temporal"
+        },
+        {
+          "objectives": "Inspeccionar de dónde salió cada dato y detectar si los montos o fechas entraron como texto en lugar de número, usando typeof().",
+          "position": 5,
+          "title": "La fuente y su estado real"
+        },
+        {
+          "objectives": "Formular tres preguntas de negocio propias con su grano, población, ventana temporal y fuente explícitos.",
+          "position": 6,
+          "title": "Escribir las preguntas del negocio"
+        }
+      ],
+      "module_description": "Conviertes una pregunta vaga en una pregunta respondible con grano, población, ventana temporal y fuente, y cargas tus datos reales en la herramienta.",
+      "module_no": 1,
+      "module_title": "Qué pregunta pueden responder los datos"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Explicar por qué SQL opera sobre conjuntos completos en lugar de fila por fila, y predecir el resultado de una agrupación simple.",
+          "position": 7,
+          "title": "Conjuntos, no bucles"
+        },
+        {
+          "objectives": "Describir los pasos reales que sigue el motor al resolver una consulta con WHERE y GROUP BY, y señalar quién entra y quién queda fuera.",
+          "position": 8,
+          "title": "Orden escrito vs orden de ejecución"
+        },
+        {
+          "objectives": "Interpretar una cláusula WHERE como un filtro que decide qué filas entran antes de cualquier agrupación, y justificar por qué ciertas filas quedan fuera.",
+          "position": 9,
+          "title": "Leer un WHERE"
+        },
+        {
+          "objectives": "Reconocer cuándo una consulta cambia el grano por culpa de GROUP BY y enunciar el nuevo significado de cada fila del resultado.",
+          "position": 10,
+          "title": "Leer un GROUP BY"
+        },
+        {
+          "objectives": "Anticipar cuántas filas produce un JOIN entre dos tablas usando una clave, y distinguir INNER de LEFT JOIN.",
+          "position": 11,
+          "title": "Leer un JOIN"
+        },
+        {
+          "objectives": "Detectar la presencia de NULL en un conjunto de datos y explicar por qué un desconocido no es lo mismo que un cero ni un texto vacío.",
+          "position": 12,
+          "title": "Leer NULL en resultados"
+        },
+        {
+          "objectives": "Predecir el resultado exacto de una consulta ajena —columnas, grano y orden— antes de ejecutarla.",
+          "position": 13,
+          "title": "Decir qué devuelve una consulta"
+        }
+      ],
+      "module_description": "Lees cualquier consulta y dices qué devuelve y sobre qué grano, sin escribirla tú; entiendes por qué SQL piensa en conjuntos y por qué el orden de ejecución no es el que ves.",
+      "module_no": 2,
+      "module_title": "Leer antes de escribir"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Escribir una consulta que selecciona columnas concretas y filtra por una condición numérica sobre tus propios datos.",
+          "position": 14,
+          "title": "Tu primer SELECT con filtro"
+        },
+        {
+          "objectives": "Agrupar tus datos por una categoría relevante y calcular sumas o conteos que respondan «por cada…».",
+          "position": 15,
+          "title": "Tu primer GROUP BY"
+        },
+        {
+          "objectives": "Filtrar resultados agregados usando HAVING, diferenciando cuándo una condición va en WHERE y cuándo en HAVING.",
+          "position": 16,
+          "title": "Filtrar grupos con HAVING"
+        },
+        {
+          "objectives": "Unir dos tablas mediante una clave común para traer el nombre o el detalle que falta en la tabla principal, cuidando el grano.",
+          "position": 17,
+          "title": "Tu primer JOIN"
+        },
+        {
+          "objectives": "Manipular fechas almacenadas como texto usando strftime para extraer año-mes y agrupar por período.",
+          "position": 18,
+          "title": "Fechas como texto"
+        },
+        {
+          "objectives": "Detectar columnas numéricas que entraron como texto y forzar su conversión con CAST para que sumas y promedios funcionen correctamente.",
+          "position": 19,
+          "title": "Convertir texto a número"
+        }
+      ],
+      "module_description": "Escribes desde cero las consultas que responden tus propias preguntas de negocio: filtras, agrupas, unes dos tablas, conviertes texto a número y manejas fechas como texto.",
+      "module_no": 3,
+      "module_title": "Escribe las tuyas"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Encontrar una columna donde contar filas y contar valores difiera, y explicar cómo los NULL afectan promedios y sumas condicionales.",
+          "position": 20,
+          "title": "NULL no es cero"
+        },
+        {
+          "objectives": "Demostrar que un filtro de exclusión (estado <> 'cerrado') deja fuera los NULL sin avisar, y corregir la consulta.",
+          "position": 21,
+          "title": "Filtros que botan los NULL"
+        },
+        {
+          "objectives": "Revelar cómo un JOIN infla un total al multiplicar filas, midiendo el conteo antes y después de la unión.",
+          "position": 22,
+          "title": "El JOIN que multiplica"
+        },
+        {
+          "objectives": "Evitar el fan-out del JOIN resumiendo primero los datos en una subconsulta y uniendo después.",
+          "position": 23,
+          "title": "Agregar antes de unir"
+        },
+        {
+          "objectives": "Detectar filas duplicadas en tus datos y estimar cuánto distorsionan un conteo o una suma.",
+          "position": 24,
+          "title": "Duplicados escondidos"
+        },
+        {
+          "objectives": "Corregir un porcentaje calculado con división entera y calcular correctamente el promedio de un período a partir del detalle.",
+          "position": 25,
+          "title": "División entera y promedios de promedios"
+        },
+        {
+          "objectives": "Revisar el formato de las fechas en tus datos y detectar si una venta nocturna pudo saltar de día por diferencias de huso horario.",
+          "position": 26,
+          "title": "Fechas y zonas horarias"
+        }
+      ],
+      "module_description": "Detectas y explicas las fallas silenciosas que corren sin error pero mienten: NULL que contamina cálculos, JOIN que infla totales, duplicados, división entera y promedios de promedios.",
+      "module_no": 4,
+      "module_title": "Cuando el número está mal (el corazón del curso)"
+    },
+    {
+      "lessons": [
+        {
+          "objectives": "Pedir a una IA una consulta para tu segunda pregunta de negocio y verificar que el resultado coincide con un total que ya conoces por otra vía.",
+          "position": 27,
+          "title": "Contrastar contra un total conocido"
+        },
+        {
+          "objectives": "Elegir un cliente o producto que conoces de memoria y probar la consulta de la IA sobre ese caso extremo para exponer errores ocultos.",
+          "position": 28,
+          "title": "Probar con un caso extremo"
+        },
+        {
+          "objectives": "Formular la misma pregunta de negocio de dos maneras distintas (por ejemplo COUNT DISTINCT vs subconsulta) y conciliar los resultados.",
+          "position": 29,
+          "title": "Comparar dos formulaciones"
+        },
+        {
+          "objectives": "Escribir tres salvedades reales de tu auditoría, redactar el resumen ejecutivo y las recomendaciones, y entregar el documento completo.",
+          "position": 30,
+          "title": "Salvedades y cierre de la auditoría"
+        }
+      ],
+      "module_description": "Verificas una consulta escrita por IA contra un total conocido, la rompes con un caso extremo, comparas dos formulaciones de la misma pregunta y cierras tu auditoría con salvedades honestas.",
+      "module_no": 5,
+      "module_title": "Verifica lo que te dio la máquina"
+    }
+  ],
+  "slug": "curso-sql",
+  "title": "SQL para auditar datos",
+  "total": 30
+}

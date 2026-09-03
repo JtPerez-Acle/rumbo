@@ -139,6 +139,16 @@
       "slug": "curso-analitica-marketing",
       "title": "Analítica y métricas de marketing",
       "total": 30
+    },
+    {
+      "available": true,
+      "category": "Analítica y automatización",
+      "description": "Lee cualquier consulta, descubre por qué un número no cuadra y entrega la auditoría que lo prueba",
+      "doc_type": "Auditoría de datos",
+      "modules": 5,
+      "slug": "curso-sql",
+      "title": "SQL para auditar datos",
+      "total": 30
     }
   ]
 }

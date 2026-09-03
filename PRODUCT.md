@@ -64,9 +64,11 @@ says "esto no lo cubrimos" is the one people trust about what it does cover.
 - **Phone-first, on mobile data.** Videos are re-encoded to ~5 MB per lesson
   specifically so a LatAm learner is not paying for the difference.
 - **Invite-gated alpha.** Every account is created with a code the operator mints.
-  Email delivery currently reaches exactly one inbox, so a returning learner
-  cannot always let themselves back in and lands in an operator queue.
-- **The library is 14 courses / 420 lessons / 70 modules**, each module carrying a
+  Email has worked since 2026-08-31 (`ponrumbo.com`, Resend, sa-east-1), so a
+  returning learner can let themselves back in without the operator. When it is
+  misconfigured they get a 409 and land in an operator queue instead — that queue
+  sitting at zero is the email health check.
+- **The library is 15 courses / 450 lessons / 75 modules**, each module carrying a
   declared outcome contract and declared prerequisites. Routes select module
   *sets*, prereq-closed server-side — the module, not the course, is the unit.
 - **The daily shape** is one lesson: video → guide → explain-back → quiz →
@@ -151,17 +153,18 @@ says "esto no lo cubrimos" is the one people trust about what it does cover.
 
 Real, and usable:
 
-- **14 courses, 420 lessons, 420 rendered videos**, every lesson with a written
+- **15 courses, 450 lessons, 450 rendered videos**, every lesson with a written
   guide — genuine generated content, not placeholder.
-- **70 module outcome contracts** with declared prerequisites.
+- **75 module outcome contracts** with declared prerequisites.
 - Real job-posting fixtures in `studio/fixtures/job-postings/`, including one real
   posting that became the original course roadmap.
 - A launch video and its composition in `brag-output/`.
 - Real CVs used to calibrate the CV matcher live only on the operator's machine
   and are never committed.
 
-Absences that future work must not paper over — verified against the live
-database on 2026-08-26:
+Absences that future work must not paper over — re-verified against the live
+database on 2026-09-03, a course and a frontend rewrite later, and every one
+of them still holds:
 
 - **5 learner accounts, 16 submissions, 3 lesson completions — every one of them a
   lesson 1.** Nobody has ever reached a lesson 2. Most of those accounts belong to

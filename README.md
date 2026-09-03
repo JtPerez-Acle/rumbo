@@ -4,7 +4,7 @@
 hands you the work document that proves it.**
 
 A Spanish-language learning platform for Latin America. Paste a real job posting —
-or just name the role — and the system matches it against a library of 70 module
+or just name the role — and the system matches it against a library of 75 module
 contracts, returns a prerequisite-closed study route, and states plainly which of
 the job's demands it *cannot* teach you. You then do real work against your own
 business or brand; an AI tutor evaluates it on three dimensions and asks one
@@ -36,12 +36,12 @@ papered over, because deciding what to build next depends on it.
 
 | | |
 |---|---|
-| Courses live | 14 (420 lessons, 420 rendered videos) |
-| Route library | 70 module contracts with declared prerequisites |
-| Real learners | 5 · 16 submissions · 1 lesson-2 completion |
+| Courses live | 15 (450 lessons, 450 rendered videos) |
+| Route library | 75 module contracts with declared prerequisites |
+| Real learners | 5 · 16 submissions · **0 lesson-2 completions** (3 lessons finished, every one of them a lesson 1) |
 | Marginal cost per course | ≈ $0.35 of LLM + ~2 h unattended render |
 | Marginal cost per learner | ≈ $0 |
-| Stack | Python · FastAPI · Postgres · vanilla-JS single-file frontends · Railway |
+| Stack | Python · FastAPI · Postgres · Astro + Svelte islands, built at deploy and served by FastAPI · Railway |
 
 ---
 

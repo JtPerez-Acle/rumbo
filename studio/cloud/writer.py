@@ -1508,9 +1508,10 @@ def _job_catalog_block(catalog: list[dict]) -> str:
     """Render the module contracts the matcher chooses from.
 
     Modules, not lessons: `_accessible_ids` gates sequentially inside a course,
-    so a route can only ever be a per-course PREFIX. Offering 35 module choices
-    instead of 210 lesson choices makes the match both cheaper and much harder
-    to hallucinate.
+    so a route can only ever be a per-course PREFIX. Offering one choice per
+    module instead of one per lesson makes the match both cheaper and much
+    harder to hallucinate — the catalog has six times as many lessons as
+    modules, and that ratio is the whole saving.
     """
     out = []
     for course in catalog:

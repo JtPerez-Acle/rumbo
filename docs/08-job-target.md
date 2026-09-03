@@ -52,7 +52,7 @@ exactly what it does today; it just leaves the critical path of a user request.
 ```mermaid
 flowchart LR
     P["Job posting (pasted)"] --> A["analyze_job_posting()\n1 LLM call, ~20s"]
-    M[("35 module contracts\nsyllabus_nodes.module_description")] --> A
+    M[("75 module contracts\nsyllabus_nodes.module_description")] --> A
     A --> R["Ruta: course → module depth"]
     A --> G["Gaps: what we do NOT cover"]
     A --> D["Document target + pitch"]

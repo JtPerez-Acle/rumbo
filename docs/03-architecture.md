@@ -11,9 +11,9 @@ flowchart TB
         APP["FastAPI (dashboard/app.py)\nadmin dashboard + learner app + all APIs"]
         SCHED["APScheduler (in-process, OFF)\n06:00 produce · 12/19/21h publish"]
     end
-    PG[("Postgres — 20 tables\ncourses · syllabus_nodes · module_capstones\nlearners · progress · submissions\nproject_docs · goal_docs · case_studies
+    PG[("Postgres — 21 tables\ncourses · syllabus_nodes · module_capstones\nlearners · progress · submissions\nproject_docs · goal_docs · case_studies
 cv_profiles · module_exemptions\njob_targets · requests · waitlist")]
-    VOL[/"Volume /app/studio/output\n420 course mp4s + channel videos"/]
+    VOL[/"Volume /app/studio/output\n450 course mp4s + channel videos"/]
     OR["OpenRouter → DeepSeek V4 Pro\ngeneration AND evaluation"]
     APP --- PG
     APP --- VOL
@@ -66,7 +66,7 @@ docs/                       ← you are here
 
 ## Data model
 
-20 tables. Schema and additive migrations both run on every boot via
+21 tables. Schema and additive migrations both run on every boot via
 `db.init_db()` — there is no migration framework, and changes must be
 additive (`CREATE TABLE IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS`).
 

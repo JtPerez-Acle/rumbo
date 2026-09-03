@@ -7,7 +7,7 @@ front of an employer.
 
 One AI content engine powers two products:
 
-1. **Rumbo** (live) — the learning platform. **14 courses, 420 lessons.**
+1. **Rumbo** (live) — the learning platform. **15 courses, 450 lessons.**
    A learner names the job they want and gets a route through the module library;
    each lesson is a short vertical video + written guide + a comprehension check +
    a hands-on exercise evaluated by an AI tutor. Every course ends in a
@@ -30,7 +30,7 @@ One AI content engine powers two products:
 | Marginal cost per course | ≈ $0.35 of LLM + ~2 h of local render compute |
 | Marginal cost per learner | ≈ $0 (videos are canonical; personalization lives in each learner's path) |
 | Cost per AI evaluation | fractions of a cent (DeepSeek V4 Pro via OpenRouter) |
-| Stack | Python/FastAPI · Postgres (20 tables) · vanilla-JS single-file frontends · MoneyPrinterTurbo render engine · Railway |
+| Stack | Python/FastAPI · Postgres (21 tables) · Astro + Svelte islands built at deploy and served by FastAPI (no Node in production) · MoneyPrinterTurbo render engine · Railway |
 | Access | Invite-gated alpha; public landing + waitlist for strangers |
 | **Real usage** | **5 learners · 16 submissions · 3 completions, all of them a lesson 1** — see doc 06 |
 

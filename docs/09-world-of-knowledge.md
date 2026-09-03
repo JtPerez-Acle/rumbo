@@ -29,7 +29,7 @@ flowchart LR
 |---|---|
 | **Goal intake** | **Shipped.** Job posting *or* bare role/skill (`analyze_job_posting`, `mode="goal"`). |
 | **Route** | **Shipped.** Prereq-closed module SETS, spec v2. |
-| **Library** | **14 courses / 420 lessons**, every module carrying declared prerequisites. |
+| **Library** | **15 courses / 450 lessons**, every module carrying declared prerequisites. |
 | **Verify** | Shipped and mature — the best part of the system. |
 | **Proof** | **Shipped per goal**, compiled across the whole route. |
 
@@ -72,7 +72,7 @@ contracts, each with an outcome, prerequisites and connections to other domains.
    declares its real prerequisites, and names what it connects to. *Started:*
    the research prompts from 2026-08-11 onward require a modularity section.
 2. ~~**Prerequisites and connections become data.**~~ **Shipped 2026-08-12.**
-   `module_prereqs` on every module of all 14 courses, extracted conservatively
+   `module_prereqs` on every module of all 15 courses, extracted conservatively
    (`course_factory <slug> backfill-prereqs`): over-declaring degrades to prefix
    behavior, under-declaring strands learners. The structures are genuinely
    non-prefix — meta-ads M3 needs only [1]; voleibol M4 (dirección de equipos)

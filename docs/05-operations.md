@@ -21,7 +21,7 @@ railway variables --service Postgres --kv   # DATABASE_PUBLIC_URL = cloud DB fro
 | `ENABLE_SCHEDULER` | social channel crons | **0 (off)** until Upload-Post connected |
 | `EVAL_RATE_MAX` / `EVAL_RATE_WINDOW` | evaluation rate limit | default **60/hr** per learner |
 | `MIN_CASE_STUDY_SUBMISSIONS` | portfolio unlock threshold | default 3 |
-| `RESEND_API_KEY` / `EMAIL_FROM` | email magic links | **unset** — returning learners get a 409 and queue in *Esperando acceso* until set. See the runbook above. |
+| `RESEND_API_KEY` / `EMAIL_FROM` | email magic links | **set since 2026-08-31** (`Rumbo <hola@ponrumbo.com>`, Resend verified, sa-east-1). If either is ever unset, returning learners get a 409 and queue in *Esperando acceso* — that panel is the email health check. |
 | `MAX_OPEN_REQUESTS` | concierge requests per learner | default 3 |
 | `MODULE_GATE_DAYS` | module time-gate | **not implemented** — design parked, see doc 06 |
 

@@ -25,7 +25,7 @@ each stated as a rule.
 **One engine, two products**, both in Spanish for LatAm:
 
 1. **Rumbo — the learning platform.** **LIVE and the whole focus.**
-   **14 courses · 420 lessons · 420 videos.** Deep docs: `docs/`.
+   **15 courses · 450 lessons · 450 videos.** Deep docs: `docs/`.
 2. **Social content factory** (`studio/channels/*.toml`, 4 channels) — short-form
    video + auto-publishing. **Built, DORMANT since July** (scheduler off, no
    Upload-Post credentials). Deep doc: `studio/README.md`.
@@ -65,7 +65,7 @@ roughly seventy times faster than it learns.
 | CV intake: proposed module skips, credited only by a passed reto | `docs/10` |
 | The public landing: a real lesson for strangers, and its demo endpoints | `docs/11` |
 | Lesson loop, rubrics, verdicts vs scores, the prediction beat | `docs/02` |
-| Schema (20 tables), API surface, request flows, **security controls** | `docs/03` |
+| Schema (21 tables), API surface, request flows, **security controls** | `docs/03` |
 | Course factory pipeline + the authoring standard | `docs/04`, `.claude/skills/course-factory/` |
 | Runbooks (deploy, ship a course, **turn on email**, invites, backups) | `docs/05` |
 | **Bug patterns and the verification ritual — read before editing** | `docs/07` |
@@ -151,7 +151,9 @@ cd studio/web && npm run build   # Astro static build; Docker stage 1 runs this
 python studio/cloud/export_web.py           # write studio/web/src/data/*.json
 python studio/cloud/export_web.py --check   # exit 1 if that export is stale
 
-# Offsite backup (all 20 tables) — before anything risky:
+# Offsite backup — before anything risky. 19 tables; login_tokens and
+# learner_sessions are excluded on purpose (restoring credentials that
+# expired is not a restore). The script NAMES any table in neither list.
 DATABASE_URL=$DB python studio/cloud/backup_db.py --keep 14
 ```
 

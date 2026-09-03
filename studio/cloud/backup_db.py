@@ -38,9 +38,36 @@ TABLES = [
     # already know, what they proved with a reto, and what strangers wrote on the
     # public lesson.
     "cv_profiles", "module_exemptions", "demo_attempts",
+    # Added 2026-09-03, third time this list has missed a table: it is the
+    # operator worklist of people locked out and waiting. Losing it loses the
+    # names of everyone who asked to be let in and never got an answer, which
+    # is the most expensive row in the database at this scale.
+    "access_requests",
 ]
 
+# DELIBERATELY NOT BACKED UP: login_tokens and learner_sessions. Both are
+# short-lived credentials; restoring them would resurrect sessions and magic
+# links that the passage of time was supposed to have killed. Their absence is
+# a decision, so the count below never looks like another silent omission.
+EXCLUDED = ["login_tokens", "learner_sessions"]
+
 BACKUP_DIR = Path(__file__).resolve().parents[2] / "backups"
+
+
+def unlisted(conn) -> list[str]:
+    """Tables the live database has that this file mentions in neither list.
+
+    The comment above records two silent omissions and a third was found on
+    2026-09-03, every time the same way: a feature shipped a table and nobody
+    thought about the backup. Asking Postgres what exists is the only version of
+    this check that cannot go stale, because it reads the truth rather than a
+    list someone has to remember to edit.
+    """
+    rows = conn.execute(
+        "SELECT table_name FROM information_schema.tables "
+        "WHERE table_schema = 'public' AND table_type = 'BASE TABLE'").fetchall()
+    known = set(TABLES) | set(EXCLUDED)
+    return sorted(r["table_name"] for r in rows if r["table_name"] not in known)
 
 
 def run(keep: int | None = None) -> Path:
@@ -49,6 +76,15 @@ def run(keep: int | None = None) -> Path:
     out = BACKUP_DIR / f"aprende-{stamp}.json.gz"
     export: dict[str, list] = {}
     with db.connect() as conn:
+        missing = unlisted(conn)
+        if missing:
+            # Loud, but NOT fatal. A backup that refuses to run because the
+            # schema grew is a backup you do not have on the day you need it;
+            # take what we can and make the gap impossible to scroll past.
+            print("!" * 68, flush=True)
+            print(f"!! {len(missing)} TABLA(S) SIN RESPALDAR: {', '.join(missing)}", flush=True)
+            print("!! Agregalas a TABLES (o a EXCLUDED, con la razon) en backup_db.py", flush=True)
+            print("!" * 68, flush=True)
         for table in TABLES:
             rows = conn.execute(f"SELECT * FROM {table} ORDER BY 1").fetchall()  # noqa: S608 — fixed table list
             export[table] = rows
@@ -57,6 +93,8 @@ def run(keep: int | None = None) -> Path:
     with gzip.open(out, "wb") as f:
         f.write(payload)
     print(f"backup written: {out} ({out.stat().st_size / 1024:.0f} KB)", flush=True)
+    print(f"  {len(TABLES)} tablas respaldadas - {len(EXCLUDED)} excluidas a proposito "
+          f"({', '.join(EXCLUDED)})", flush=True)
     if keep:
         dumps = sorted(BACKUP_DIR.glob("aprende-*.json.gz"))
         for old in dumps[:-keep]:

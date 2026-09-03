@@ -1,9 +1,10 @@
 # 06 — Status, roadmap and parked designs
 
-*Verified against the live database 2026-08-31. Nothing in the table below moved
-between 2026-08-26 and 2026-08-31, which is itself the finding: five days of
-feature work shipped on 08-26 into a product whose last learner submission was
-2026-08-21 and whose last completion of anything was 2026-08-07.*
+*Verified against the live database 2026-09-03. Nothing in the table below moved
+between 2026-08-26 and 2026-09-03 except the catalog, which grew by a course: the
+last learner submission is still 2026-08-21 and the last completion of anything is
+still 2026-08-07. Eight days, a fifteenth course and a frontend rewrite later, the
+only numbers that changed are the ones we control by building.*
 
 ## Where we actually are
 
@@ -12,19 +13,19 @@ every decision:
 
 | | |
 |---|---|
-| Courses live | **14** (420 lessons, 420 videos, all with written guides) |
-| Route library | 70 module contracts with declared prerequisites |
+| Courses live | **15** (450 lessons, 450 videos, all with written guides) |
+| Route library | 75 module contracts with declared prerequisites |
 | Learners | **5** · 16 submissions · **3 lesson completions, every one of them a lesson 1** |
 | Last completion of any kind | **2026-08-07** |
 | Verdicts produced by a real learner | 1 (and it was the operator's own account) |
 | Conversations answered | **1 of 4 asked**, and that one scored 0 |
 | Transversal projects declared | **0 of 5** |
 | Job analyses run | 3 (15 distinct gaps, **none recurring**) |
-| Modules never selected by any route | **42 of 70** |
+| Modules never selected by any route | **47 of 75** |
 | Concierge requests / waitlist | 0 / 0 |
 | CV intakes / exemptions claimed | **0 / 0** — shipped 08-26, never used |
 | Public-landing demo attempts | **0** — the landing has converted nobody |
-| Unresolved *Esperando acceso* rows | **1, waiting since 2026-08-24** |
+| Unresolved *Esperando acceso* rows | **0** — the one row was the operator's own login test; cleared 2026-09-03 |
 
 **We build roughly seventy times faster than we learn.** The machinery is now
 genuinely complete — goal engine, verified learning, portfolio compilation,
@@ -43,9 +44,14 @@ Module 1 (6 lessons) and produces an artifact she actually uses.
    `aprende-ia.app`, which the runbook told you to *verify*, had never been
    registered, so there was nothing to verify and the runbook could not have
    worked as written. **A returning learner can now log themselves back in.**
-   The one row still in *Esperando acceso* from 2026-08-24 predates the fix and
-   needs a human to tell that person they can simply log in — a successful login
-   does not clear the row.
+   The one row still in *Esperando acceso* from 2026-08-24 turned out to be the
+   operator's own account (learner 5), left behind by a login test run while mail
+   was still broken; it was resolved on 2026-09-03. **Nobody was ever waiting.**
+   And the claim this page used to make here — "a successful login does not clear
+   the row" — was wrong: `learn_routes` calls `resolve_access_request` the moment a
+   magic link is consumed. That row survived because the account never came back
+   to consume one, not because the self-clearing is broken. Check the code before
+   writing a person onto a worklist.
 2. **The 15-use invite code has been shared once, and that one use bounced.**
    *(Corrected 2026-08-31 — this page previously said it had never been shared.)*
    "Cohorte agosto 2026" sits at **1/15**: learner 42 signed up 2026-08-17, hit
@@ -56,10 +62,18 @@ Module 1 (6 lessons) and produces an artifact she actually uses.
 
 ### What the data says NOT to do
 
-**Do not build course #15.** 42 of 70 modules have never been selected for
+**Do not build course #15.** 47 of 75 modules have never been selected for
 anyone's goal, and no gap in the demand ledger recurs. The catalog is ahead of
 demand, not behind it. `GET /api/demand` is the instrument that says so; check it
 before generating anything.
+
+> **2026-09-03 — course #15 was built anyway.** `curso-sql` (30 lessons) shipped
+> at the operator's direction, chosen on judgment rather than from the ledger; no
+> `course_requests` row asked for it and no recurring gap named SQL. The measured
+> effect is in the table above: never-routed modules went from **42 of 70 to 47 of
+> 75**. The rule stays as written and this note stays under it, because a rule that
+> gets deleted the first time it is overridden was never a rule — and the next
+> person planning work needs to know the catalog grew while the evidence did not.
 
 ## Success gates (fixed before the data, so the data can't negotiate)
 

@@ -60,8 +60,9 @@ a brand the interviewer knows has demonstrated judgment, not attendance.
 
 ## Where the thesis actually stands (be honest about this)
 
-As of 2026-08-12: **14 courses, 420 lessons, 420 videos — and 3 lessons completed
-by a human.** Thirteen submissions, one design partner with real activity. The
+As of 2026-09-03: **15 courses, 450 lessons, 450 videos — and 3 lessons completed
+by a human.** Sixteen submissions, one design partner with real activity. Three
+weeks and one more course later, that completion count has not moved. The
 engine is proven; the thesis is not tested yet. Every strategic statement below
 is a hypothesis, and the platform's bottleneck is evidence, not build capacity.
 Read doc 06 before planning work.

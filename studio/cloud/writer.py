@@ -512,7 +512,19 @@ _HASHTAG = re.compile(r"#(\w+)")
 _ARROW = re.compile(r"\s*(?:->|→|=>)\s*")
 _EMPHASIS = re.compile(r"\*(\S[^*]*?\S|\S)\*")   # *enfasis* -> markup
 _LONE_STAR = re.compile(r"(?<![\w*])\*(?![\w*])")  # a bare * MEANS something
-_STRIP_CHARS = re.compile(r"[`|\[\]{}<>]")
+# A comparison operator is VOCABULARY, not punctuation.
+# `<` and `>` used to be in _STRIP_CHARS, so `WHERE monto > 200` narrated as
+# "WHERE monto 200" and `WHERE estado <> 'cerrado'` as "WHERE estado 'cerrado'":
+# the operator deleted, silently, in the one lesson whose entire subject was
+# that operator. Longest first, so `<>` and `>=` match before the bare forms.
+_OPERATORS = [
+    (re.compile(r"<>|!="), " distinto de "),
+    (re.compile(r">="), " mayor o igual que "),
+    (re.compile(r"<="), " menor o igual que "),
+    (re.compile(r"(?<![-=])>(?!=)"), " mayor que "),
+    (re.compile(r"(?<![-=])<(?!=)"), " menor que "),
+]
+_STRIP_CHARS = re.compile(r"[`|\[\]{}]")
 _MULTISPACE = re.compile(r"[ \t]{2,}")
 
 
@@ -545,6 +557,11 @@ def narration_text(script: str) -> str:
     t = _LONE_STAR.sub("asterisco", t)
     t = _HASHTAG.sub(_say_hashtag, t)                           # #ModaSostenible
     t = _ARROW.sub(" a ", t)
+    # Operators BEFORE the strip, and before nothing else: the arrow rule above
+    # owns `->` and `=>`, and the lookbehinds here keep this from eating the
+    # tails of those.
+    for rx, said in _OPERATORS:
+        t = rx.sub(said, t)
     t = _STRIP_CHARS.sub("", t)
     t = _MULTISPACE.sub(" ", t)
     return t.strip()
@@ -565,7 +582,13 @@ def narration_warnings(script: str) -> list[str]:
     for label, rx in (("guiones bajos", re.compile(r"_")),
                       ("markdown/simbolos", re.compile(r"[*`|\[\]{}]")),
                       ("hashtags", re.compile(r"#\w")),
-                      ("flechas", re.compile(r"->|→|=>"))):
+                      ("flechas", re.compile(r"->|→|=>")),
+                      # Its own category because the old one did not exist: `<>`
+                      # and `>` fell through every pattern here, so the check
+                      # reported "narración correcta" on a lesson whose audio had
+                      # lost the operator it was teaching. A blind spot in a
+                      # checker is worse than a missing checker.
+                      ("operadores", re.compile(r"<>|!=|>=|<=|(?<![-=])[<>](?!=)"))):
         hits = rx.findall(raw)
         if hits:
             out.append(f"{label} x{len(hits)}")
